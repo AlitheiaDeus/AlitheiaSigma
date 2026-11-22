@@ -147,8 +147,8 @@ export function serializeStandaloneSVG(moduleKey) {
     ? companionTop + companion.scaledH + padX
     : primaryTop + primary.scaledH + padX;
 
-  const sourceLabel = getState()[moduleKey]?.source?.label || 'MudaSlayer';
-  const titleLabel = `MUDASLAYER — ${(TAB_NAMES[moduleKey] || moduleKey).toUpperCase()}`;
+  const sourceLabel = getState()[moduleKey]?.source?.label || 'AlitheiaSigma';
+  const titleLabel = `ALITHEIASIGMA — ${(TAB_NAMES[moduleKey] || moduleKey).toUpperCase()}`;
   const timeLabel = new Date().toLocaleString();
 
   let kpiSvg = '';
@@ -198,6 +198,6 @@ export function downloadSVG(moduleKey, renderAll) {
     showToast('Switch to an analytical module to export SVG', true);
     return;
   }
-  triggerDownload(`mudaslayer_${moduleKey}_${dateStamp()}.svg`, svgStr, 'image/svg+xml;charset=utf-8');
+  triggerDownload(`alitheiasigma_${moduleKey}_${dateStamp()}.svg`, svgStr, 'image/svg+xml;charset=utf-8');
   showToast(`Exported ${TAB_NAMES[moduleKey] || moduleKey} SVG Snapshot`);
 }

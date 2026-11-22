@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="favicon.svg" alt="MudaSlayer" width="64" height="64" />
-  <h1>MudaSlayer</h1>
+  <img src="favicon.svg" alt="AlitheiaSigma" width="64" height="64" />
+  <h1>AlitheiaSigma</h1>
   <p><strong>Zero-build, local-first Lean &amp; Six Sigma analytical workbench for turning messy shop-floor spreadsheets into SPC, OEE, Pareto, VSM, and Root-Cause visuals.</strong></p>
 
   <p>
@@ -12,18 +12,15 @@
 
 ---
 
-## UI Preview
+## Chart Previews
 
-### Capability & SPC (Empirical Data, Anderson-Darling, Lognormal / ISO Non-Parametric & I-MR)
-![MudaSlayer Capability & SPC](docs/screenshots/capability.png)
-
-### OEE (Multi-Shift Trend & Time-Loss Waterfall)
-![MudaSlayer OEE](docs/screenshots/oee.png)
-
-### Value Stream Mapping (VSM) & Ishikawa Fishbone
-| Value Stream Map | Ishikawa 6M Fishbone |
+| Capability & SPC | OEE Trend & Time-Loss |
 | :---: | :---: |
-| ![MudaSlayer VSM](docs/screenshots/vsm.png) | ![MudaSlayer Ishikawa](docs/screenshots/ishikawa.png) |
+| <img src="docs/screenshots/capability.png" alt="AlitheiaSigma Capability & SPC" width="420" /> | <img src="docs/screenshots/oee.png" alt="AlitheiaSigma OEE" width="420" /> |
+
+| Value Stream Map (VSM) | Ishikawa 6M Fishbone |
+| :---: | :---: |
+| <img src="docs/screenshots/vsm.png" alt="AlitheiaSigma VSM" width="420" /> | <img src="docs/screenshots/ishikawa.png" alt="AlitheiaSigma Ishikawa" width="420" /> |
 
 ---
 
@@ -83,7 +80,7 @@ Then open **http://localhost:8000** (or `http://localhost:3000`).
 ## Project Structure
 
 ```text
-MudaSlayer/
+AlitheiaSigma/
 ├── index.html                 # Application shell & module views
 ├── favicon.svg / favicon.ico  # App icons
 ├── styles/theme.css           # Industrial navy/mint/crimson tokens & print stylesheet

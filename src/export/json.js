@@ -5,7 +5,7 @@ import { switchTab } from '../ui/navigation.js';
 
 export function downloadJSONWorkspace() {
   const payload = JSON.stringify(getState(), null, 2);
-  triggerDownload(`mudaslayer_workspace_${dateStamp()}.json`, payload, 'application/json;charset=utf-8');
+  triggerDownload(`alitheiasigma_workspace_${dateStamp()}.json`, payload, 'application/json;charset=utf-8');
   showToast('Saved Workspace JSON');
 }
 

@@ -9,7 +9,7 @@ export function switchTab(tabKey, { updateHash = true } = {}) {
   const labelEl = document.getElementById('header-active-label');
   if (labelEl) labelEl.textContent = TAB_NAMES[safeKey];
 
-  document.title = `MudaSlayer — ${TAB_NAMES[safeKey]}`;
+  document.title = `AlitheiaSigma — ${TAB_NAMES[safeKey]}`;
 
   document.querySelectorAll('.rail-tab').forEach((b) => {
     b.classList.toggle('active', b.dataset.tab === safeKey);

@@ -175,11 +175,11 @@ export function downloadCSV(key) {
   if (key === 'all') {
     const keys = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa'];
     const combined = keys.map((k) => `### ${TAB_NAMES[k].toUpperCase()} ###\n${buildModuleCSV(state, k)}`).join('\n\n');
-    triggerDownload(`mudaslayer_all_tables_${dateStamp()}.csv`, combined, 'text/csv;charset=utf-8');
+    triggerDownload(`alitheiasigma_all_tables_${dateStamp()}.csv`, combined, 'text/csv;charset=utf-8');
     showToast('Exported Combined CSV');
     return;
   }
-  triggerDownload(`mudaslayer_${key}_${dateStamp()}.csv`, buildModuleCSV(state, key), 'text/csv;charset=utf-8');
+  triggerDownload(`alitheiasigma_${key}_${dateStamp()}.csv`, buildModuleCSV(state, key), 'text/csv;charset=utf-8');
   showToast(`Exported ${TAB_NAMES[key] || key} CSV`);
 }
 
