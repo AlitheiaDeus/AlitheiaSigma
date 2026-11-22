@@ -1,0 +1,18 @@
+# --- Private Internal Landmarks & Scratchpads ---
+internal/
+scratch/
+ideas/
+*.tmp
+*.bak
+
+# --- Agent Steering Documents (Local Only) ---
+AGENTS.md
+GEMINI.md
+
+# --- Machine-Specific Launchers & Overrides ---
+*.local.env
+.env
+
+# --- OS & Editor Artifacts ---
+.DS_Store
+Thumbs.db
