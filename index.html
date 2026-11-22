@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MudaSlayer</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230A113E' stroke='%23D929CF' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' fill='%2345E1A5' font-family='monospace' font-size='26' font-weight='700'%3EMS%3C/text%3E%3C/svg%3E" />
   <!-- Load Tailwind CSS for responsive layout utilities -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -43,286 +44,9 @@
       },
     };
   </script>
-
-  <style>
-    /* Strict opaque tactile industrial design tokens */
-    :root {
-      --bg-canvas: #0A113E;
-      --bg-card: #111952;
-      --bg-panel: #182268;
-      --border-struct: #253182;
-      --color-crimson: #B42754;
-      --color-icemint: #B4DDD8;
-      --color-magenta: #D929CF;
-      --color-indigo: #3B2F9A;
-      --color-copper: #B97232;
-      --color-emerald: #45E1A5;
-      --color-teal: #59A8A2;
-      --color-olive: #579200;
-      --color-rose: #E9C7C5;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      background-color: var(--bg-canvas);
-      color: var(--color-icemint);
-      font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    /* Tactile industrial range sliders (no gradients, solid precision thumbs) */
-    input[type="range"].ind-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 8px;
-      background: #0A113E;
-      border: 2px solid #253182;
-      border-radius: 4px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    input[type="range"].ind-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      background: #45E1A5;
-      border: 2px solid #0A113E;
-      cursor: grab;
-    }
-
-    input[type="range"].ind-slider::-webkit-slider-thumb:hover {
-      background: #D929CF;
-    }
-
-    input[type="range"].ind-slider::-webkit-slider-thumb:active {
-      cursor: grabbing;
-      background: #E9C7C5;
-    }
-
-    input[type="range"].ind-slider::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      background: #45E1A5;
-      border: 2px solid #0A113E;
-      cursor: grab;
-    }
-
-    /* Solid industrial inputs */
-    .ind-input {
-      background-color: #0A113E;
-      border: 2px solid #253182;
-      color: #E9C7C5;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.875rem;
-      font-weight: 600;
-      outline: none;
-      transition: border-color 0.12s ease;
-    }
-
-    .ind-input:focus {
-      border-color: #D929CF;
-    }
-
-    .ind-input-text {
-      font-family: Inter, system-ui, -apple-system, sans-serif;
-      color: #B4DDD8;
-    }
-
-    /* Structural panels and buttons */
-    .ind-card {
-      background-color: #111952;
-      border: 2px solid #253182;
-      border-radius: 8px;
-    }
-
-    .ind-well {
-      background-color: #0A113E;
-      border: 2px solid #253182;
-      border-radius: 8px;
-    }
-
-    .ind-btn {
-      background-color: #182268;
-      border: 2px solid #253182;
-      color: #B4DDD8;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.8125rem;
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-    }
-
-    .ind-btn:hover {
-      background-color: #3B2F9A;
-      border-color: #D929CF;
-      color: #E9C7C5;
-    }
-
-    .ind-btn-primary {
-      background-color: #3B2F9A;
-      border: 2px solid #D929CF;
-      color: #E9C7C5;
-    }
-
-    .ind-btn-primary:hover {
-      background-color: #D929CF;
-      border-color: #E9C7C5;
-      color: #0A113E;
-    }
-
-    .ind-btn-ok {
-      background-color: #111952;
-      border: 2px solid #45E1A5;
-      color: #45E1A5;
-    }
-
-    .ind-btn-ok:hover {
-      background-color: #45E1A5;
-      color: #0A113E;
-    }
-
-    .ind-btn-danger {
-      background-color: #111952;
-      border: 2px solid #B42754;
-      color: #E9C7C5;
-    }
-
-    .ind-btn-danger:hover {
-      background-color: #B42754;
-      color: #FFFFFF;
-    }
-
-    /* Left rail tab states */
-    .rail-tab {
-      background-color: #111952;
-      border: 2px solid transparent;
-      color: #B4DDD8;
-      border-radius: 6px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.875rem;
-      padding: 10px 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      white-space: nowrap;
-      transition: background-color 0.12s ease, border-color 0.12s ease;
-    }
-
-    .rail-tab:hover {
-      background-color: #182268;
-      border-color: #253182;
-    }
-
-    .rail-tab.active {
-      background-color: #182268;
-      border-color: #D929CF;
-      color: #E9C7C5;
-    }
-
-    .rail-tab .tab-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      background-color: #253182;
-      flex-shrink: 0;
-    }
-
-    .rail-tab.active .tab-dot {
-      background-color: #45E1A5;
-    }
-
-    /* Interactive SVG drag affordances */
-    .drag-ew {
-      cursor: ew-resize;
-    }
-    .drag-curve {
-      cursor: grab;
-    }
-    .drag-curve:active {
-      cursor: grabbing;
-    }
-
-    /* 5S Tactile Score Buttons */
-    .score-btn {
-      width: 32px;
-      height: 30px;
-      border: 2px solid #253182;
-      background-color: #0A113E;
-      color: #B4DDD8;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-weight: 700;
-      font-size: 0.75rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .score-btn:hover {
-      border-color: #59A8A2;
-    }
-    .score-btn.selected {
-      background-color: #45E1A5;
-      border-color: #45E1A5;
-      color: #0A113E;
-    }
-
-    /* Custom subtle scrollbar for dark industrial tables */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0A113E;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #253182;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #3B2F9A;
-    }
-
-    /* Clean Print Layout for Executive Reporting */
-    @media print {
-      body {
-        background: #FFFFFF !important;
-        color: #0A113E !important;
-      }
-      #top-bar, #left-rail, .no-print {
-        display: none !important;
-      }
-      #main-workspace {
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      .module-section {
-        display: block !important;
-        page-break-after: always;
-        margin-bottom: 24px;
-      }
-      #module-export {
-        display: none !important;
-      }
-      .ind-card, .ind-well {
-        border: 2px solid #0A113E !important;
-        break-inside: avoid;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="./styles/theme.css" />
+  <!-- SheetJS for browser-local .xlsx / .xls parsing -->
+  <script defer src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -330,11 +54,11 @@
   <header id="top-bar" class="bg-navy-card border-b-2 border-navy-border px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-30">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-md bg-navy-canvas border-2 border-magenta flex items-center justify-center font-mono font-bold text-sm text-emerald-mint">
-        LN
+        MS
       </div>
       <div>
         <h1 class="text-base sm:text-lg font-bold tracking-wider text-rose-dusty leading-none">
-          LEAN SUITE
+          MUDASLAYER
         </h1>
         <span id="header-active-label" class="text-xs font-mono text-teal-slate">
           Capability
@@ -342,9 +66,20 @@
       </div>
     </div>
 
-    <!-- Top Quick Export Controls (Atomic Labels) -->
+    <!-- Scenario Preset + Import + Quick Export Controls -->
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" id="btn-quick-svg" class="ind-btn ind-btn-ok" title="Download active chart as SVG">
+      <select id="scenario-select" aria-label="Sample Factory Scenario" class="ind-input ind-input-text text-xs py-1.5">
+        <option value="cnc">Scenario: Precision CNC Cell</option>
+        <option value="smt">Scenario: SMT Electronics Line</option>
+        <option value="packaging">Scenario: High-Speed Packaging</option>
+      </select>
+      <button type="button" id="btn-open-import" class="ind-btn ind-btn-primary" title="Import Excel / CSV or paste cells (Shortcut: i)">
+        Import Data
+      </button>
+      <button type="button" id="btn-quick-png" class="ind-btn ind-btn-ok" title="Download active chart as PNG">
+        Export PNG
+      </button>
+      <button type="button" id="btn-quick-svg" class="ind-btn" title="Download active chart as SVG">
         Export SVG
       </button>
       <button type="button" id="btn-quick-json-save" class="ind-btn" title="Save workspace JSON">
@@ -357,48 +92,124 @@
     </div>
   </header>
 
-  <!-- INLINE NOTIFICATION TOAST BANNER (No window.alert) -->
+  <!-- INLINE NOTIFICATION TOAST BANNER -->
   <div id="toast-bar" class="hidden fixed bottom-4 right-4 z-50 bg-navy-panel border-2 border-emerald-mint text-rose-dusty px-4 py-2.5 rounded-md font-mono text-xs font-semibold shadow-lg flex items-center gap-3">
     <span class="w-2.5 h-2.5 rounded-xs bg-emerald-mint inline-block" id="toast-dot"></span>
     <span id="toast-message">Ready</span>
   </div>
 
+  <!-- UNIVERSAL DATA IMPORT MODAL -->
+  <div id="import-modal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="imp-modal-title">
+    <div class="modal-panel shadow-2xl">
+      <div class="px-5 py-3.5 border-b-2 border-navy-border flex items-center justify-between bg-navy-panel">
+        <div>
+          <h2 id="imp-modal-title" class="text-base font-bold uppercase tracking-wider text-rose-dusty">Import Spreadsheet / Clipboard Data</h2>
+          <p class="text-xs text-teal-slate font-mono">100% browser-local parsing (.xlsx, .xls, .csv, .tsv, or Ctrl+V from Excel)</p>
+        </div>
+        <button type="button" id="imp-btn-close" class="ind-btn py-1 px-3 text-xs">ESC</button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 flex-1">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <label for="imp-target-module" class="text-xs font-bold uppercase text-rose-dusty">Target Module</label>
+            <select id="imp-target-module" class="ind-input ind-input-text text-xs">
+              <option value="capability">Capability (Measurements)</option>
+              <option value="oee">OEE (Shift Production Log)</option>
+              <option value="pareto">Pareto (Defect / Downtime Log)</option>
+              <option value="takt">Takt (Workstations)</option>
+              <option value="vsm">VSM (Process Steps)</option>
+            </select>
+          </div>
+          <button type="button" id="imp-btn-sample" class="ind-btn text-xs">Load Sample CSV</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="imp-dropzone" class="dropzone flex flex-col items-center justify-center gap-1.5">
+            <span class="text-sm font-bold text-emerald-mint">Drop .xlsx / .csv / .tsv file here</span>
+            <span class="text-xs text-teal-slate font-mono">or click to browse local disk</span>
+            <input type="file" id="imp-file-input" accept=".csv,.tsv,.txt,.xlsx,.xls" class="hidden" />
+          </div>
+          <div class="space-y-1.5">
+            <label for="imp-paste-text" class="block text-xs font-bold uppercase text-rose-dusty">Or Paste Cells Directly From Excel / Sheets</label>
+            <textarea id="imp-paste-text" rows="4" placeholder="Paste Excel columns or CSV text here..." class="ind-input w-full text-xs font-mono resize-y"></textarea>
+          </div>
+        </div>
+
+        <!-- Optional Capability Spec Bounds -->
+        <div id="imp-cap-specs" class="ind-well p-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label for="imp-cap-label" class="block text-[11px] font-bold uppercase text-teal-slate mb-1">Characteristic Name</label>
+            <input id="imp-cap-label" type="text" class="ind-input ind-input-text w-full text-xs" placeholder="e.g. Bore Diameter" />
+          </div>
+          <div>
+            <label for="imp-cap-lsl" class="block text-[11px] font-bold uppercase text-teal-slate mb-1">Lower Spec Limit (LSL)</label>
+            <input id="imp-cap-lsl" type="number" step="any" class="ind-input w-full text-xs" />
+          </div>
+          <div>
+            <label for="imp-cap-usl" class="block text-[11px] font-bold uppercase text-teal-slate mb-1">Upper Spec Limit (USL)</label>
+            <input id="imp-cap-usl" type="number" step="any" class="ind-input w-full text-xs" />
+          </div>
+        </div>
+
+        <!-- Column Mapping Selectors -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase text-rose-dusty">Column Mapping</h3>
+            <span id="imp-preview-meta" class="text-xs font-mono text-emerald-mint"></span>
+          </div>
+          <div id="imp-mapper-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
+        </div>
+
+        <!-- Preview Table -->
+        <div class="ind-well p-3 overflow-x-auto">
+          <table id="imp-preview-table" class="w-full text-left border-collapse"></table>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 border-t-2 border-navy-border bg-navy-panel flex items-center justify-end gap-2.5">
+        <button type="button" id="imp-btn-cancel" class="ind-btn">Cancel</button>
+        <button type="button" id="imp-btn-apply" class="ind-btn ind-btn-primary" disabled>Import Into Module</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MAIN APPLICATION SHELL -->
   <div class="flex-1 flex flex-col lg:flex-row min-h-0">
 
-    <!-- LEFT NAVIGATION RAIL (8 Strictly Atomic Tabs) -->
+    <!-- LEFT NAVIGATION RAIL (8 Atomic Tabs + Shortcut Hints) -->
     <nav id="left-rail" aria-label="Module Navigation" class="bg-navy-card border-b-2 lg:border-b-0 lg:border-r-2 border-navy-border p-3 lg:w-52 shrink-0">
       <div class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
         <button type="button" class="rail-tab active" data-tab="capability">
-          <span>Capability</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">1</span><span>Capability</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="oee">
-          <span>OEE</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">2</span><span>OEE</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="takt">
-          <span>Takt</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">3</span><span>Takt</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="pareto">
-          <span>Pareto</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">4</span><span>Pareto</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="vsm">
-          <span>VSM</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">5</span><span>VSM</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="fives">
-          <span>5S</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">6</span><span>5S</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="ishikawa">
-          <span>Ishikawa</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">7</span><span>Ishikawa</span></span>
           <span class="tab-dot"></span>
         </button>
         <button type="button" class="rail-tab" data-tab="export">
-          <span>Export</span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">8</span><span>Export</span></span>
           <span class="tab-dot"></span>
         </button>
       </div>
@@ -408,19 +219,28 @@
     <main id="main-workspace" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
 
       <!-- ================================================================= -->
-      <!-- MODULE 1: CAPABILITY (Interactive Process Capability Simulator)   -->
+      <!-- MODULE 1: CAPABILITY (Empirical Data + Interactive Simulator)     -->
       <!-- ================================================================= -->
       <section id="module-capability" class="module-section space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-rose-dusty">Capability</h2>
-            <p class="text-xs text-icemint mt-0.5">Drag curve horizontally for mean shift, drag vertical limits for tolerance bounds</p>
+            <h2 class="text-xl font-bold text-rose-dusty">Capability &amp; SPC</h2>
+            <p class="text-xs text-icemint mt-0.5">Analyze actual measurement samples (Cp/Cpk, Pp/Ppk, I-MR control) or simulate distributions interactively</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2 no-print">
-            <button type="button" class="ind-btn cap-preset" data-preset="centered">Centered</button>
-            <button type="button" class="ind-btn cap-preset" data-preset="shifted">Shifted</button>
-            <button type="button" class="ind-btn cap-preset" data-preset="tight">Tight</button>
-            <button type="button" class="ind-btn ind-btn-danger cap-preset" data-preset="reset">Reset</button>
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="mode-switch" role="group" aria-label="Capability Mode">
+              <button type="button" id="cap-mode-data" class="mode-pill active">Data Mode</button>
+              <button type="button" id="cap-mode-sim" class="mode-pill">Simulator</button>
+            </div>
+            <div id="cap-data-presets" class="flex items-center gap-2">
+              <button type="button" id="btn-cap-import" class="ind-btn ind-btn-primary">Import Measurements</button>
+            </div>
+            <div id="cap-sim-presets" class="hidden flex flex-wrap items-center gap-2">
+              <button type="button" class="ind-btn cap-preset" data-preset="centered">Centered</button>
+              <button type="button" class="ind-btn cap-preset" data-preset="shifted">Shifted</button>
+              <button type="button" class="ind-btn cap-preset" data-preset="tight">Tight</button>
+              <button type="button" class="ind-btn ind-btn-danger cap-preset" data-preset="reset">Reset</button>
+            </div>
           </div>
         </div>
 
@@ -428,16 +248,16 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
           <div class="ind-card p-3.5 flex flex-col justify-between" id="cap-card-cp">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cp</span>
+              <span id="cap-lbl-1" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cp</span>
               <span id="cap-badge-cp" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-emerald-mint text-emerald-mint">Capable</span>
             </div>
             <div id="cap-val-cp" class="font-mono text-2xl font-bold text-icemint mt-2">1.33</div>
-            <div id="cap-sub-cp" class="font-mono text-[11px] text-teal-slate mt-1">(70.0 - 30.0) / 30.0</div>
+            <div id="cap-sub-cp" class="font-mono text-[11px] text-teal-slate mt-1"></div>
           </div>
 
           <div class="ind-card p-3.5 flex flex-col justify-between border-magenta" id="cap-card-cpk">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpk</span>
+              <span id="cap-lbl-2" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpk</span>
               <span id="cap-badge-cpk" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-emerald-mint text-emerald-mint">Capable</span>
             </div>
             <div id="cap-val-cpk" class="font-mono text-2xl font-bold text-emerald-mint mt-2">1.33</div>
@@ -446,49 +266,56 @@
 
           <div class="ind-card p-3.5 flex flex-col justify-between" id="cap-card-cpu">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpu</span>
+              <span id="cap-lbl-3" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpu</span>
               <span id="cap-badge-cpu" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-navy-border text-icemint">Upper</span>
             </div>
             <div id="cap-val-cpu" class="font-mono text-2xl font-bold text-icemint mt-2">1.33</div>
-            <div id="cap-sub-cpu" class="font-mono text-[11px] text-teal-slate mt-1">(70.0 - 50.0) / 15.0</div>
+            <div id="cap-sub-cpu" class="font-mono text-[11px] text-teal-slate mt-1"></div>
           </div>
 
           <div class="ind-card p-3.5 flex flex-col justify-between" id="cap-card-cpl">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpl</span>
+              <span id="cap-lbl-4" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cpl</span>
               <span id="cap-badge-cpl" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-navy-border text-icemint">Lower</span>
             </div>
             <div id="cap-val-cpl" class="font-mono text-2xl font-bold text-icemint mt-2">1.33</div>
-            <div id="cap-sub-cpl" class="font-mono text-[11px] text-teal-slate mt-1">(50.0 - 30.0) / 15.0</div>
+            <div id="cap-sub-cpl" class="font-mono text-[11px] text-teal-slate mt-1"></div>
           </div>
 
           <div class="ind-card p-3.5 flex flex-col justify-between" id="cap-card-ppm">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">PPM</span>
+              <span id="cap-lbl-5" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">PPM</span>
               <span id="cap-badge-ppm" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-olive text-emerald-mint">Low</span>
             </div>
             <div id="cap-val-ppm" class="font-mono text-2xl font-bold text-icemint mt-2">63.3</div>
-            <div id="cap-yield" class="font-mono text-[11px] text-teal-slate mt-1">Yield: 99.9937%</div>
+            <div id="cap-yield" class="font-mono text-[11px] text-teal-slate mt-1"></div>
           </div>
 
           <div class="ind-card p-3.5 flex flex-col justify-between" id="cap-card-sigma">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Sigma</span>
+              <span id="cap-lbl-6" class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Sigma</span>
               <span class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-navy-border text-icemint">Level</span>
             </div>
             <div id="cap-val-sigma" class="font-mono text-2xl font-bold text-emerald-mint mt-2">4.00σ</div>
-            <div id="cap-sub-sigma" class="font-mono text-[11px] text-teal-slate mt-1">Zmin: 4.00</div>
+            <div id="cap-sub-sigma" class="font-mono text-[11px] text-teal-slate mt-1"></div>
           </div>
         </div>
 
         <!-- SVG Distribution Canvas Well -->
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <div class="flex flex-wrap items-center gap-4">
+            <div id="cap-legend-sim" class="hidden flex flex-wrap items-center gap-4">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-teal-slate border border-emerald-mint"></span> 1σ</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-copper"></span> 2σ</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-indigo-royal"></span> 3σ</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-crimson"></span> Defect</span>
+            </div>
+            <div id="cap-legend-data" class="flex flex-wrap items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-teal-slate border border-emerald-mint"></span> Histogram</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-emerald-mint"></span> Overall Fit</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-icemint"></span> Within Fit</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-crimson"></span> Out of Spec</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> LSL / USL</span>
             </div>
             <span id="cap-drag-status" class="text-emerald-mint">Ready</span>
           </div>
@@ -501,77 +328,126 @@
                   <line x1="0" y1="0" x2="0" y2="8" stroke="#E9C7C5" stroke-width="2" />
                 </pattern>
               </defs>
-              <!-- Explicit solid background for standalone SVG export -->
               <rect x="0" y="0" width="1000" height="490" fill="#0A113E" />
-              <g id="cap-grid"></g>
-              <g id="cap-fills" class="drag-curve">
-                <path id="cap-fill-tl" fill="#3B2F9A" fill-opacity="0.45" />
-                <path id="cap-fill-m32" fill="#3B2F9A" />
-                <path id="cap-fill-m21" fill="#B97232" />
-                <path id="cap-fill-m10" fill="#59A8A2" />
-                <path id="cap-fill-p01" fill="#59A8A2" />
-                <path id="cap-fill-p12" fill="#B97232" />
-                <path id="cap-fill-p23" fill="#3B2F9A" />
-                <path id="cap-fill-tr" fill="#3B2F9A" fill-opacity="0.45" />
-              </g>
-              <g id="cap-defects" style="pointer-events:none;">
-                <path id="cap-defect-left" fill="url(#cap-defect-hatch)" stroke="#E9C7C5" stroke-width="1.2" />
-                <path id="cap-defect-right" fill="url(#cap-defect-hatch)" stroke="#E9C7C5" stroke-width="1.2" />
-              </g>
-              <g id="cap-sigma-guides" stroke="#0A113E" stroke-width="1.4" style="pointer-events:none;"></g>
-              <g id="cap-outline-grp" class="drag-curve">
-                <path id="cap-outline" fill="none" stroke="#45E1A5" stroke-width="3" stroke-linejoin="round" />
-                <path id="cap-outline-hit" fill="none" stroke="transparent" stroke-width="24" />
-              </g>
-              <g id="cap-mu-grp" class="drag-ew">
-                <line id="cap-mu-line" x1="500" y1="125" x2="500" y2="340" stroke="#E9C7C5" stroke-width="2" stroke-dasharray="5 4" />
-                <line id="cap-mu-hit" x1="500" y1="115" x2="500" y2="370" stroke="transparent" stroke-width="24" />
-                <g id="cap-mu-badge" transform="translate(500, 122)">
-                  <rect x="-42" y="-12" width="84" height="22" rx="4" fill="#182268" stroke="#45E1A5" stroke-width="1.5" />
-                  <text id="cap-mu-text" x="0" y="3" text-anchor="middle" fill="#45E1A5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">μ = 50.0</text>
+
+              <!-- SIMULATOR LAYER -->
+              <g id="cap-sim-root" class="hidden" data-export-hidden="true">
+                <g id="cap-grid"></g>
+                <g id="cap-fills" class="drag-curve">
+                  <path id="cap-fill-tl" fill="#3B2F9A" fill-opacity="0.45" />
+                  <path id="cap-fill-m32" fill="#3B2F9A" />
+                  <path id="cap-fill-m21" fill="#B97232" />
+                  <path id="cap-fill-m10" fill="#59A8A2" />
+                  <path id="cap-fill-p01" fill="#59A8A2" />
+                  <path id="cap-fill-p12" fill="#B97232" />
+                  <path id="cap-fill-p23" fill="#3B2F9A" />
+                  <path id="cap-fill-tr" fill="#3B2F9A" fill-opacity="0.45" />
+                </g>
+                <g id="cap-defects" style="pointer-events:none;">
+                  <path id="cap-defect-left" fill="url(#cap-defect-hatch)" stroke="#E9C7C5" stroke-width="1.2" />
+                  <path id="cap-defect-right" fill="url(#cap-defect-hatch)" stroke="#E9C7C5" stroke-width="1.2" />
+                </g>
+                <g id="cap-sigma-guides" stroke="#0A113E" stroke-width="1.4" style="pointer-events:none;"></g>
+                <g id="cap-outline-grp" class="drag-curve">
+                  <path id="cap-outline" fill="none" stroke="#45E1A5" stroke-width="3" stroke-linejoin="round" />
+                  <path id="cap-outline-hit" fill="none" stroke="transparent" stroke-width="24" />
+                </g>
+                <g id="cap-mu-grp" class="drag-ew">
+                  <line id="cap-mu-line" x1="500" y1="125" x2="500" y2="340" stroke="#E9C7C5" stroke-width="2" stroke-dasharray="5 4" />
+                  <line id="cap-mu-hit" x1="500" y1="115" x2="500" y2="370" stroke="transparent" stroke-width="24" />
+                  <g id="cap-mu-badge" transform="translate(500, 122)">
+                    <rect x="-42" y="-12" width="84" height="22" rx="4" fill="#182268" stroke="#45E1A5" stroke-width="1.5" />
+                    <text id="cap-mu-text" x="0" y="3" text-anchor="middle" fill="#45E1A5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">μ = 50.0</text>
+                  </g>
+                </g>
+                <line x1="60" y1="340" x2="940" y2="340" stroke="#B4DDD8" stroke-width="2" />
+                <g id="cap-ruler-grp" class="drag-curve">
+                  <rect id="cap-bar-m32" y="343" height="22" fill="#3B2F9A" />
+                  <rect id="cap-bar-m21" y="343" height="22" fill="#B97232" />
+                  <rect id="cap-bar-m10" y="343" height="22" fill="#59A8A2" />
+                  <rect id="cap-bar-p01" y="343" height="22" fill="#45E1A5" />
+                  <rect id="cap-bar-p12" y="343" height="22" fill="#B97232" />
+                  <rect id="cap-bar-p23" y="343" height="22" fill="#3B2F9A" />
+                  <g id="cap-bar-dividers" stroke="#0A113E" stroke-width="2"></g>
+                  <rect id="cap-bar-border" y="343" height="22" fill="none" stroke="#B4DDD8" stroke-width="1.2" />
+                </g>
+                <g id="cap-sigma-ticks" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700"></g>
+                <g id="cap-axis"></g>
+                <g id="cap-brackets">
+                  <g id="cap-brk-spec"></g>
+                  <g id="cap-brk-lower"></g>
+                  <g id="cap-brk-upper"></g>
+                  <g id="cap-brk-six"></g>
+                </g>
+                <g id="cap-lsl-grp" class="drag-ew">
+                  <line id="cap-lsl-line" x1="324" y1="115" x2="324" y2="412" stroke="#D929CF" stroke-width="2.5" stroke-dasharray="6 4" />
+                  <line id="cap-lsl-hit" x1="324" y1="108" x2="324" y2="418" stroke="transparent" stroke-width="26" />
+                  <g id="cap-lsl-badge" transform="translate(324, 152)">
+                    <rect x="-44" y="-12" width="88" height="24" rx="4" fill="#182268" stroke="#D929CF" stroke-width="2" />
+                    <text id="cap-lsl-text" x="0" y="4" text-anchor="middle" fill="#E9C7C5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">LSL 30.0</text>
+                  </g>
+                </g>
+                <g id="cap-usl-grp" class="drag-ew">
+                  <line id="cap-usl-line" x1="676" y1="115" x2="676" y2="412" stroke="#D929CF" stroke-width="2.5" stroke-dasharray="6 4" />
+                  <line id="cap-usl-hit" x1="676" y1="108" x2="676" y2="418" stroke="transparent" stroke-width="26" />
+                  <g id="cap-usl-badge" transform="translate(676, 152)">
+                    <rect x="-44" y="-12" width="88" height="24" rx="4" fill="#182268" stroke="#D929CF" stroke-width="2" />
+                    <text id="cap-usl-text" x="0" y="4" text-anchor="middle" fill="#E9C7C5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">USL 70.0</text>
+                  </g>
                 </g>
               </g>
-              <line x1="60" y1="340" x2="940" y2="340" stroke="#B4DDD8" stroke-width="2" />
-              <g id="cap-ruler-grp" class="drag-curve">
-                <rect id="cap-bar-m32" y="343" height="22" fill="#3B2F9A" />
-                <rect id="cap-bar-m21" y="343" height="22" fill="#B97232" />
-                <rect id="cap-bar-m10" y="343" height="22" fill="#59A8A2" />
-                <rect id="cap-bar-p01" y="343" height="22" fill="#45E1A5" />
-                <rect id="cap-bar-p12" y="343" height="22" fill="#B97232" />
-                <rect id="cap-bar-p23" y="343" height="22" fill="#3B2F9A" />
-                <g id="cap-bar-dividers" stroke="#0A113E" stroke-width="2"></g>
-                <rect id="cap-bar-border" y="343" height="22" fill="none" stroke="#B4DDD8" stroke-width="1.2" />
-              </g>
-              <g id="cap-sigma-ticks" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700"></g>
-              <g id="cap-axis"></g>
-              <g id="cap-brackets">
-                <g id="cap-brk-spec"></g>
-                <g id="cap-brk-lower"></g>
-                <g id="cap-brk-upper"></g>
-                <g id="cap-brk-six"></g>
-              </g>
-              <g id="cap-lsl-grp" class="drag-ew">
-                <line id="cap-lsl-line" x1="324" y1="115" x2="324" y2="412" stroke="#D929CF" stroke-width="2.5" stroke-dasharray="6 4" />
-                <line id="cap-lsl-hit" x1="324" y1="108" x2="324" y2="418" stroke="transparent" stroke-width="26" />
-                <g id="cap-lsl-badge" transform="translate(324, 152)">
-                  <rect x="-44" y="-12" width="88" height="24" rx="4" fill="#182268" stroke="#D929CF" stroke-width="2" />
-                  <text id="cap-lsl-text" x="0" y="4" text-anchor="middle" fill="#E9C7C5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">LSL 30.0</text>
-                </g>
-              </g>
-              <g id="cap-usl-grp" class="drag-ew">
-                <line id="cap-usl-line" x1="676" y1="115" x2="676" y2="412" stroke="#D929CF" stroke-width="2.5" stroke-dasharray="6 4" />
-                <line id="cap-usl-hit" x1="676" y1="108" x2="676" y2="418" stroke="transparent" stroke-width="26" />
-                <g id="cap-usl-badge" transform="translate(676, 152)">
-                  <rect x="-44" y="-12" width="88" height="24" rx="4" fill="#182268" stroke="#D929CF" stroke-width="2" />
-                  <text id="cap-usl-text" x="0" y="4" text-anchor="middle" fill="#E9C7C5" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">USL 70.0</text>
-                </g>
-              </g>
+
+              <!-- EMPIRICAL DATA MODE LAYER -->
+              <g id="cap-data-root"></g>
             </svg>
           </div>
         </div>
 
-        <!-- Synchronized Parameter Controls -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 no-print">
+        <!-- Companion I-MR Run Chart (Data Mode) -->
+        <div id="cap-imr-card" class="ind-card p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <span class="font-bold text-rose-dusty uppercase">Individuals (I-MR) Statistical Control Chart</span>
+            <div class="flex items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-emerald-mint"></span> In Control</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-crimson"></span> OOC (Rule 1 / 8-pt Run)</span>
+            </div>
+          </div>
+          <div class="ind-well p-2">
+            <svg id="svg-capability-imr" viewBox="0 0 1000 270" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <!-- Data Mode Inputs & Raw Measurement Editor -->
+        <div id="cap-data-controls" class="ind-card p-4 space-y-4 no-print">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label for="cap-data-label" class="block text-xs font-bold uppercase text-rose-dusty mb-1">Characteristic</label>
+              <input id="cap-data-label" type="text" class="ind-input ind-input-text w-full" />
+            </div>
+            <div>
+              <label for="cap-data-unit" class="block text-xs font-bold uppercase text-rose-dusty mb-1">Unit</label>
+              <input id="cap-data-unit" type="text" class="ind-input ind-input-text w-full" placeholder="mm, g, um..." />
+            </div>
+            <div>
+              <label for="cap-data-lsl" class="block text-xs font-bold uppercase text-rose-dusty mb-1">LSL</label>
+              <input id="cap-data-lsl" type="number" step="any" class="ind-input w-full text-right" />
+            </div>
+            <div>
+              <label for="cap-data-usl" class="block text-xs font-bold uppercase text-rose-dusty mb-1">USL</label>
+              <input id="cap-data-usl" type="number" step="any" class="ind-input w-full text-right" />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="cap-data-raw" class="text-xs font-bold uppercase text-rose-dusty">Measurement Samples (comma, space, or newline separated)</label>
+              <button type="button" id="btn-cap-apply-raw" class="ind-btn ind-btn-ok py-1.5 px-3 text-xs">Apply Measurements</button>
+            </div>
+            <textarea id="cap-data-raw" rows="2" class="ind-input w-full text-xs font-mono resize-y"></textarea>
+          </div>
+        </div>
+
+        <!-- Simulator Parameter Controls -->
+        <div id="cap-sim-controls" class="hidden grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 no-print">
           <div class="ind-card p-4 space-y-2.5">
             <div class="flex items-center justify-between">
               <label for="cap-in-mu" class="text-xs font-bold uppercase text-rose-dusty">Mean (μ)</label>
@@ -613,16 +489,26 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">OEE</h2>
-            <p class="text-xs text-icemint mt-0.5">Equipment effectiveness time cascade across availability, performance, quality</p>
+            <p class="text-xs text-icemint mt-0.5">Multi-shift equipment effectiveness trend &amp; time loss waterfall</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2 no-print">
-            <button type="button" class="ind-btn oee-preset" data-preset="world">World Class</button>
-            <button type="button" class="ind-btn oee-preset" data-preset="average">Average</button>
-            <button type="button" class="ind-btn oee-preset" data-preset="bottleneck">Bottlenecked</button>
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="mode-switch" role="group" aria-label="OEE Mode">
+              <button type="button" id="oee-mode-log" class="mode-pill active">Shift Log</button>
+              <button type="button" id="oee-mode-single" class="mode-pill">Single Shift</button>
+            </div>
+            <div id="oee-log-toolbar" class="flex flex-wrap items-center gap-2">
+              <select id="oee-filter-line" aria-label="Filter by Line" class="ind-input ind-input-text text-xs py-1.5"></select>
+              <button type="button" id="btn-oee-import" class="ind-btn ind-btn-primary">Import Shift Log</button>
+            </div>
+            <div id="oee-single-presets" class="hidden flex flex-wrap items-center gap-2">
+              <button type="button" class="ind-btn oee-preset" data-preset="world">World Class</button>
+              <button type="button" class="ind-btn oee-preset" data-preset="average">Average</button>
+              <button type="button" class="ind-btn oee-preset" data-preset="bottleneck">Bottlenecked</button>
+            </div>
           </div>
         </div>
 
-        <!-- Atomic OEE KPI Cards with Horizontal Gauge Bars -->
+        <!-- Atomic OEE KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
           <div class="ind-card p-4 border-magenta space-y-2">
             <div class="flex items-center justify-between">
@@ -696,8 +582,51 @@
           </div>
         </div>
 
-        <!-- OEE Inputs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 no-print">
+        <!-- Multi-Shift Trend SVG (Shift Log Mode) -->
+        <div id="oee-trend-card" class="ind-card p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <span class="font-bold text-rose-dusty uppercase">Multi-Shift OEE Trend</span>
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-emerald-mint"></span> OEE</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-crimson"></span> Avail</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-copper"></span> Perf</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> Qual</span>
+            </div>
+          </div>
+          <div class="ind-well p-2">
+            <svg id="svg-oee-trend" viewBox="0 0 960 256" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <!-- Shift Log Table -->
+        <div id="oee-log-table-card" class="ind-card p-4 space-y-3 no-print">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase text-rose-dusty">Shift Production Log</h3>
+            <button type="button" id="btn-oee-add-row" class="ind-btn ind-btn-primary">Add Shift Row</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-navy-border text-xs font-mono uppercase text-teal-slate">
+                  <th class="py-2 pr-2">Date</th>
+                  <th class="py-2 px-1">Shift</th>
+                  <th class="py-2 px-1">Line</th>
+                  <th class="py-2 px-1">Plan (m)</th>
+                  <th class="py-2 px-1">Down (m)</th>
+                  <th class="py-2 px-1">Cycle (s)</th>
+                  <th class="py-2 px-1">Output</th>
+                  <th class="py-2 px-1">Scrap</th>
+                  <th class="py-2 px-2">OEE</th>
+                  <th class="py-2 pl-1 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="oee-log-body" class="divide-y divide-navy-border text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Single Shift Sliders -->
+        <div id="oee-single-controls" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 no-print">
           <div class="ind-card p-4 space-y-2.5">
             <div class="flex items-center justify-between">
               <label for="oee-in-shift" class="text-xs font-bold uppercase text-rose-dusty">Shift (min)</label>
@@ -750,6 +679,8 @@
             <p class="text-xs text-icemint mt-0.5">Yamazumi workstation cycle balance against customer demand pace</p>
           </div>
           <div class="flex flex-wrap items-center gap-3 no-print">
+            <button type="button" id="btn-takt-import" class="ind-btn ind-btn-primary">Import Stations</button>
+            <button type="button" id="btn-takt-to-ishikawa" class="ind-btn">Bottleneck → Ishikawa</button>
             <div class="flex items-center gap-2">
               <label for="takt-in-avail" class="text-xs font-bold uppercase text-rose-dusty">Available (s)</label>
               <input id="takt-in-avail" type="number" min="600" max="86400" step="300" class="ind-input w-28 text-right" />
@@ -761,7 +692,6 @@
           </div>
         </div>
 
-        <!-- Atomic Takt KPI Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="ind-card p-4 border-magenta">
             <span class="text-xs font-bold uppercase text-rose-dusty">Takt</span>
@@ -785,7 +715,6 @@
           </div>
         </div>
 
-        <!-- Yamazumi SVG Chart -->
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Yamazumi Balance Chart</span>
@@ -801,7 +730,6 @@
           </div>
         </div>
 
-        <!-- Editable Stations Table -->
         <div class="ind-card p-4 space-y-3 no-print">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold uppercase text-rose-dusty">Workstations</h3>
@@ -833,16 +761,30 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">Pareto</h2>
-            <p class="text-xs text-icemint mt-0.5">Auto-sorted cumulative frequency analysis identifying vital defect drivers</p>
+            <p class="text-xs text-icemint mt-0.5">Group raw defect/downtime logs by frequency or cost/duration to isolate vital drivers</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="mode-switch" role="group" aria-label="Pareto Mode">
+              <button type="button" id="par-mode-events" class="mode-pill active">Event Log</button>
+              <button type="button" id="par-mode-summary" class="mode-pill">Summary Table</button>
+            </div>
+            <div id="par-events-toolbar" class="flex flex-wrap items-center gap-2">
+              <div class="mode-switch" role="group" aria-label="Pareto Metric">
+                <button type="button" id="par-metric-count" class="mode-pill active">Count</button>
+                <button type="button" id="par-metric-weight" class="mode-pill">Weighted</button>
+              </div>
+              <select id="par-filter-group" aria-label="Filter Group" class="ind-input ind-input-text text-xs py-1.5"></select>
+              <button type="button" id="btn-par-import" class="ind-btn ind-btn-primary">Import Defect Log</button>
+            </div>
+            <button type="button" id="btn-par-to-ishikawa" class="ind-btn">Top Driver → Ishikawa</button>
           </div>
         </div>
 
-        <!-- Atomic Pareto KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="ind-card p-4">
             <span class="text-xs font-bold uppercase text-rose-dusty">Total</span>
             <div id="par-val-total" class="font-mono text-2xl font-bold text-icemint mt-1">246</div>
-            <div class="font-mono text-[11px] text-teal-slate mt-1">Recorded Defects</div>
+            <div class="font-mono text-[11px] text-teal-slate mt-1">Aggregated Impact</div>
           </div>
           <div class="ind-card p-4 border-magenta">
             <span class="text-xs font-bold uppercase text-rose-dusty">Vital</span>
@@ -856,7 +798,6 @@
           </div>
         </div>
 
-        <!-- Pareto Dual-Axis SVG Chart -->
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Defect Distribution</span>
@@ -874,18 +815,18 @@
           </div>
         </div>
 
-        <!-- Editable Defect Table -->
+        <!-- Ranked Categories Table -->
         <div class="ind-card p-4 space-y-3 no-print">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold uppercase text-rose-dusty">Categories</h3>
-            <button type="button" id="btn-par-add" class="ind-btn ind-btn-primary">Add Row</button>
+            <h3 class="text-sm font-bold uppercase text-rose-dusty">Ranked Categories</h3>
+            <button type="button" id="btn-par-add" class="hidden ind-btn ind-btn-primary">Add Row</button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b-2 border-navy-border text-xs font-mono uppercase text-teal-slate">
                   <th class="py-2 pr-3">Category</th>
-                  <th class="py-2 px-2">Count</th>
+                  <th class="py-2 px-2">Value</th>
                   <th class="py-2 px-2">Share</th>
                   <th class="py-2 px-2">Cumulative</th>
                   <th class="py-2 px-2">Class</th>
@@ -893,6 +834,30 @@
                 </tr>
               </thead>
               <tbody id="pareto-table-body" class="divide-y divide-navy-border text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Raw Event Log Card (Event Log Mode) -->
+        <div id="par-events-card" class="ind-card p-4 space-y-3 no-print">
+          <h3 class="text-sm font-bold uppercase text-rose-dusty">Raw Defect / Downtime Events</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <input id="par-ev-cat" type="text" placeholder="Defect / Reason (e.g. Burr)" class="ind-input ind-input-text sm:col-span-5" />
+            <input id="par-ev-weight" type="number" min="0" step="any" placeholder="Weight (Cost / Min)" value="50" class="ind-input sm:col-span-2" />
+            <input id="par-ev-group" type="text" placeholder="Line / Group" class="ind-input ind-input-text sm:col-span-3" />
+            <button type="button" id="btn-par-ev-add" class="ind-btn ind-btn-primary sm:col-span-2">Log Event</button>
+          </div>
+          <div class="overflow-x-auto max-h-60 overflow-y-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-navy-border text-xs font-mono uppercase text-teal-slate">
+                  <th class="py-1.5 pr-2">Category</th>
+                  <th class="py-1.5 px-2">Weight</th>
+                  <th class="py-1.5 px-2">Group</th>
+                  <th class="py-1.5 pl-2 text-right">Del</th>
+                </tr>
+              </thead>
+              <tbody id="par-events-body" class="divide-y divide-navy-border"></tbody>
             </table>
           </div>
         </div>
@@ -907,9 +872,13 @@
             <h2 class="text-xl font-bold text-rose-dusty">VSM</h2>
             <p class="text-xs text-icemint mt-0.5">End-to-end production process boxes, inventory queues, sawtooth lead time ladder</p>
           </div>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button type="button" id="btn-vsm-import" class="ind-btn ind-btn-primary">Import Steps</button>
+            <button type="button" id="btn-vsm-to-takt" class="ind-btn ind-btn-ok">Sync Steps → Takt</button>
+            <button type="button" id="btn-vsm-to-ishikawa" class="ind-btn">Bottleneck → Ishikawa</button>
+          </div>
         </div>
 
-        <!-- Atomic VSM KPI Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="ind-card p-4">
             <span class="text-xs font-bold uppercase text-rose-dusty">Lead Time</span>
@@ -933,7 +902,6 @@
           </div>
         </div>
 
-        <!-- VSM Diagram SVG -->
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Process Flow Map</span>
@@ -948,7 +916,6 @@
           </div>
         </div>
 
-        <!-- Editable Process Chain Table -->
         <div class="ind-card p-4 space-y-3 no-print">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold uppercase text-rose-dusty">Process Chain</h3>
@@ -989,7 +956,6 @@
           </div>
         </div>
 
-        <!-- Atomic 5S KPI Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="ind-card p-4 border-magenta">
             <span class="text-xs font-bold uppercase text-rose-dusty">Score</span>
@@ -1013,9 +979,7 @@
           </div>
         </div>
 
-        <!-- Radar Chart + Audit Scoring Matrix -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
-          <!-- Radar Chart -->
           <div class="xl:col-span-5 ind-card p-4 space-y-3">
             <div class="flex items-center justify-between text-xs font-mono">
               <span class="font-bold text-rose-dusty uppercase">Pillar Radar</span>
@@ -1029,14 +993,12 @@
             </div>
           </div>
 
-          <!-- 5S Pillar Criteria Matrix -->
           <div class="xl:col-span-7 ind-card p-4 space-y-4">
             <h3 class="text-sm font-bold uppercase text-rose-dusty">Audit Matrix</h3>
             <div id="fives-matrix" class="space-y-4 max-h-[460px] overflow-y-auto pr-1"></div>
           </div>
         </div>
 
-        <!-- Corrective Action Log -->
         <div class="ind-card p-4 space-y-3 no-print">
           <h3 class="text-sm font-bold uppercase text-rose-dusty">Action Log</h3>
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
@@ -1083,7 +1045,6 @@
           </div>
         </div>
 
-        <!-- Fishbone SVG Diagram -->
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Fishbone Diagram</span>
@@ -1097,7 +1058,6 @@
           </div>
         </div>
 
-        <!-- 6 Rib Editors -->
         <div class="ind-card p-4 space-y-4 no-print">
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
             <select id="ish-sel-rib" class="ind-input ind-input-text sm:col-span-3">
@@ -1116,15 +1076,14 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- MODULE 8: EXPORT (Full Export Hub)                                -->
+      <!-- MODULE 8: EXPORT (Full Export & Clipboard Hub)                    -->
       <!-- ================================================================= -->
       <section id="module-export" class="module-section hidden space-y-5">
         <div>
-          <h2 class="text-xl font-bold text-rose-dusty">Export</h2>
-          <p class="text-xs text-icemint mt-0.5">Download raw data tables, standalone vector graphics, workspace snapshots, executive HTML reports</p>
+          <h2 class="text-xl font-bold text-rose-dusty">Export &amp; Reporting Hub</h2>
+          <p class="text-xs text-icemint mt-0.5">Download CSV/TSV tables, PNG/SVG charts, Markdown executive summaries, HTML bundles, and JSON snapshots</p>
         </div>
 
-        <!-- Live Export Summary Bar -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="ind-card p-4">
             <span class="text-xs font-bold uppercase text-rose-dusty">Modules</span>
@@ -1132,9 +1091,9 @@
             <div class="font-mono text-[11px] text-teal-slate mt-1">Active Analytical Models</div>
           </div>
           <div class="ind-card p-4">
-            <span class="text-xs font-bold uppercase text-rose-dusty">Vectors</span>
-            <div class="font-mono text-2xl font-bold text-icemint mt-1">7</div>
-            <div class="font-mono text-[11px] text-teal-slate mt-1">Standalone SVG Diagrams</div>
+            <span class="text-xs font-bold uppercase text-rose-dusty">Charts</span>
+            <div class="font-mono text-2xl font-bold text-icemint mt-1">SVG + PNG</div>
+            <div class="font-mono text-[11px] text-teal-slate mt-1">Vector &amp; 2x Raster</div>
           </div>
           <div class="ind-card p-4">
             <span class="text-xs font-bold uppercase text-rose-dusty">Storage</span>
@@ -1172,53 +1131,74 @@
             </div>
           </div>
 
-          <!-- Card 2: Report -->
+          <!-- Card 2: Executive Reports -->
           <div class="ind-card p-5 space-y-4">
             <div class="flex items-center justify-between border-b-2 border-navy-border pb-2">
-              <h3 class="text-base font-bold uppercase text-rose-dusty">Report</h3>
-              <span class="font-mono text-xs text-teal-slate">Executive Bundle</span>
+              <h3 class="text-base font-bold uppercase text-rose-dusty">Executive Reports</h3>
+              <span class="font-mono text-xs text-teal-slate">HTML / Markdown / PDF</span>
             </div>
             <p class="text-xs text-icemint">
-              Generate a standalone styled HTML executive report containing live KPI tables and inline vector snapshots from every module.
+              Generate a standalone styled HTML bundle, paste-ready Markdown summary, or light-mode Print-to-PDF report.
             </p>
             <div class="flex flex-wrap items-center gap-2.5">
               <button type="button" id="exp-btn-html" class="ind-btn ind-btn-ok">Download HTML</button>
-              <button type="button" id="exp-btn-print" class="ind-btn">Print</button>
+              <button type="button" id="exp-btn-md-download" class="ind-btn ind-btn-primary">Download .MD</button>
+              <button type="button" id="exp-btn-md-copy" class="ind-btn">Copy Markdown</button>
+              <button type="button" id="exp-btn-print" class="ind-btn">Print / PDF</button>
             </div>
           </div>
 
-          <!-- Card 3: Tables (CSV) -->
+          <!-- Card 3: Tables (CSV + Copy TSV) -->
           <div class="ind-card p-5 space-y-4">
             <div class="flex items-center justify-between border-b-2 border-navy-border pb-2">
-              <h3 class="text-base font-bold uppercase text-rose-dusty">Tables</h3>
-              <span class="font-mono text-xs text-teal-slate">CSV Data</span>
+              <h3 class="text-base font-bold uppercase text-rose-dusty">Tables (CSV &amp; Clipboard TSV)</h3>
+              <span class="font-mono text-xs text-teal-slate">Excel Ready</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="capability">Capability</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="oee">OEE</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="takt">Takt</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="pareto">Pareto</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="vsm">VSM</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="fives">5S</button>
-              <button type="button" class="ind-btn exp-csv-btn" data-csv="ishikawa">Ishikawa</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="capability">CSV Cap</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="oee">CSV OEE</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="takt">CSV Takt</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="pareto">CSV Pareto</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="vsm">CSV VSM</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="fives">CSV 5S</button>
+              <button type="button" class="ind-btn exp-csv-btn" data-csv="ishikawa">CSV Ishikawa</button>
               <button type="button" class="ind-btn ind-btn-primary exp-csv-btn" data-csv="all">All CSV</button>
             </div>
+            <div class="pt-2 border-t border-navy-border flex flex-wrap items-center gap-2">
+              <span class="text-xs font-mono text-teal-slate">Copy TSV:</span>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-tsv-btn" data-tsv="capability">Cap</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-tsv-btn" data-tsv="oee">OEE</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-tsv-btn" data-tsv="takt">Takt</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-tsv-btn" data-tsv="pareto">Pareto</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-tsv-btn" data-tsv="vsm">VSM</button>
+            </div>
           </div>
 
-          <!-- Card 4: Vectors (SVG) -->
+          <!-- Card 4: Diagrams (SVG & PNG) -->
           <div class="ind-card p-5 space-y-4">
             <div class="flex items-center justify-between border-b-2 border-navy-border pb-2">
-              <h3 class="text-base font-bold uppercase text-rose-dusty">Vectors</h3>
-              <span class="font-mono text-xs text-teal-slate">Standalone SVG</span>
+              <h3 class="text-base font-bold uppercase text-rose-dusty">Charts &amp; Diagrams</h3>
+              <span class="font-mono text-xs text-teal-slate">SVG &amp; 2x PNG</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="capability">Capability</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="oee">OEE</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="takt">Takt</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="pareto">Pareto</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="vsm">VSM</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="fives">5S</button>
-              <button type="button" class="ind-btn ind-btn-ok exp-svg-btn" data-svg="ishikawa">Ishikawa</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="capability">PNG Cap</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="oee">PNG OEE</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="takt">PNG Takt</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="pareto">PNG Pareto</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="vsm">PNG VSM</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="fives">PNG 5S</button>
+              <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="ishikawa">PNG Fishbone</button>
+              <button type="button" id="exp-btn-png-copy" class="ind-btn ind-btn-primary">Copy PNG</button>
+            </div>
+            <div class="pt-2 border-t border-navy-border flex flex-wrap items-center gap-2">
+              <span class="text-xs font-mono text-teal-slate">Vector SVG:</span>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="capability">Cap</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="oee">OEE</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="takt">Takt</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="pareto">Pareto</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="vsm">VSM</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="fives">5S</button>
+              <button type="button" class="ind-btn py-1 px-2 text-xs exp-svg-btn" data-svg="ishikawa">Ishikawa</button>
             </div>
           </div>
         </div>
@@ -1227,2416 +1207,6 @@
     </main>
   </div>
 
-  <script>
-    /**
-     * LEAN Operational Excellence Suite
-     * Self-contained analytical engine, SVG renderer, state persistence, and multi-format exporter.
-     */
-    (function () {
-      'use strict';
-
-      const STORAGE_KEY = 'lean_suite_workspace_v1';
-      const SVG_NS = 'http://www.w3.org/2000/svg';
-
-      /* Palette Reference Tokens */
-      const PALETTE = {
-        canvas: '#0A113E',
-        card: '#111952',
-        panel: '#182268',
-        border: '#253182',
-        crimson: '#B42754',
-        icemint: '#B4DDD8',
-        magenta: '#D929CF',
-        indigo: '#3B2F9A',
-        copper: '#B97232',
-        emerald: '#45E1A5',
-        teal: '#59A8A2',
-        olive: '#579200',
-        rose: '#E9C7C5',
-      };
-
-      const TAB_NAMES = {
-        capability: 'Capability',
-        oee: 'OEE',
-        takt: 'Takt',
-        pareto: 'Pareto',
-        vsm: 'VSM',
-        fives: '5S',
-        ishikawa: 'Ishikawa',
-        export: 'Export',
-      };
-
-      /**
-       * Generates deep-cloned factory defaults for all 7 analytical modules.
-       */
-      function createDefaultState() {
-        return {
-          activeTab: 'capability',
-          capability: {
-            mu: 50.0,
-            sigma: 5.0,
-            lsl: 30.0,
-            usl: 70.0,
-          },
-          oee: {
-            shift: 480,
-            downtime: 42,
-            cycle: 30,
-            output: 760,
-            scrap: 18,
-          },
-          takt: {
-            available: 27000,
-            demand: 450,
-            stations: [
-              { id: 1, name: 'Prep', va: 32, bnva: 10, waste: 6 },
-              { id: 2, name: 'Machining', va: 48, bnva: 12, waste: 10 },
-              { id: 3, name: 'Assembly', va: 40, bnva: 8, waste: 7 },
-              { id: 4, name: 'Test', va: 28, bnva: 14, waste: 4 },
-              { id: 5, name: 'Pack', va: 24, bnva: 8, waste: 9 },
-            ],
-          },
-          pareto: {
-            items: [
-              { id: 1, name: 'Burr', count: 84 },
-              { id: 2, name: 'Scratch', count: 52 },
-              { id: 3, name: 'Tolerance', count: 41 },
-              { id: 4, name: 'Torque', count: 27 },
-              { id: 5, name: 'Finish', count: 18 },
-              { id: 6, name: 'Label', count: 11 },
-              { id: 7, name: 'Seal', count: 8 },
-              { id: 8, name: 'Other', count: 5 },
-            ],
-          },
-          vsm: {
-            steps: [
-              { id: 1, name: 'Cutting', cycle: 45, changeover: 15, uptime: 96, operators: 1, queue: 4.0 },
-              { id: 2, name: 'Forming', cycle: 70, changeover: 25, uptime: 91, operators: 2, queue: 6.5 },
-              { id: 3, name: 'Welding', cycle: 95, changeover: 18, uptime: 94, operators: 2, queue: 5.0 },
-              { id: 4, name: 'Inspection', cycle: 55, changeover: 5, uptime: 99, operators: 1, queue: 2.5 },
-            ],
-          },
-          fives: {
-            target: 4.0,
-            pillars: [
-              {
-                name: 'Sort',
-                criteria: [
-                  { label: 'Unneeded items red-tagged', score: 4 },
-                  { label: 'Workstation clear of obsolete tools', score: 4 },
-                  { label: 'Scrap bins separated clearly', score: 5 },
-                  { label: 'Excess WIP removed from floor', score: 3 },
-                ],
-              },
-              {
-                name: 'Straighten',
-                criteria: [
-                  { label: 'Shadow boards maintained', score: 4 },
-                  { label: 'Aisle floor markings intact', score: 4 },
-                  { label: 'Parts bins labeled with min-max', score: 4 },
-                  { label: 'Tools stored at point of use', score: 4 },
-                ],
-              },
-              {
-                name: 'Shine',
-                criteria: [
-                  { label: 'Machines wiped free of coolant', score: 4 },
-                  { label: 'Floor clean of chips or spills', score: 4 },
-                  { label: 'Cleaning supplies stocked', score: 5 },
-                  { label: 'Inspection lighting unobstructed', score: 4 },
-                ],
-              },
-              {
-                name: 'Standardize',
-                criteria: [
-                  { label: 'Visual SOP posted at station', score: 4 },
-                  { label: 'Color-coded zones documented', score: 3 },
-                  { label: 'Shift handover checklist active', score: 4 },
-                  { label: 'Owner map displayed clearly', score: 3 },
-                ],
-              },
-              {
-                name: 'Sustain',
-                criteria: [
-                  { label: 'Weekly audit trend posted', score: 3 },
-                  { label: 'Action items closed on time', score: 3 },
-                  { label: 'Team trained on audit rubric', score: 4 },
-                  { label: 'Management gemba walk logged', score: 3 },
-                ],
-              },
-            ],
-            actions: [
-              { id: 1, pillar: 'Sustain', item: 'Schedule Friday 10-minute zone audit', owner: 'M. Tan', status: 'Open' },
-              { id: 2, pillar: 'Sort', item: 'Clear retired fixture rack Bay 3', owner: 'R. Lim', status: 'Open' },
-              { id: 3, pillar: 'Straighten', item: 'Relabel torque wrench shadow board', owner: 'K. Patel', status: 'Closed' },
-            ],
-          },
-          ishikawa: {
-            problem: 'Bore Diameter Out of Tolerance',
-            ribs: {
-              Man: [
-                { id: 1, text: 'Inconsistent chuck torque', root: false },
-                { id: 2, text: 'Night shift setup variance', root: true },
-              ],
-              Machine: [
-                { id: 3, text: 'Spindle thermal drift', root: true },
-                { id: 4, text: 'Worn boring bar insert', root: false },
-                { id: 5, text: 'Coolant pressure drop', root: false },
-              ],
-              Method: [
-                { id: 6, text: 'No warm-up cycle step', root: true },
-                { id: 7, text: 'Missing first-piece offset check', root: false },
-              ],
-              Material: [
-                { id: 8, text: 'Alloy hardness variation', root: false },
-                { id: 9, text: 'Casting wall porosity', root: false },
-              ],
-              Measurement: [
-                { id: 10, text: 'Bore gauge zero drift', root: false },
-                { id: 11, text: 'Part measured while hot', root: false },
-              ],
-              Environment: [
-                { id: 12, text: 'Bay door ambient swing', root: false },
-                { id: 13, text: 'Floor vibration from press', root: false },
-              ],
-            },
-          },
-        };
-      }
-
-      /* Load persisted state safely */
-      let state = createDefaultState();
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.capability && parsed.oee && parsed.takt && parsed.pareto && parsed.vsm && parsed.fives && parsed.ishikawa) {
-            state = Object.assign(createDefaultState(), parsed);
-          }
-        }
-      } catch (err) {
-        console.warn('Workspace restore fallback to defaults:', err);
-      }
-
-      let toastTimer = null;
-      function showToast(msg, isError) {
-        const bar = document.getElementById('toast-bar');
-        const dot = document.getElementById('toast-dot');
-        const text = document.getElementById('toast-message');
-        text.textContent = msg;
-        bar.style.borderColor = isError ? PALETTE.crimson : PALETTE.emerald;
-        dot.style.backgroundColor = isError ? PALETTE.crimson : PALETTE.emerald;
-        bar.classList.remove('hidden');
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => bar.classList.add('hidden'), 2800);
-      }
-
-      function persistState() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (err) {
-          console.warn('LocalStorage write skipped:', err);
-        }
-      }
-
-      function escapeHtml(str) {
-        return String(str)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-
-      function truncateText(str, maxLen) {
-        const s = String(str || '');
-        return s.length > maxLen ? s.slice(0, maxLen - 1) + '…' : s;
-      }
-
-      function nextId(list) {
-        return list.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
-      }
-
-      /* =====================================================================
-       * MODULE 1: CAPABILITY ENGINE
-       * ===================================================================== */
-      const CAP_DOM_MIN = 0;
-      const CAP_DOM_MAX = 100;
-      const CAP_LEFT = 60;
-      const CAP_RIGHT = 940;
-      const CAP_WIDTH = CAP_RIGHT - CAP_LEFT;
-      const CAP_BASE_Y = 340;
-      const CAP_MAX_H = 195;
-
-      let capDragging = null;
-      let capDragOffset = 0;
-
-      function erfc(x) {
-        const z = Math.abs(x);
-        const t = 1.0 / (1.0 + 0.5 * z);
-        const ans =
-          t *
-          Math.exp(
-            -z * z -
-              1.26551223 +
-              t *
-                (1.00002368 +
-                  t *
-                    (0.37409196 +
-                      t *
-                        (0.09678418 +
-                          t *
-                            (-0.18628806 +
-                              t *
-                                (0.27886807 +
-                                  t *
-                                    (-1.13520398 +
-                                      t *
-                                        (1.48851587 +
-                                          t * (-0.82215223 + t * 0.17087277))))))))
-          );
-        return x >= 0.0 ? ans : 2.0 - ans;
-      }
-
-      function normalCDF(z) {
-        return 0.5 * erfc(-z / Math.SQRT2);
-      }
-
-      function capDomToX(val) {
-        return CAP_LEFT + ((val - CAP_DOM_MIN) / (CAP_DOM_MAX - CAP_DOM_MIN)) * CAP_WIDTH;
-      }
-
-      function capXToDom(svgX) {
-        return CAP_DOM_MIN + ((svgX - CAP_LEFT) / CAP_WIDTH) * (CAP_DOM_MAX - CAP_DOM_MIN);
-      }
-
-      function capCurveY(x) {
-        const { mu, sigma } = state.capability;
-        const z = (x - mu) / sigma;
-        const density = Math.exp(-0.5 * z * z);
-        const peakH = Math.min(CAP_MAX_H, Math.max(75, (4.5 / sigma) * 172));
-        return CAP_BASE_Y - density * peakH;
-      }
-
-      function capBuildArea(xStart, xEnd, samples) {
-        const a = Math.max(CAP_DOM_MIN, Math.min(CAP_DOM_MAX, xStart));
-        const b = Math.max(CAP_DOM_MIN, Math.min(CAP_DOM_MAX, xEnd));
-        if (b - a <= 0.0001) return '';
-        let d = `M ${capDomToX(a).toFixed(2)} ${CAP_BASE_Y}`;
-        for (let i = 0; i <= samples; i++) {
-          const domX = a + (i / samples) * (b - a);
-          d += ` L ${capDomToX(domX).toFixed(2)} ${capCurveY(domX).toFixed(2)}`;
-        }
-        d += ` L ${capDomToX(b).toFixed(2)} ${CAP_BASE_Y} Z`;
-        return d;
-      }
-
-      function capBuildOutline(samples) {
-        let d = '';
-        for (let i = 0; i <= samples; i++) {
-          const domX = CAP_DOM_MIN + (i / samples) * (CAP_DOM_MAX - CAP_DOM_MIN);
-          d += (i === 0 ? 'M ' : ' L ') + `${capDomToX(domX).toFixed(2)} ${capCurveY(domX).toFixed(2)}`;
-        }
-        return d;
-      }
-
-      function initCapabilityGrid() {
-        const grid = document.getElementById('cap-grid');
-        const axis = document.getElementById('cap-axis');
-        let gHtml = '';
-        let aHtml = `<line x1="${CAP_LEFT}" y1="412" x2="${CAP_RIGHT}" y2="412" stroke="${PALETTE.border}" stroke-width="2" />`;
-        for (let v = 0; v <= 100; v += 2) {
-          const x = capDomToX(v);
-          const major = v % 10 === 0;
-          if (major) {
-            gHtml += `<line x1="${x.toFixed(1)}" y1="115" x2="${x.toFixed(1)}" y2="${CAP_BASE_Y}" stroke="${PALETTE.border}" stroke-width="1" />`;
-          }
-          aHtml += `<line x1="${x.toFixed(1)}" y1="412" x2="${x.toFixed(1)}" y2="${major ? 420 : 416}" stroke="${major ? PALETTE.icemint : PALETTE.border}" stroke-width="${major ? 1.5 : 1}" />`;
-          if (major) {
-            aHtml += `<text x="${x.toFixed(1)}" y="433" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${v}</text>`;
-          }
-        }
-        grid.innerHTML = gHtml;
-        axis.innerHTML = aHtml;
-      }
-
-      function renderCapBracket(container, cfg) {
-        const { x1, x2, y, extTop, extBottom, label, color, pillBg, pillBorder, textColor, offsetX } = cfg;
-        const left = Math.min(x1, x2);
-        const right = Math.max(x1, x2);
-        const span = right - left;
-        const mid = (left + right) / 2;
-        const px = mid + (offsetX || 0);
-        const pw = Math.max(88, label.length * 7.5 + 18);
-        const outward = span < pw + 22;
-        const a = 6;
-        let h = '';
-        h += `<line x1="${x1.toFixed(1)}" y1="${extTop}" x2="${x1.toFixed(1)}" y2="${extBottom}" stroke="${color}" stroke-width="1.3" stroke-dasharray="3 2" />`;
-        h += `<line x1="${x2.toFixed(1)}" y1="${extTop}" x2="${x2.toFixed(1)}" y2="${extBottom}" stroke="${color}" stroke-width="1.3" stroke-dasharray="3 2" />`;
-        if (outward) {
-          h += `<line x1="${(left - 16).toFixed(1)}" y1="${y}" x2="${(right + 16).toFixed(1)}" y2="${y}" stroke="${color}" stroke-width="1.6" />`;
-          h += `<polygon points="${left.toFixed(1)},${y} ${(left - a).toFixed(1)},${y - 4} ${(left - a).toFixed(1)},${y + 4}" fill="${color}" />`;
-          h += `<polygon points="${right.toFixed(1)},${y} ${(right + a).toFixed(1)},${y - 4} ${(right + a).toFixed(1)},${y + 4}" fill="${color}" />`;
-        } else {
-          h += `<line x1="${left.toFixed(1)}" y1="${y}" x2="${right.toFixed(1)}" y2="${y}" stroke="${color}" stroke-width="1.6" />`;
-          h += `<polygon points="${left.toFixed(1)},${y} ${(left + a).toFixed(1)},${y - 4} ${(left + a).toFixed(1)},${y + 4}" fill="${color}" />`;
-          h += `<polygon points="${right.toFixed(1)},${y} ${(right - a).toFixed(1)},${y - 4} ${(right - a).toFixed(1)},${y + 4}" fill="${color}" />`;
-        }
-        if (Math.abs(offsetX || 0) > 2) {
-          h += `<line x1="${mid.toFixed(1)}" y1="${y}" x2="${px.toFixed(1)}" y2="${y}" stroke="${color}" stroke-width="1.2" stroke-dasharray="2 2" />`;
-        }
-        h += `<g transform="translate(${px.toFixed(1)}, ${y})">
-          <rect x="${(-pw / 2).toFixed(1)}" y="-11" width="${pw.toFixed(1)}" height="22" rx="4" fill="${pillBg}" stroke="${pillBorder}" stroke-width="1.5" />
-          <text x="0" y="4" text-anchor="middle" fill="${textColor}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${escapeHtml(label)}</text>
-        </g>`;
-        container.innerHTML = h;
-      }
-
-      function computeCapabilityMetrics() {
-        const { mu, sigma, lsl, usl } = state.capability;
-        const specW = usl - lsl;
-        const upperM = usl - mu;
-        const lowerM = mu - lsl;
-        const cp = specW / (6 * sigma);
-        const cpu = upperM / (3 * sigma);
-        const cpl = lowerM / (3 * sigma);
-        const cpk = Math.min(cpu, cpl);
-        const pLower = normalCDF((lsl - mu) / sigma);
-        const pUpper = normalCDF((mu - usl) / sigma);
-        const ppm = (pLower + pUpper) * 1e6;
-        const yieldPct = Math.max(0, (1 - (pLower + pUpper)) * 100);
-        const zMin = Math.min(upperM / sigma, lowerM / sigma);
-        return { mu, sigma, lsl, usl, specW, upperM, lowerM, cp, cpu, cpl, cpk, ppm, yieldPct, zMin };
-      }
-
-      function formatPPM(ppm) {
-        if (!Number.isFinite(ppm) || ppm < 0) return '0.0';
-        if (ppm >= 10000) return Math.round(ppm).toLocaleString('en-US');
-        if (ppm >= 100) return ppm.toFixed(1);
-        if (ppm >= 1) return ppm.toFixed(2);
-        if (ppm >= 0.001) return ppm.toFixed(3);
-        return '<0.001';
-      }
-
-      function styleCapBadge(el, val) {
-        if (val < 0) {
-          el.textContent = 'Violation';
-          el.style.borderColor = PALETTE.crimson;
-          el.style.color = PALETTE.rose;
-          el.style.backgroundColor = PALETTE.crimson;
-        } else if (val < 1.0) {
-          el.textContent = 'Incapable';
-          el.style.borderColor = PALETTE.crimson;
-          el.style.color = PALETTE.crimson;
-          el.style.backgroundColor = PALETTE.canvas;
-        } else if (val < 1.33) {
-          el.textContent = 'Marginal';
-          el.style.borderColor = PALETTE.copper;
-          el.style.color = PALETTE.copper;
-          el.style.backgroundColor = PALETTE.canvas;
-        } else {
-          el.textContent = 'Capable';
-          el.style.borderColor = PALETTE.emerald;
-          el.style.color = PALETTE.emerald;
-          el.style.backgroundColor = PALETTE.canvas;
-        }
-      }
-
-      function renderCapability() {
-        const m = computeCapabilityMetrics();
-        const { mu, sigma, lsl, usl } = m;
-
-        // Sync form inputs
-        const syncInput = (id, val) => {
-          const el = document.getElementById(id);
-          if (document.activeElement !== el) el.value = val.toFixed(1);
-        };
-        syncInput('cap-in-mu', mu);
-        document.getElementById('cap-sl-mu').value = mu.toFixed(1);
-        syncInput('cap-in-sigma', sigma);
-        document.getElementById('cap-sl-sigma').value = sigma.toFixed(1);
-        syncInput('cap-in-lsl', lsl);
-        document.getElementById('cap-sl-lsl').value = lsl.toFixed(1);
-        syncInput('cap-in-usl', usl);
-        document.getElementById('cap-sl-usl').value = usl.toFixed(1);
-
-        // Sigma points
-        const pts = [mu - 3 * sigma, mu - 2 * sigma, mu - sigma, mu, mu + sigma, mu + 2 * sigma, mu + 3 * sigma];
-
-        // Curve band fills
-        document.getElementById('cap-fill-tl').setAttribute('d', capBuildArea(CAP_DOM_MIN, pts[0], 28));
-        document.getElementById('cap-fill-m32').setAttribute('d', capBuildArea(pts[0], pts[1], 28));
-        document.getElementById('cap-fill-m21').setAttribute('d', capBuildArea(pts[1], pts[2], 28));
-        document.getElementById('cap-fill-m10').setAttribute('d', capBuildArea(pts[2], pts[3], 28));
-        document.getElementById('cap-fill-p01').setAttribute('d', capBuildArea(pts[3], pts[4], 28));
-        document.getElementById('cap-fill-p12').setAttribute('d', capBuildArea(pts[4], pts[5], 28));
-        document.getElementById('cap-fill-p23').setAttribute('d', capBuildArea(pts[5], pts[6], 28));
-        document.getElementById('cap-fill-tr').setAttribute('d', capBuildArea(pts[6], CAP_DOM_MAX, 28));
-
-        // Defect tails
-        document.getElementById('cap-defect-left').setAttribute('d', capBuildArea(CAP_DOM_MIN, lsl, 56));
-        document.getElementById('cap-defect-right').setAttribute('d', capBuildArea(usl, CAP_DOM_MAX, 56));
-
-        // Outline
-        const outD = capBuildOutline(220);
-        document.getElementById('cap-outline').setAttribute('d', outD);
-        document.getElementById('cap-outline-hit').setAttribute('d', outD);
-
-        // Vertical sigma guides under curve
-        let gLines = '';
-        [pts[0], pts[1], pts[2], pts[4], pts[5], pts[6]].forEach((p) => {
-          if (p > CAP_DOM_MIN && p < CAP_DOM_MAX) {
-            const x = capDomToX(p);
-            const y = capCurveY(p);
-            if (CAP_BASE_Y - y > 4) {
-              gLines += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${CAP_BASE_Y}" />`;
-            }
-          }
-        });
-        document.getElementById('cap-sigma-guides').innerHTML = gLines;
-
-        // Mean line and badge
-        const xMu = capDomToX(mu);
-        const peakY = capCurveY(mu);
-        document.getElementById('cap-mu-line').setAttribute('x1', xMu.toFixed(1));
-        document.getElementById('cap-mu-line').setAttribute('x2', xMu.toFixed(1));
-        document.getElementById('cap-mu-line').setAttribute('y1', Math.max(115, peakY - 6).toFixed(1));
-        document.getElementById('cap-mu-hit').setAttribute('x1', xMu.toFixed(1));
-        document.getElementById('cap-mu-hit').setAttribute('x2', xMu.toFixed(1));
-        document.getElementById('cap-mu-badge').setAttribute('transform', `translate(${xMu.toFixed(1)}, ${Math.max(120, peakY - 16).toFixed(1)})`);
-        document.getElementById('cap-mu-text').textContent = `μ = ${mu.toFixed(1)}`;
-
-        // Segmented 6-sigma axis bar
-        const bars = ['cap-bar-m32', 'cap-bar-m21', 'cap-bar-m10', 'cap-bar-p01', 'cap-bar-p12', 'cap-bar-p23'];
-        let divHtml = '';
-        for (let i = 0; i < 6; i++) {
-          const xs = Math.max(CAP_LEFT, Math.min(CAP_RIGHT, capDomToX(pts[i])));
-          const xe = Math.max(CAP_LEFT, Math.min(CAP_RIGHT, capDomToX(pts[i + 1])));
-          const el = document.getElementById(bars[i]);
-          el.setAttribute('x', xs.toFixed(1));
-          el.setAttribute('width', Math.max(0, xe - xs).toFixed(1));
-          if (i > 0 && xs > CAP_LEFT && xs < CAP_RIGHT) {
-            divHtml += `<line x1="${xs.toFixed(1)}" y1="343" x2="${xs.toFixed(1)}" y2="365" />`;
-          }
-        }
-        document.getElementById('cap-bar-dividers').innerHTML = divHtml;
-        const bxL = Math.max(CAP_LEFT, Math.min(CAP_RIGHT, capDomToX(pts[0])));
-        const bxR = Math.max(CAP_LEFT, Math.min(CAP_RIGHT, capDomToX(pts[6])));
-        document.getElementById('cap-bar-border').setAttribute('x', bxL.toFixed(1));
-        document.getElementById('cap-bar-border').setAttribute('width', Math.max(0, bxR - bxL).toFixed(1));
-
-        // Sigma labels along ruler
-        const sNames = ['-3σ', '-2σ', '-1σ', 'μ', '+1σ', '+2σ', '+3σ'];
-        const oneSigPx = (sigma / 100) * CAP_WIDTH;
-        let tickHtml = '';
-        pts.forEach((p, idx) => {
-          if (p < CAP_DOM_MIN - 0.5 || p > CAP_DOM_MAX + 0.5) return;
-          if ((idx === 1 || idx === 2 || idx === 4 || idx === 5) && oneSigPx < 28) return;
-          const x = Math.max(CAP_LEFT, Math.min(CAP_RIGHT, capDomToX(p)));
-          const isMu = idx === 3;
-          tickHtml += `<line x1="${x.toFixed(1)}" y1="365" x2="${x.toFixed(1)}" y2="372" stroke="${isMu ? PALETTE.emerald : PALETTE.icemint}" stroke-width="1.5" />`;
-          tickHtml += `<text x="${x.toFixed(1)}" y="386" text-anchor="middle" fill="${isMu ? PALETTE.emerald : PALETTE.rose}">${sNames[idx]}</text>`;
-        });
-        document.getElementById('cap-sigma-ticks').innerHTML = tickHtml;
-
-        // LSL & USL lines
-        const xLsl = capDomToX(lsl);
-        const xUsl = capDomToX(usl);
-        document.getElementById('cap-lsl-line').setAttribute('x1', xLsl.toFixed(1));
-        document.getElementById('cap-lsl-line').setAttribute('x2', xLsl.toFixed(1));
-        document.getElementById('cap-lsl-hit').setAttribute('x1', xLsl.toFixed(1));
-        document.getElementById('cap-lsl-hit').setAttribute('x2', xLsl.toFixed(1));
-        document.getElementById('cap-lsl-badge').setAttribute('transform', `translate(${xLsl.toFixed(1)}, 152)`);
-        document.getElementById('cap-lsl-text').textContent = `LSL ${lsl.toFixed(1)}`;
-
-        document.getElementById('cap-usl-line').setAttribute('x1', xUsl.toFixed(1));
-        document.getElementById('cap-usl-line').setAttribute('x2', xUsl.toFixed(1));
-        document.getElementById('cap-usl-hit').setAttribute('x1', xUsl.toFixed(1));
-        document.getElementById('cap-usl-hit').setAttribute('x2', xUsl.toFixed(1));
-        document.getElementById('cap-usl-badge').setAttribute('transform', `translate(${xUsl.toFixed(1)}, 152)`);
-        document.getElementById('cap-usl-text').textContent = `USL ${usl.toFixed(1)}`;
-
-        // Engineering Brackets
-        renderCapBracket(document.getElementById('cap-brk-spec'), {
-          x1: xLsl,
-          x2: xUsl,
-          y: 34,
-          extTop: 22,
-          extBottom: 115,
-          label: `USL - LSL = ${m.specW.toFixed(1)}`,
-          color: PALETTE.magenta,
-          pillBg: PALETTE.panel,
-          pillBorder: PALETTE.magenta,
-          textColor: PALETTE.rose,
-        });
-
-        const lowLbl = `μ - LSL = ${m.lowerM.toFixed(1)}`;
-        const upLbl = `USL - μ = ${m.upperM.toFixed(1)}`;
-        const midL = (xLsl + xMu) / 2;
-        const midU = (xMu + xUsl) / 2;
-        const minGap = (Math.max(88, lowLbl.length * 7.5 + 18) + Math.max(88, upLbl.length * 7.5 + 18)) / 2 + 12;
-        let offL = 0;
-        let offU = 0;
-        if (Math.abs(midU - midL) < minGap) {
-          const shift = (minGap - Math.abs(midU - midL)) / 2;
-          if (midL <= midU) { offL = -shift; offU = shift; }
-          else { offL = shift; offU = -shift; }
-        }
-
-        const lowNeg = m.lowerM < 0;
-        renderCapBracket(document.getElementById('cap-brk-lower'), {
-          x1: xLsl,
-          x2: xMu,
-          y: 82,
-          extTop: 70,
-          extBottom: 116,
-          label: lowLbl,
-          color: lowNeg ? PALETTE.crimson : PALETTE.icemint,
-          pillBg: lowNeg ? PALETTE.crimson : PALETTE.card,
-          pillBorder: lowNeg ? PALETTE.rose : PALETTE.teal,
-          textColor: lowNeg ? '#FFFFFF' : PALETTE.icemint,
-          offsetX: offL,
-        });
-
-        const upNeg = m.upperM < 0;
-        renderCapBracket(document.getElementById('cap-brk-upper'), {
-          x1: xMu,
-          x2: xUsl,
-          y: 82,
-          extTop: 70,
-          extBottom: 116,
-          label: upLbl,
-          color: upNeg ? PALETTE.crimson : PALETTE.icemint,
-          pillBg: upNeg ? PALETTE.crimson : PALETTE.card,
-          pillBorder: upNeg ? PALETTE.rose : PALETTE.teal,
-          textColor: upNeg ? '#FFFFFF' : PALETTE.icemint,
-          offsetX: offU,
-        });
-
-        renderCapBracket(document.getElementById('cap-brk-six'), {
-          x1: bxL,
-          x2: bxR,
-          y: 460,
-          extTop: 368,
-          extBottom: 472,
-          label: `6σ = ${(6 * sigma).toFixed(1)}`,
-          color: PALETTE.emerald,
-          pillBg: PALETTE.card,
-          pillBorder: PALETTE.emerald,
-          textColor: PALETTE.emerald,
-        });
-
-        // KPI Cards
-        document.getElementById('cap-val-cp').textContent = m.cp.toFixed(2);
-        document.getElementById('cap-sub-cp').textContent = `(${usl.toFixed(1)} - ${lsl.toFixed(1)}) / ${(6 * sigma).toFixed(1)}`;
-        styleCapBadge(document.getElementById('cap-badge-cp'), m.cp);
-
-        document.getElementById('cap-val-cpk').textContent = m.cpk.toFixed(2);
-        document.getElementById('cap-val-cpk').style.color = m.cpk < 1 ? PALETTE.crimson : m.cpk < 1.33 ? PALETTE.copper : PALETTE.emerald;
-        styleCapBadge(document.getElementById('cap-badge-cpk'), m.cpk);
-
-        document.getElementById('cap-val-cpu').textContent = m.cpu.toFixed(2);
-        document.getElementById('cap-sub-cpu').textContent = `(${usl.toFixed(1)} - ${mu.toFixed(1)}) / ${(3 * sigma).toFixed(1)}`;
-        document.getElementById('cap-val-cpl').textContent = m.cpl.toFixed(2);
-        document.getElementById('cap-sub-cpl').textContent = `(${mu.toFixed(1)} - ${lsl.toFixed(1)}) / ${(3 * sigma).toFixed(1)}`;
-
-        // Active bottleneck highlight on Cpu or Cpl
-        const cardCpu = document.getElementById('cap-card-cpu');
-        const cardCpl = document.getElementById('cap-card-cpl');
-        const bdgCpu = document.getElementById('cap-badge-cpu');
-        const bdgCpl = document.getElementById('cap-badge-cpl');
-        cardCpu.style.borderColor = PALETTE.border;
-        cardCpl.style.borderColor = PALETTE.border;
-        bdgCpu.textContent = 'Upper';
-        bdgCpu.style.color = PALETTE.icemint;
-        bdgCpu.style.borderColor = PALETTE.border;
-        bdgCpl.textContent = 'Lower';
-        bdgCpl.style.color = PALETTE.icemint;
-        bdgCpl.style.borderColor = PALETTE.border;
-
-        if (Math.abs(m.cpu - m.cpl) < 0.015) {
-          document.getElementById('cap-bottleneck').textContent = 'Balanced';
-        } else if (m.cpu < m.cpl) {
-          document.getElementById('cap-bottleneck').textContent = 'Bottleneck: Cpu';
-          cardCpu.style.borderColor = m.cpu < 1 ? PALETTE.crimson : PALETTE.copper;
-          bdgCpu.textContent = 'Bottleneck';
-          bdgCpu.style.color = PALETTE.crimson;
-          bdgCpu.style.borderColor = PALETTE.crimson;
-        } else {
-          document.getElementById('cap-bottleneck').textContent = 'Bottleneck: Cpl';
-          cardCpl.style.borderColor = m.cpl < 1 ? PALETTE.crimson : PALETTE.copper;
-          bdgCpl.textContent = 'Bottleneck';
-          bdgCpl.style.color = PALETTE.crimson;
-          bdgCpl.style.borderColor = PALETTE.crimson;
-        }
-
-        document.getElementById('cap-val-ppm').textContent = formatPPM(m.ppm);
-        document.getElementById('cap-val-ppm').style.color = m.ppm > 2700 ? PALETTE.crimson : PALETTE.icemint;
-        document.getElementById('cap-yield').textContent = `Yield: ${m.yieldPct > 99.9999 ? '99.9999' : m.yieldPct.toFixed(4)}%`;
-        const bdgPpm = document.getElementById('cap-badge-ppm');
-        if (m.ppm > 2700) {
-          bdgPpm.textContent = 'High';
-          bdgPpm.style.borderColor = PALETTE.crimson;
-          bdgPpm.style.color = PALETTE.crimson;
-        } else if (m.ppm > 64) {
-          bdgPpm.textContent = 'Moderate';
-          bdgPpm.style.borderColor = PALETTE.copper;
-          bdgPpm.style.color = PALETTE.copper;
-        } else {
-          bdgPpm.textContent = 'Low';
-          bdgPpm.style.borderColor = PALETTE.olive;
-          bdgPpm.style.color = PALETTE.emerald;
-        }
-
-        document.getElementById('cap-val-sigma').textContent = `${m.zMin.toFixed(2)}σ`;
-        document.getElementById('cap-sub-sigma').textContent = `Zmin: ${m.zMin.toFixed(2)}`;
-      }
-
-      function bindCapabilityEvents() {
-        const svg = document.getElementById('svg-capability');
-        const status = document.getElementById('cap-drag-status');
-
-        function toSvgPt(cx, cy) {
-          const pt = svg.createSVGPoint();
-          pt.x = cx;
-          pt.y = cy;
-          const ctm = svg.getScreenCTM();
-          return ctm ? pt.matrixTransform(ctm.inverse()) : { x: 0, y: 0 };
-        }
-
-        function startDrag(kind, cx, cy) {
-          capDragging = kind;
-          const domX = capXToDom(toSvgPt(cx, cy).x);
-          if (kind === 'mu') {
-            capDragOffset = domX - state.capability.mu;
-            status.textContent = 'Shifting Mean (μ)';
-          } else if (kind === 'lsl') {
-            capDragOffset = domX - state.capability.lsl;
-            status.textContent = 'Adjusting LSL';
-          } else if (kind === 'usl') {
-            capDragOffset = domX - state.capability.usl;
-            status.textContent = 'Adjusting USL';
-          }
-        }
-
-        function moveDrag(cx, cy) {
-          if (!capDragging) return;
-          const raw = capXToDom(toSvgPt(cx, cy).x) - capDragOffset;
-          const val = Math.round(raw * 10) / 10;
-          if (capDragging === 'mu') {
-            state.capability.mu = Math.max(5, Math.min(95, val));
-          } else if (capDragging === 'lsl') {
-            state.capability.lsl = Math.max(0, Math.min(state.capability.usl - 1, val));
-          } else if (capDragging === 'usl') {
-            state.capability.usl = Math.min(100, Math.max(state.capability.lsl + 1, val));
-          }
-          renderCapability();
-          persistState();
-        }
-
-        function endDrag() {
-          if (!capDragging) return;
-          capDragging = null;
-          status.textContent = 'Ready';
-        }
-
-        const dragMap = [
-          ['cap-fills', 'mu'],
-          ['cap-outline-grp', 'mu'],
-          ['cap-mu-grp', 'mu'],
-          ['cap-ruler-grp', 'mu'],
-          ['cap-lsl-grp', 'lsl'],
-          ['cap-usl-grp', 'usl'],
-        ];
-        dragMap.forEach(([id, kind]) => {
-          const el = document.getElementById(id);
-          el.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag(kind, e.clientX, e.clientY); });
-          el.addEventListener('touchstart', (e) => {
-            if (e.touches.length) { e.preventDefault(); startDrag(kind, e.touches[0].clientX, e.touches[0].clientY); }
-          }, { passive: false });
-        });
-
-        window.addEventListener('mousemove', (e) => { if (capDragging) moveDrag(e.clientX, e.clientY); });
-        window.addEventListener('touchmove', (e) => {
-          if (capDragging && e.touches.length) { e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); }
-        }, { passive: false });
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
-        window.addEventListener('touchcancel', endDrag);
-
-        // Slider & numeric inputs
-        const bindPair = (slId, inId, setter) => {
-          document.getElementById(slId).addEventListener('input', (e) => {
-            setter(parseFloat(e.target.value));
-            renderCapability();
-            persistState();
-          });
-          document.getElementById(inId).addEventListener('input', (e) => {
-            const v = parseFloat(e.target.value);
-            if (!Number.isNaN(v)) {
-              setter(v);
-              renderCapability();
-              persistState();
-            }
-          });
-          document.getElementById(inId).addEventListener('blur', renderCapability);
-        };
-
-        bindPair('cap-sl-mu', 'cap-in-mu', (v) => { state.capability.mu = Math.max(5, Math.min(95, v)); });
-        bindPair('cap-sl-sigma', 'cap-in-sigma', (v) => { state.capability.sigma = Math.max(1.5, Math.min(12, v)); });
-        bindPair('cap-sl-lsl', 'cap-in-lsl', (v) => { state.capability.lsl = Math.max(0, Math.min(state.capability.usl - 1, v)); });
-        bindPair('cap-sl-usl', 'cap-in-usl', (v) => { state.capability.usl = Math.min(100, Math.max(state.capability.lsl + 1, v)); });
-
-        const capPresets = {
-          centered: { mu: 50, sigma: 4.5, lsl: 30, usl: 70 },
-          shifted: { mu: 63, sigma: 5.0, lsl: 30, usl: 70 },
-          tight: { mu: 50, sigma: 6.2, lsl: 38, usl: 62 },
-          reset: { mu: 50, sigma: 5.0, lsl: 30, usl: 70 },
-        };
-        document.querySelectorAll('.cap-preset').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const p = capPresets[btn.dataset.preset];
-            if (p) {
-              state.capability = { ...p };
-              renderCapability();
-              persistState();
-            }
-          });
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 2: OEE ENGINE
-       * ===================================================================== */
-      function computeOEEMetrics() {
-        const { shift, downtime, cycle, output, scrap } = state.oee;
-        const planned = Math.max(1, shift);
-        const availLoss = Math.min(planned, Math.max(0, downtime));
-        const runTime = Math.max(0, planned - availLoss);
-        const avail = runTime / planned;
-
-        const idealRunMin = (Math.max(0, output) * Math.max(1, cycle)) / 60;
-        const perf = runTime > 0 ? idealRunMin / runTime : 0;
-        const netRunTime = Math.min(runTime, idealRunMin);
-        const perfLoss = Math.max(0, runTime - netRunTime);
-
-        const safeScrap = Math.min(Math.max(0, output), Math.max(0, scrap));
-        const goodUnits = Math.max(0, output - safeScrap);
-        const qual = output > 0 ? goodUnits / output : 0;
-
-        const prodTime = Math.min(netRunTime, (goodUnits * Math.max(1, cycle)) / 60);
-        const qualLoss = Math.max(0, netRunTime - prodTime);
-
-        const oee = avail * perf * qual;
-        return {
-          planned,
-          availLoss,
-          runTime,
-          perfLoss,
-          netRunTime,
-          qualLoss,
-          prodTime,
-          avail,
-          perf,
-          qual,
-          oee,
-          goodUnits,
-          safeScrap,
-          output,
-        };
-      }
-
-      function renderOEE() {
-        const m = computeOEEMetrics();
-        const o = state.oee;
-
-        const sync = (inId, slId, val) => {
-          const el = document.getElementById(inId);
-          if (document.activeElement !== el) el.value = val;
-          document.getElementById(slId).value = val;
-        };
-        sync('oee-in-shift', 'oee-sl-shift', o.shift);
-        sync('oee-in-down', 'oee-sl-down', o.downtime);
-        sync('oee-in-cycle', 'oee-sl-cycle', o.cycle);
-        sync('oee-in-output', 'oee-sl-output', o.output);
-        sync('oee-in-scrap', 'oee-sl-scrap', o.scrap);
-
-        const pct = (v) => `${(v * 100).toFixed(1)}%`;
-        const clampW = (v) => `${Math.max(0, Math.min(100, v * 100)).toFixed(1)}%`;
-
-        document.getElementById('oee-val-main').textContent = pct(m.oee);
-        document.getElementById('oee-bar-main').style.width = clampW(m.oee);
-        const badge = document.getElementById('oee-badge-main');
-        if (m.oee >= 0.85) {
-          badge.textContent = 'World Class';
-          badge.style.color = PALETTE.emerald;
-          badge.style.borderColor = PALETTE.emerald;
-          document.getElementById('oee-val-main').style.color = PALETTE.emerald;
-        } else if (m.oee >= 0.65) {
-          badge.textContent = 'Standard';
-          badge.style.color = PALETTE.copper;
-          badge.style.borderColor = PALETTE.copper;
-          document.getElementById('oee-val-main').style.color = PALETTE.icemint;
-        } else {
-          badge.textContent = 'Low';
-          badge.style.color = PALETTE.crimson;
-          badge.style.borderColor = PALETTE.crimson;
-          document.getElementById('oee-val-main').style.color = PALETTE.crimson;
-        }
-
-        document.getElementById('oee-val-avail').textContent = pct(m.avail);
-        document.getElementById('oee-sub-avail').textContent = `${m.runTime.toFixed(0)}m`;
-        document.getElementById('oee-bar-avail').style.width = clampW(m.avail);
-
-        document.getElementById('oee-val-perf').textContent = pct(m.perf);
-        document.getElementById('oee-sub-perf').textContent = `${m.netRunTime.toFixed(0)}m`;
-        document.getElementById('oee-bar-perf').style.width = clampW(m.perf);
-
-        document.getElementById('oee-val-qual').textContent = pct(m.qual);
-        document.getElementById('oee-sub-qual').textContent = `${m.safeScrap} scrap`;
-        document.getElementById('oee-bar-qual').style.width = clampW(m.qual);
-
-        document.getElementById('oee-val-good').textContent = m.goodUnits.toLocaleString('en-US');
-        document.getElementById('oee-sub-good').textContent = `of ${m.output}`;
-        document.getElementById('oee-bar-good').style.width = clampW(m.qual);
-
-        // Render SVG Waterfall Chart
-        const svg = document.getElementById('svg-oee');
-        const left = 72;
-        const right = 928;
-        const top = 46;
-        const bottom = 320;
-        const plotH = bottom - top;
-        const maxMin = m.planned;
-
-        const yAt = (min) => bottom - (Math.max(0, min) / maxMin) * plotH;
-
-        const steps = [
-          { label: 'Planned', start: 0, end: m.planned, val: m.planned, color: PALETTE.indigo, isLoss: false },
-          { label: 'Avail Loss', start: m.runTime, end: m.planned, val: -m.availLoss, color: PALETTE.crimson, isLoss: true },
-          { label: 'Run Time', start: 0, end: m.runTime, val: m.runTime, color: PALETTE.teal, isLoss: false },
-          { label: 'Perf Loss', start: m.netRunTime, end: m.runTime, val: -m.perfLoss, color: PALETTE.copper, isLoss: true },
-          { label: 'Net Run', start: 0, end: m.netRunTime, val: m.netRunTime, color: PALETTE.indigo, isLoss: false },
-          { label: 'Qual Loss', start: m.prodTime, end: m.netRunTime, val: -m.qualLoss, color: PALETTE.magenta, isLoss: true },
-          { label: 'Productive', start: 0, end: m.prodTime, val: m.prodTime, color: PALETTE.emerald, isLoss: false },
-        ];
-
-        const slotW = (right - left) / steps.length;
-        const barW = Math.min(82, slotW * 0.64);
-
-        let html = `<rect x="0" y="0" width="960" height="390" fill="${PALETTE.canvas}" />`;
-
-        // Horizontal Y grid
-        for (let i = 0; i <= 4; i++) {
-          const v = (maxMin * i) / 4;
-          const y = yAt(v);
-          html += `<line x1="${left}" y1="${y.toFixed(1)}" x2="${right}" y2="${y.toFixed(1)}" stroke="${PALETTE.border}" stroke-width="1" />`;
-          html += `<text x="${left - 10}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${Math.round(v)}m</text>`;
-        }
-
-        // Baseline
-        html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
-
-        // Waterfall step connectors & bars
-        steps.forEach((st, idx) => {
-          const cx = left + slotW * idx + slotW / 2;
-          const bx = cx - barW / 2;
-          const yTop = yAt(st.end);
-          const yBot = yAt(st.start);
-          const h = Math.max(2, yBot - yTop);
-
-          // Connecting dashed bridge from previous bar
-          if (idx > 0) {
-            const prevCx = left + slotW * (idx - 1) + slotW / 2;
-            const prevRight = prevCx + barW / 2;
-            const connY = st.isLoss ? yTop : yTop;
-            html += `<line x1="${prevRight.toFixed(1)}" y1="${connY.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${connY.toFixed(1)}" stroke="${PALETTE.rose}" stroke-width="1.3" stroke-dasharray="4 3" />`;
-          }
-
-          html += `<rect x="${bx.toFixed(1)}" y="${yTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${st.color}" stroke="${PALETTE.canvas}" stroke-width="1.5" rx="3" />`;
-
-          // Numeric annotation above bar
-          const valStr = st.isLoss ? `-${Math.abs(st.val).toFixed(0)}m` : `${st.val.toFixed(0)}m`;
-          const pctStr = `${((Math.abs(st.val) / maxMin) * 100).toFixed(1)}%`;
-          html += `<text x="${cx.toFixed(1)}" y="${(yTop - 16).toFixed(1)}" text-anchor="middle" fill="${st.isLoss ? PALETTE.rose : PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" font-weight="700">${valStr}</text>`;
-          html += `<text x="${cx.toFixed(1)}" y="${(yTop - 4).toFixed(1)}" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10">${pctStr}</text>`;
-
-          // X axis category label
-          html += `<text x="${cx.toFixed(1)}" y="${bottom + 22}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700">${st.label}</text>`;
-        });
-
-        // Bottom OEE summary ribbon inside SVG
-        html += `<rect x="${left}" y="356" width="${right - left}" height="24" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
-        html += `<text x="480" y="372" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">OEE ${pct(m.oee)}   |   Availability ${pct(m.avail)}   |   Performance ${pct(m.perf)}   |   Quality ${pct(m.qual)}</text>`;
-
-        svg.innerHTML = html;
-      }
-
-      function bindOEEEvents() {
-        const bind = (inId, slId, key, min, max) => {
-          document.getElementById(slId).addEventListener('input', (e) => {
-            state.oee[key] = Math.max(min, Math.min(max, parseFloat(e.target.value) || 0));
-            renderOEE();
-            persistState();
-          });
-          document.getElementById(inId).addEventListener('input', (e) => {
-            const v = parseFloat(e.target.value);
-            if (!Number.isNaN(v)) {
-              state.oee[key] = Math.max(min, Math.min(max, v));
-              renderOEE();
-              persistState();
-            }
-          });
-        };
-        bind('oee-in-shift', 'oee-sl-shift', 'shift', 60, 1440);
-        bind('oee-in-down', 'oee-sl-down', 'downtime', 0, 1440);
-        bind('oee-in-cycle', 'oee-sl-cycle', 'cycle', 1, 600);
-        bind('oee-in-output', 'oee-sl-output', 'output', 0, 10000);
-        bind('oee-in-scrap', 'oee-sl-scrap', 'scrap', 0, 5000);
-
-        const presets = {
-          world: { shift: 480, downtime: 20, cycle: 30, output: 885, scrap: 8 },
-          average: { shift: 480, downtime: 58, cycle: 30, output: 710, scrap: 24 },
-          bottleneck: { shift: 480, downtime: 115, cycle: 30, output: 540, scrap: 48 },
-        };
-        document.querySelectorAll('.oee-preset').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const p = presets[btn.dataset.preset];
-            if (p) {
-              state.oee = { ...p };
-              renderOEE();
-              persistState();
-            }
-          });
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 3: TAKT (Yamazumi Line Balancing)
-       * ===================================================================== */
-      function computeTaktMetrics() {
-        const avail = Math.max(1, state.takt.available);
-        const demand = Math.max(1, state.takt.demand);
-        const takt = avail / demand;
-        const stations = state.takt.stations;
-        let totalCycle = 0;
-        let bottleneck = { name: 'None', total: 0 };
-        stations.forEach((s) => {
-          const tot = (s.va || 0) + (s.bnva || 0) + (s.waste || 0);
-          totalCycle += tot;
-          if (tot > bottleneck.total) bottleneck = { name: s.name, total: tot };
-        });
-        const eff = stations.length > 0 && bottleneck.total > 0 ? (totalCycle / (stations.length * bottleneck.total)) * 100 : 0;
-        const headcount = takt > 0 ? totalCycle / takt : 0;
-        return { avail, demand, takt, totalCycle, bottleneck, eff, headcount };
-      }
-
-      function renderTaktChartOnly() {
-        const m = computeTaktMetrics();
-        const stations = state.takt.stations;
-
-        // Sync top inputs
-        const inA = document.getElementById('takt-in-avail');
-        const inD = document.getElementById('takt-in-demand');
-        if (document.activeElement !== inA) inA.value = state.takt.available;
-        if (document.activeElement !== inD) inD.value = state.takt.demand;
-
-        // Update KPI cards
-        document.getElementById('takt-val-takt').textContent = `${m.takt.toFixed(1)}s`;
-        document.getElementById('takt-val-bottle').textContent = `${m.bottleneck.total.toFixed(1)}s`;
-        document.getElementById('takt-val-bottle').style.color = m.bottleneck.total > m.takt ? PALETTE.crimson : PALETTE.emerald;
-        document.getElementById('takt-sub-bottle').textContent = m.bottleneck.name;
-        document.getElementById('takt-val-eff').textContent = `${m.eff.toFixed(1)}%`;
-        document.getElementById('takt-val-head').textContent = m.headcount.toFixed(2);
-
-        // Render SVG Yamazumi Chart
-        const svg = document.getElementById('svg-takt');
-        const left = 72;
-        const right = 920;
-        const top = 50;
-        const bottom = 328;
-        const plotH = bottom - top;
-
-        const maxVal = Math.max(m.takt * 1.22, m.bottleneck.total * 1.18, 20);
-        const yAt = (v) => bottom - (v / maxVal) * plotH;
-
-        let html = `<rect x="0" y="0" width="960" height="390" fill="${PALETTE.canvas}" />`;
-
-        // Grid lines
-        for (let i = 0; i <= 5; i++) {
-          const val = (maxVal * i) / 5;
-          const y = yAt(val);
-          html += `<line x1="${left}" y1="${y.toFixed(1)}" x2="${right}" y2="${y.toFixed(1)}" stroke="${PALETTE.border}" stroke-width="1" />`;
-          html += `<text x="${left - 10}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${val.toFixed(0)}s</text>`;
-        }
-
-        html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
-
-        if (stations.length > 0) {
-          const slotW = (right - left) / stations.length;
-          const barW = Math.min(86, slotW * 0.56);
-
-          stations.forEach((st, idx) => {
-            const cx = left + slotW * idx + slotW / 2;
-            const bx = cx - barW / 2;
-            const va = Math.max(0, st.va || 0);
-            const bnva = Math.max(0, st.bnva || 0);
-            const waste = Math.max(0, st.waste || 0);
-            const tot = va + bnva + waste;
-            const over = tot > m.takt;
-
-            // Stacked bars from bottom up: VA -> BNVA -> Waste
-            const yVaTop = yAt(va);
-            const yBnvaTop = yAt(va + bnva);
-            const yWasteTop = yAt(tot);
-
-            if (va > 0) {
-              html += `<rect x="${bx.toFixed(1)}" y="${yVaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(bottom - yVaTop).toFixed(1)}" fill="${PALETTE.emerald}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
-            }
-            if (bnva > 0) {
-              html += `<rect x="${bx.toFixed(1)}" y="${yBnvaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yVaTop - yBnvaTop).toFixed(1)}" fill="${PALETTE.teal}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
-            }
-            if (waste > 0) {
-              html += `<rect x="${bx.toFixed(1)}" y="${yWasteTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yBnvaTop - yWasteTop).toFixed(1)}" fill="${PALETTE.crimson}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
-            }
-
-            // Over-takt alert frame + badge
-            if (over) {
-              html += `<rect x="${(bx - 3).toFixed(1)}" y="${(yWasteTop - 3).toFixed(1)}" width="${(barW + 6).toFixed(1)}" height="${(bottom - yWasteTop + 3).toFixed(1)}" fill="none" stroke="${PALETTE.crimson}" stroke-width="2.2" rx="3" />`;
-              html += `<rect x="${(cx - 26).toFixed(1)}" y="${(yWasteTop - 36).toFixed(1)}" width="52" height="17" rx="3" fill="${PALETTE.crimson}" />`;
-              html += `<text x="${cx.toFixed(1)}" y="${(yWasteTop - 24).toFixed(1)}" text-anchor="middle" fill="#FFFFFF" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">OVER</text>`;
-            }
-
-            // Total label
-            html += `<text x="${cx.toFixed(1)}" y="${(yWasteTop - 7).toFixed(1)}" text-anchor="middle" fill="${over ? PALETTE.rose : PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" font-weight="700">${tot.toFixed(0)}s</text>`;
-
-            // Station name
-            html += `<text x="${cx.toFixed(1)}" y="${bottom + 22}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700">${escapeHtml(truncateText(st.name, 13))}</text>`;
-            html += `<text x="${cx.toFixed(1)}" y="${bottom + 38}" text-anchor="middle" fill="${PALETTE.teal}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10">VA ${va}s</text>`;
-          });
-        }
-
-        // Takt horizontal threshold line
-        const yTakt = yAt(m.takt);
-        html += `<line x1="${left}" y1="${yTakt.toFixed(1)}" x2="${right}" y2="${yTakt.toFixed(1)}" stroke="${PALETTE.magenta}" stroke-width="2.8" stroke-dasharray="8 5" />`;
-        html += `<rect x="${(right - 122).toFixed(1)}" y="${(yTakt - 25).toFixed(1)}" width="122" height="21" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.magenta}" stroke-width="1.5" />`;
-        html += `<text x="${(right - 61).toFixed(1)}" y="${(yTakt - 11).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">TAKT ${m.takt.toFixed(1)}s</text>`;
-
-        svg.innerHTML = html;
-      }
-
-      function renderTaktTable() {
-        const m = computeTaktMetrics();
-        const tbody = document.getElementById('takt-table-body');
-        tbody.innerHTML = state.takt.stations
-          .map((st, idx) => {
-            const tot = (st.va || 0) + (st.bnva || 0) + (st.waste || 0);
-            const over = tot > m.takt;
-            return `
-              <tr class="hover:bg-navy-panel">
-                <td class="py-2 pr-3">
-                  <input type="text" data-idx="${idx}" data-field="name" value="${escapeHtml(st.name)}" class="ind-input ind-input-text w-36 takt-edit" />
-                </td>
-                <td class="py-2 px-2">
-                  <input type="number" min="0" max="600" data-idx="${idx}" data-field="va" value="${st.va}" class="ind-input w-20 text-right takt-edit" />
-                </td>
-                <td class="py-2 px-2">
-                  <input type="number" min="0" max="600" data-idx="${idx}" data-field="bnva" value="${st.bnva}" class="ind-input w-20 text-right takt-edit" />
-                </td>
-                <td class="py-2 px-2">
-                  <input type="number" min="0" max="600" data-idx="${idx}" data-field="waste" value="${st.waste}" class="ind-input w-20 text-right takt-edit" />
-                </td>
-                <td class="py-2 px-2 font-mono font-bold" id="takt-row-tot-${idx}">${tot.toFixed(0)}s</td>
-                <td class="py-2 px-2">
-                  <span id="takt-row-st-${idx}" class="px-2 py-0.5 text-xs font-mono font-bold rounded-xs border ${over ? 'border-crimson text-crimson bg-navy-canvas' : 'border-emerald-mint text-emerald-mint bg-navy-canvas'}">${over ? 'Over' : 'Balanced'}</span>
-                </td>
-                <td class="py-2 pl-2 text-right">
-                  <button type="button" data-idx="${idx}" class="ind-btn ind-btn-danger py-1 px-2.5 text-xs takt-del">Delete</button>
-                </td>
-              </tr>
-            `;
-          })
-          .join('');
-
-        tbody.querySelectorAll('.takt-edit').forEach((inp) => {
-          inp.addEventListener('input', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            const f = e.target.dataset.field;
-            if (f === 'name') {
-              state.takt.stations[i].name = e.target.value;
-            } else {
-              state.takt.stations[i][f] = Math.max(0, parseFloat(e.target.value) || 0);
-            }
-            const st = state.takt.stations[i];
-            const tot = (st.va || 0) + (st.bnva || 0) + (st.waste || 0);
-            const curTakt = computeTaktMetrics().takt;
-            const totCell = document.getElementById(`takt-row-tot-${i}`);
-            const stCell = document.getElementById(`takt-row-st-${i}`);
-            if (totCell) totCell.textContent = `${tot.toFixed(0)}s`;
-            if (stCell) {
-              const over = tot > curTakt;
-              stCell.textContent = over ? 'Over' : 'Balanced';
-              stCell.className = `px-2 py-0.5 text-xs font-mono font-bold rounded-xs border ${over ? 'border-crimson text-crimson bg-navy-canvas' : 'border-emerald-mint text-emerald-mint bg-navy-canvas'}`;
-            }
-            renderTaktChartOnly();
-            persistState();
-          });
-        });
-
-        tbody.querySelectorAll('.takt-del').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            if (state.takt.stations.length <= 1) {
-              showToast('At least one station required', true);
-              return;
-            }
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.takt.stations.splice(i, 1);
-            renderTakt();
-            persistState();
-          });
-        });
-      }
-
-      function renderTakt() {
-        renderTaktChartOnly();
-        renderTaktTable();
-      }
-
-      function bindTaktEvents() {
-        document.getElementById('takt-in-avail').addEventListener('input', (e) => {
-          state.takt.available = Math.max(60, parseFloat(e.target.value) || 60);
-          renderTakt();
-          persistState();
-        });
-        document.getElementById('takt-in-demand').addEventListener('input', (e) => {
-          state.takt.demand = Math.max(1, parseFloat(e.target.value) || 1);
-          renderTakt();
-          persistState();
-        });
-        document.getElementById('btn-takt-add').addEventListener('click', () => {
-          const n = state.takt.stations.length + 1;
-          state.takt.stations.push({ id: nextId(state.takt.stations), name: `Station ${n}`, va: 30, bnva: 8, waste: 5 });
-          renderTakt();
-          persistState();
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 4: PARETO ENGINE (80/20 Defect Analysis)
-       * ===================================================================== */
-      function computeParetoSorted() {
-        const sorted = [...state.pareto.items]
-          .map((it) => ({ ...it, count: Math.max(0, Number(it.count) || 0) }))
-          .sort((a, b) => b.count - a.count);
-        const total = sorted.reduce((acc, it) => acc + it.count, 0);
-        let running = 0;
-        let vitalCount = 0;
-        let reached80 = false;
-
-        const rows = sorted.map((it, idx) => {
-          const prevCum = total > 0 ? (running / total) * 100 : 0;
-          running += it.count;
-          const share = total > 0 ? (it.count / total) * 100 : 0;
-          const cum = total > 0 ? (running / total) * 100 : 0;
-          const isVital = !reached80 && total > 0;
-          if (isVital) {
-            vitalCount++;
-            if (cum >= 80) reached80 = true;
-          }
-          return { ...it, share, cum, prevCum, isVital, isTop: idx === 0 && it.count > 0 };
-        });
-
-        return { rows, total, vitalCount };
-      }
-
-      function renderParetoChartOnly() {
-        const { rows, total, vitalCount } = computeParetoSorted();
-
-        // Update KPI cards
-        document.getElementById('par-val-total').textContent = total.toLocaleString('en-US');
-        document.getElementById('par-val-vital').textContent = String(vitalCount);
-        document.getElementById('par-sub-vital').textContent = `of ${rows.length} Categories`;
-        if (rows.length > 0 && total > 0) {
-          document.getElementById('par-val-top').textContent = truncateText(rows[0].name, 14);
-          document.getElementById('par-sub-top').textContent = `${rows[0].share.toFixed(1)}% Share (${rows[0].count})`;
-        } else {
-          document.getElementById('par-val-top').textContent = 'None';
-          document.getElementById('par-sub-top').textContent = '0.0% Share';
-        }
-
-        // Render SVG Dual-Axis Pareto Chart
-        const svg = document.getElementById('svg-pareto');
-        const left = 68;
-        const right = 888;
-        const top = 46;
-        const bottom = 324;
-        const plotH = bottom - top;
-        const maxCount = Math.max(10, ...rows.map((r) => r.count)) * 1.15;
-
-        const yCount = (c) => bottom - (c / maxCount) * plotH;
-        const yPct = (p) => bottom - (p / 100) * plotH;
-
-        let html = `<rect x="0" y="0" width="960" height="390" fill="${PALETTE.canvas}" />`;
-
-        // Left & Right Y-axes grid
-        for (let i = 0; i <= 5; i++) {
-          const p = i * 20;
-          const y = yPct(p);
-          const cVal = (maxCount * i) / 5;
-          html += `<line x1="${left}" y1="${y.toFixed(1)}" x2="${right}" y2="${y.toFixed(1)}" stroke="${PALETTE.border}" stroke-width="1" />`;
-          html += `<text x="${left - 10}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${Math.round(cVal)}</text>`;
-          html += `<text x="${right + 10}" y="${(y + 4).toFixed(1)}" text-anchor="start" fill="${PALETTE.magenta}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${p}%</text>`;
-        }
-
-        // Axes borders
-        html += `<line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="1.5" />`;
-        html += `<line x1="${right}" y1="${top}" x2="${right}" y2="${bottom}" stroke="${PALETTE.magenta}" stroke-width="1.5" />`;
-        html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
-
-        // 80% horizontal threshold line
-        const y80 = yPct(80);
-        html += `<line x1="${left}" y1="${y80.toFixed(1)}" x2="${right}" y2="${y80.toFixed(1)}" stroke="${PALETTE.copper}" stroke-width="2" stroke-dasharray="7 4" />`;
-        html += `<rect x="${left + 8}" y="${(y80 - 22).toFixed(1)}" width="74" height="18" rx="3" fill="${PALETTE.panel}" stroke="${PALETTE.copper}" stroke-width="1.2" />`;
-        html += `<text x="${left + 45}" y="${(y80 - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">80% RULE</text>`;
-
-        if (rows.length > 0) {
-          const slotW = (right - left) / rows.length;
-          const barW = Math.min(72, slotW * 0.62);
-          let polyPts = '';
-
-          // Draw bars
-          rows.forEach((r, idx) => {
-            const cx = left + slotW * idx + slotW / 2;
-            const bx = cx - barW / 2;
-            const yTop = yCount(r.count);
-            const h = Math.max(2, bottom - yTop);
-            const fill = r.isTop ? PALETTE.crimson : r.isVital ? PALETTE.indigo : PALETTE.teal;
-
-            html += `<rect class="par-hover-bar" data-name="${escapeHtml(r.name)}" data-count="${r.count}" data-share="${r.share.toFixed(1)}" data-cum="${r.cum.toFixed(1)}" x="${bx.toFixed(1)}" y="${yTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" stroke="${PALETTE.canvas}" stroke-width="1.5" rx="2" />`;
-            html += `<text x="${cx.toFixed(1)}" y="${(yTop - 6).toFixed(1)}" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${r.count}</text>`;
-
-            // Category X-label
-            html += `<text x="${cx.toFixed(1)}" y="${bottom + 20}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700">${escapeHtml(truncateText(r.name, 10))}</text>`;
-
-            const py = yPct(r.cum);
-            polyPts += `${cx.toFixed(1)},${py.toFixed(1)} `;
-          });
-
-          // Cumulative polyline
-          html += `<polyline points="${polyPts.trim()}" fill="none" stroke="${PALETTE.magenta}" stroke-width="3" stroke-linejoin="round" />`;
-
-          // Cumulative nodes
-          rows.forEach((r, idx) => {
-            const cx = left + slotW * idx + slotW / 2;
-            const py = yPct(r.cum);
-            html += `<circle class="par-hover-bar" data-name="${escapeHtml(r.name)}" data-count="${r.count}" data-share="${r.share.toFixed(1)}" data-cum="${r.cum.toFixed(1)}" cx="${cx.toFixed(1)}" cy="${py.toFixed(1)}" r="5.5" fill="${PALETTE.canvas}" stroke="${PALETTE.magenta}" stroke-width="2.5" />`;
-            html += `<text x="${cx.toFixed(1)}" y="${(py - 11).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">${r.cum.toFixed(0)}%</text>`;
-          });
-        }
-
-        svg.innerHTML = html;
-
-        // Bind hover tooltips
-        const tip = document.getElementById('pareto-tooltip');
-        svg.querySelectorAll('.par-hover-bar').forEach((el) => {
-          el.addEventListener('mouseenter', () => {
-            tip.textContent = `${el.dataset.name}: ${el.dataset.count} (${el.dataset.share}% share, ${el.dataset.cum}% cum)`;
-            tip.classList.remove('hidden');
-          });
-          el.addEventListener('mouseleave', () => tip.classList.add('hidden'));
-        });
-      }
-
-      function renderParetoTable() {
-        const { rows } = computeParetoSorted();
-        const mapById = new Map(rows.map((r) => [r.id, r]));
-        const tbody = document.getElementById('pareto-table-body');
-        tbody.innerHTML = state.pareto.items
-          .map((item, idx) => {
-            const stat = mapById.get(item.id) || { share: 0, cum: 0, isVital: false };
-            return `
-              <tr class="hover:bg-navy-panel">
-                <td class="py-2 pr-3">
-                  <input type="text" data-idx="${idx}" data-field="name" value="${escapeHtml(item.name)}" class="ind-input ind-input-text w-40 par-edit" />
-                </td>
-                <td class="py-2 px-2">
-                  <input type="number" min="0" max="99999" data-idx="${idx}" data-field="count" value="${item.count}" class="ind-input w-24 text-right par-edit" />
-                </td>
-                <td class="py-2 px-2 font-mono text-icemint" id="par-share-${item.id}">${stat.share.toFixed(1)}%</td>
-                <td class="py-2 px-2 font-mono text-magenta" id="par-cum-${item.id}">${stat.cum.toFixed(1)}%</td>
-                <td class="py-2 px-2">
-                  <span id="par-cls-${item.id}" class="px-2 py-0.5 text-xs font-mono font-bold rounded-xs border ${stat.isVital ? 'border-magenta text-rose-dusty bg-indigo-royal' : 'border-teal-slate text-teal-slate bg-navy-canvas'}">${stat.isVital ? 'Vital' : 'Trivial'}</span>
-                </td>
-                <td class="py-2 pl-2 text-right">
-                  <button type="button" data-idx="${idx}" class="ind-btn ind-btn-danger py-1 px-2.5 text-xs par-del">Delete</button>
-                </td>
-              </tr>
-            `;
-          })
-          .join('');
-
-        tbody.querySelectorAll('.par-edit').forEach((inp) => {
-          inp.addEventListener('input', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            const f = e.target.dataset.field;
-            if (f === 'name') {
-              state.pareto.items[i].name = e.target.value;
-            } else {
-              state.pareto.items[i].count = Math.max(0, parseInt(e.target.value, 10) || 0);
-            }
-            renderParetoChartOnly();
-            // Refresh derived stats columns without resetting input focus
-            const { rows: updated } = computeParetoSorted();
-            updated.forEach((r) => {
-              const sEl = document.getElementById(`par-share-${r.id}`);
-              const cEl = document.getElementById(`par-cum-${r.id}`);
-              const kEl = document.getElementById(`par-cls-${r.id}`);
-              if (sEl) sEl.textContent = `${r.share.toFixed(1)}%`;
-              if (cEl) cEl.textContent = `${r.cum.toFixed(1)}%`;
-              if (kEl) {
-                kEl.textContent = r.isVital ? 'Vital' : 'Trivial';
-                kEl.className = `px-2 py-0.5 text-xs font-mono font-bold rounded-xs border ${r.isVital ? 'border-magenta text-rose-dusty bg-indigo-royal' : 'border-teal-slate text-teal-slate bg-navy-canvas'}`;
-              }
-            });
-            persistState();
-          });
-        });
-
-        tbody.querySelectorAll('.par-del').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            if (state.pareto.items.length <= 1) {
-              showToast('At least one category required', true);
-              return;
-            }
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.pareto.items.splice(i, 1);
-            renderPareto();
-            persistState();
-          });
-        });
-      }
-
-      function renderPareto() {
-        renderParetoChartOnly();
-        renderParetoTable();
-      }
-
-      function bindParetoEvents() {
-        document.getElementById('btn-par-add').addEventListener('click', () => {
-          const n = state.pareto.items.length + 1;
-          state.pareto.items.push({ id: nextId(state.pareto.items), name: `Defect ${n}`, count: 12 });
-          renderPareto();
-          persistState();
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 5: VSM (Value Stream Mapping)
-       * ===================================================================== */
-      function computeVSMMetrics() {
-        const steps = state.vsm.steps;
-        const totalVASec = steps.reduce((a, s) => a + Math.max(0, Number(s.cycle) || 0), 0);
-        const totalQueueHrs = steps.reduce((a, s) => a + Math.max(0, Number(s.queue) || 0), 0);
-        const totalLeadSec = totalQueueHrs * 3600 + totalVASec;
-        const totalLeadHrs = totalLeadSec / 3600;
-        const pce = totalLeadSec > 0 ? (totalVASec / totalLeadSec) * 100 : 0;
-        const totalOps = steps.reduce((a, s) => a + Math.max(0, Number(s.operators) || 0), 0);
-        return { totalVASec, totalQueueHrs, totalLeadSec, totalLeadHrs, pce, totalOps, count: steps.length };
-      }
-
-      function renderVSMChartOnly() {
-        const m = computeVSMMetrics();
-        const steps = state.vsm.steps;
-
-        // KPI cards
-        document.getElementById('vsm-val-lead').textContent = `${m.totalLeadHrs.toFixed(2)}h`;
-        document.getElementById('vsm-sub-lead').textContent = `${(m.totalLeadHrs / 24).toFixed(2)} Days`;
-        document.getElementById('vsm-val-va').textContent = `${m.totalVASec.toFixed(0)}s`;
-        document.getElementById('vsm-sub-va').textContent = `${(m.totalVASec / 60).toFixed(2)} Min`;
-        document.getElementById('vsm-val-pce').textContent = `${m.pce.toFixed(2)}%`;
-        document.getElementById('vsm-val-steps').textContent = String(m.count);
-        document.getElementById('vsm-sub-ops').textContent = `${m.totalOps} Operators`;
-
-        // Render SVG Value Stream Map
-        const svg = document.getElementById('svg-vsm');
-        let html = `<rect x="0" y="0" width="1000" height="420" fill="${PALETTE.canvas}" />`;
-
-        // Production Control Header Box (Top Center)
-        html += `<rect x="370" y="16" width="260" height="40" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.magenta}" stroke-width="2" />`;
-        html += `<text x="500" y="41" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700">PRODUCTION CONTROL</text>`;
-
-        // Supplier (Left) & Customer (Right) icons
-        html += `<rect x="24" y="20" width="96" height="34" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.teal}" stroke-width="1.8" />`;
-        html += `<text x="72" y="41" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">SUPPLIER</text>`;
-
-        html += `<rect x="880" y="20" width="96" height="34" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.emerald}" stroke-width="1.8" />`;
-        html += `<text x="928" y="41" text-anchor="middle" fill="${PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">CUSTOMER</text>`;
-
-        // Information flow dashed lines
-        html += `<line x1="120" y1="37" x2="370" y2="37" stroke="${PALETTE.teal}" stroke-width="1.5" stroke-dasharray="5 4" />`;
-        html += `<line x1="630" y1="37" x2="880" y2="37" stroke="${PALETTE.emerald}" stroke-width="1.5" stroke-dasharray="5 4" />`;
-
-        const n = steps.length;
-        if (n > 0) {
-          const marginL = 34;
-          const marginR = 148; // Reserve space on right for summary box
-          const usableW = 1000 - marginL - marginR;
-          const segW = usableW / n;
-          const boxW = Math.min(136, segW * 0.62);
-          const triGap = segW - boxW;
-          const boxY = 108;
-          const boxH = 146;
-
-          const ladderTopY = 308;
-          const ladderBotY = 356;
-          let ladderPath = '';
-
-          steps.forEach((st, idx) => {
-            const segX = marginL + idx * segW;
-            const triCx = segX + triGap * 0.48;
-            const bx = segX + triGap;
-            const boxCx = bx + boxW / 2;
-
-            // Inventory Queue Triangle before step
-            const triY = boxY + 62;
-            const triSz = Math.min(20, Math.max(12, triGap * 0.28));
-            html += `<polygon points="${triCx.toFixed(1)},${(triY - triSz).toFixed(1)} ${(triCx - triSz).toFixed(1)},${(triY + triSz * 0.85).toFixed(1)} ${(triCx + triSz).toFixed(1)},${(triY + triSz * 0.85).toFixed(1)}" fill="${PALETTE.copper}" stroke="${PALETTE.rose}" stroke-width="1.5" />`;
-            html += `<text x="${triCx.toFixed(1)}" y="${(triY + 6).toFixed(1)}" text-anchor="middle" fill="${PALETTE.canvas}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">I</text>`;
-            html += `<text x="${triCx.toFixed(1)}" y="${(triY + triSz + 16).toFixed(1)}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${Number(st.queue).toFixed(1)}h</text>`;
-
-            // Arrow from triangle to process box
-            html += `<line x1="${(triCx + triSz + 2).toFixed(1)}" y1="${triY}" x2="${(bx - 4).toFixed(1)}" y2="${triY}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
-            html += `<polygon points="${bx.toFixed(1)},${triY} ${(bx - 7).toFixed(1)},${triY - 4} ${(bx - 7).toFixed(1)},${triY + 4}" fill="${PALETTE.icemint}" />`;
-
-            // Control signal vertical dashed line
-            html += `<line x1="${boxCx.toFixed(1)}" y1="56" x2="${boxCx.toFixed(1)}" y2="${boxY}" stroke="${PALETTE.border}" stroke-width="1.4" stroke-dasharray="4 3" />`;
-
-            // Process Box
-            html += `<rect x="${bx.toFixed(1)}" y="${boxY}" width="${boxW.toFixed(1)}" height="${boxH}" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.teal}" stroke-width="2" />`;
-            html += `<rect x="${bx.toFixed(1)}" y="${boxY}" width="${boxW.toFixed(1)}" height="32" rx="3" fill="${PALETTE.indigo}" />`;
-            html += `<text x="${boxCx.toFixed(1)}" y="${boxY + 21}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="11.5" font-weight="700">${escapeHtml(truncateText(st.name, 13))}</text>`;
-
-            // Embedded Data Box rows
-            const dataRows = [
-              ['C/T', `${st.cycle}s`, PALETTE.emerald],
-              ['C/O', `${st.changeover}m`, PALETTE.copper],
-              ['Up', `${st.uptime}%`, PALETTE.icemint],
-              ['Ops', `${st.operators}`, PALETTE.rose],
-            ];
-            dataRows.forEach(([k, v, col], rIdx) => {
-              const ry = boxY + 52 + rIdx * 23;
-              html += `<line x1="${(bx + 6).toFixed(1)}" y1="${ry - 14}" x2="${(bx + boxW - 6).toFixed(1)}" y2="${ry - 14}" stroke="${PALETTE.border}" stroke-width="1" />`;
-              html += `<text x="${(bx + 10).toFixed(1)}" y="${ry}" fill="${PALETTE.teal}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5">${k}</text>`;
-              html += `<text x="${(bx + boxW - 10).toFixed(1)}" y="${ry}" text-anchor="end" fill="${col}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${v}</text>`;
-            });
-
-            // Sawtooth Lead-Time Ladder segments
-            const waitStartX = segX;
-            const waitEndX = bx;
-            const procEndX = bx + boxW;
-
-            if (idx === 0) {
-              ladderPath += `M ${waitStartX.toFixed(1)} ${ladderTopY}`;
-            } else {
-              ladderPath += ` L ${waitStartX.toFixed(1)} ${ladderTopY}`;
-            }
-            ladderPath += ` L ${waitEndX.toFixed(1)} ${ladderTopY} L ${waitEndX.toFixed(1)} ${ladderBotY} L ${procEndX.toFixed(1)} ${ladderBotY} L ${procEndX.toFixed(1)} ${ladderTopY}`;
-
-            // Wait tooth label (Top)
-            html += `<text x="${((waitStartX + waitEndX) / 2).toFixed(1)}" y="${ladderTopY - 8}" text-anchor="middle" fill="${PALETTE.crimson}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${Number(st.queue).toFixed(1)}h</text>`;
-            // Value-Add trough label (Bottom)
-            html += `<text x="${boxCx.toFixed(1)}" y="${ladderBotY + 18}" text-anchor="middle" fill="${PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${st.cycle}s</text>`;
-          });
-
-          // Render complete sawtooth polyline
-          html += `<path d="${ladderPath}" fill="none" stroke="${PALETTE.icemint}" stroke-width="2.5" stroke-linejoin="miter" />`;
-          // Highlight wait top teeth and VA troughs subtly with colored caps
-          steps.forEach((st, idx) => {
-            const segX = marginL + idx * segW;
-            const bx = segX + triGap;
-            html += `<line x1="${segX.toFixed(1)}" y1="${ladderTopY}" x2="${bx.toFixed(1)}" y2="${ladderTopY}" stroke="${PALETTE.crimson}" stroke-width="3.5" />`;
-            html += `<line x1="${bx.toFixed(1)}" y1="${ladderBotY}" x2="${(bx + boxW).toFixed(1)}" y2="${ladderBotY}" stroke="${PALETTE.emerald}" stroke-width="3.5" />`;
-          });
-        }
-
-        // Far-right Summary Metric Box on Timeline
-        html += `<rect x="862" y="294" width="122" height="84" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.magenta}" stroke-width="2" />`;
-        html += `<text x="872" y="316" fill="${PALETTE.crimson}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">LT: ${m.totalLeadHrs.toFixed(1)}h</text>`;
-        html += `<text x="872" y="338" fill="${PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">VA: ${m.totalVASec.toFixed(0)}s</text>`;
-        html += `<text x="872" y="362" fill="${PALETTE.magenta}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">PCE: ${m.pce.toFixed(2)}%</text>`;
-
-        svg.innerHTML = html;
-      }
-
-      function renderVSMTable() {
-        const tbody = document.getElementById('vsm-table-body');
-        tbody.innerHTML = state.vsm.steps
-          .map((st, idx) => `
-            <tr class="hover:bg-navy-panel">
-              <td class="py-2 pr-2"><input type="text" data-idx="${idx}" data-field="name" value="${escapeHtml(st.name)}" class="ind-input ind-input-text w-32 vsm-edit" /></td>
-              <td class="py-2 px-2"><input type="number" min="1" max="9999" data-idx="${idx}" data-field="cycle" value="${st.cycle}" class="ind-input w-20 text-right vsm-edit" /></td>
-              <td class="py-2 px-2"><input type="number" min="0" max="999" data-idx="${idx}" data-field="changeover" value="${st.changeover}" class="ind-input w-20 text-right vsm-edit" /></td>
-              <td class="py-2 px-2"><input type="number" min="1" max="100" data-idx="${idx}" data-field="uptime" value="${st.uptime}" class="ind-input w-20 text-right vsm-edit" /></td>
-              <td class="py-2 px-2"><input type="number" min="1" max="50" data-idx="${idx}" data-field="operators" value="${st.operators}" class="ind-input w-16 text-right vsm-edit" /></td>
-              <td class="py-2 px-2"><input type="number" min="0" max="500" step="0.5" data-idx="${idx}" data-field="queue" value="${st.queue}" class="ind-input w-20 text-right vsm-edit" /></td>
-              <td class="py-2 pl-2 text-right whitespace-nowrap space-x-1">
-                <button type="button" data-idx="${idx}" data-dir="-1" class="ind-btn py-1 px-2 text-xs vsm-move" title="Move Left">&lt;</button>
-                <button type="button" data-idx="${idx}" data-dir="1" class="ind-btn py-1 px-2 text-xs vsm-move" title="Move Right">&gt;</button>
-                <button type="button" data-idx="${idx}" class="ind-btn ind-btn-danger py-1 px-2 text-xs vsm-del">Delete</button>
-              </td>
-            </tr>
-          `)
-          .join('');
-
-        tbody.querySelectorAll('.vsm-edit').forEach((inp) => {
-          inp.addEventListener('input', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            const f = e.target.dataset.field;
-            if (f === 'name') {
-              state.vsm.steps[i].name = e.target.value;
-            } else {
-              state.vsm.steps[i][f] = Math.max(0, parseFloat(e.target.value) || 0);
-            }
-            renderVSMChartOnly();
-            persistState();
-          });
-        });
-
-        tbody.querySelectorAll('.vsm-move').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            const d = parseInt(e.target.dataset.dir, 10);
-            const target = i + d;
-            if (target < 0 || target >= state.vsm.steps.length) return;
-            const tmp = state.vsm.steps[i];
-            state.vsm.steps[i] = state.vsm.steps[target];
-            state.vsm.steps[target] = tmp;
-            renderVSM();
-            persistState();
-          });
-        });
-
-        tbody.querySelectorAll('.vsm-del').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            if (state.vsm.steps.length <= 1) {
-              showToast('At least one process step required', true);
-              return;
-            }
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.vsm.steps.splice(i, 1);
-            renderVSM();
-            persistState();
-          });
-        });
-      }
-
-      function renderVSM() {
-        renderVSMChartOnly();
-        renderVSMTable();
-      }
-
-      function bindVSMEvents() {
-        document.getElementById('btn-vsm-add').addEventListener('click', () => {
-          if (state.vsm.steps.length >= 7) {
-            showToast('Maximum 7 steps supported on map', true);
-            return;
-          }
-          const n = state.vsm.steps.length + 1;
-          state.vsm.steps.push({
-            id: nextId(state.vsm.steps),
-            name: `Process ${n}`,
-            cycle: 50,
-            changeover: 12,
-            uptime: 95,
-            operators: 1,
-            queue: 3.0,
-          });
-          renderVSM();
-          persistState();
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 6: 5S AUDIT ENGINE
-       * ===================================================================== */
-      function compute5SMetrics() {
-        const pillars = state.fives.pillars.map((p) => {
-          const avg = p.criteria.reduce((a, c) => a + c.score, 0) / p.criteria.length;
-          return { name: p.name, avg };
-        });
-        const overallMean = pillars.reduce((a, p) => a + p.avg, 0) / pillars.length;
-        const overallPct = (overallMean / 5) * 100;
-        let lowest = pillars[0];
-        pillars.forEach((p) => { if (p.avg < lowest.avg) lowest = p; });
-        const openActions = state.fives.actions.filter((a) => a.status === 'Open').length;
-        return { pillars, overallMean, overallPct, lowest, openActions, target: state.fives.target };
-      }
-
-      function render5SRadarAndKPIs() {
-        const m = compute5SMetrics();
-        document.getElementById('fives-sl-target').value = m.target.toFixed(1);
-        document.getElementById('fives-lbl-target').textContent = m.target.toFixed(1);
-
-        document.getElementById('fives-val-score').textContent = `${m.overallPct.toFixed(1)}%`;
-        document.getElementById('fives-sub-score').textContent = `${m.overallMean.toFixed(2)} Mean`;
-        document.getElementById('fives-val-target').textContent = m.target.toFixed(2);
-        document.getElementById('fives-val-lowest').textContent = m.lowest.name;
-        document.getElementById('fives-sub-lowest').textContent = `${m.lowest.avg.toFixed(2)} Mean`;
-        document.getElementById('fives-val-actions').textContent = String(m.openActions);
-
-        // Render SVG 5-Axis Radar Chart
-        const svg = document.getElementById('svg-fives');
-        const cx = 260;
-        const cy = 218;
-        const radius = 148;
-        const n = 5;
-
-        const pt = (axisIdx, level) => {
-          const angle = -Math.PI / 2 + (axisIdx * 2 * Math.PI) / n;
-          const r = (level / 5) * radius;
-          return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
-        };
-
-        let html = `<rect x="0" y="0" width="520" height="420" fill="${PALETTE.canvas}" />`;
-
-        // Concentric pentagons (levels 1 to 5)
-        for (let lvl = 1; lvl <= 5; lvl++) {
-          const pts = [];
-          for (let i = 0; i < n; i++) {
-            const p = pt(i, lvl);
-            pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
-          }
-          html += `<polygon points="${pts.join(' ')}" fill="none" stroke="${PALETTE.border}" stroke-width="${lvl === 5 ? 2 : 1.2}" />`;
-          const lblPt = pt(0, lvl);
-          html += `<text x="${(lblPt.x + 8).toFixed(1)}" y="${(lblPt.y + 4).toFixed(1)}" fill="${PALETTE.teal}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10">${lvl}</text>`;
-        }
-
-        // Spokes & Axis Labels
-        m.pillars.forEach((p, idx) => {
-          const outer = pt(idx, 5);
-          html += `<line x1="${cx}" y1="${cy}" x2="${outer.x.toFixed(1)}" y2="${outer.y.toFixed(1)}" stroke="${PALETTE.border}" stroke-width="1.2" />`;
-          const lp = pt(idx, 5.95);
-          html += `<text x="${lp.x.toFixed(1)}" y="${(lp.y + 4).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="12.5" font-weight="700">${p.name}</text>`;
-          html += `<text x="${lp.x.toFixed(1)}" y="${(lp.y + 18).toFixed(1)}" text-anchor="middle" fill="${p.avg >= m.target ? PALETTE.emerald : PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${p.avg.toFixed(2)}</text>`;
-        });
-
-        // Target benchmark polygon
-        const targetPts = m.pillars.map((_, i) => {
-          const p = pt(i, m.target);
-          return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
-        });
-        html += `<polygon points="${targetPts.join(' ')}" fill="none" stroke="${PALETTE.magenta}" stroke-width="2.5" stroke-dasharray="6 4" />`;
-
-        // Actual score polygon
-        const actualPts = m.pillars.map((pil, i) => {
-          const p = pt(i, pil.avg);
-          return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
-        });
-        html += `<polygon points="${actualPts.join(' ')}" fill="${PALETTE.teal}" fill-opacity="0.34" stroke="${PALETTE.emerald}" stroke-width="3" />`;
-
-        // Vertex dots
-        m.pillars.forEach((pil, i) => {
-          const p = pt(i, pil.avg);
-          html += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="${PALETTE.canvas}" stroke="${PALETTE.emerald}" stroke-width="2.5" />`;
-        });
-
-        svg.innerHTML = html;
-      }
-
-      function render5SMatrix() {
-        const box = document.getElementById('fives-matrix');
-        box.innerHTML = state.fives.pillars
-          .map((p, pIdx) => {
-            const avg = p.criteria.reduce((a, c) => a + c.score, 0) / p.criteria.length;
-            return `
-              <div class="ind-well p-3 space-y-2.5">
-                <div class="flex items-center justify-between border-b border-navy-border pb-1.5">
-                  <span class="text-sm font-bold text-rose-dusty">${p.name}</span>
-                  <span class="font-mono text-xs font-bold ${avg >= state.fives.target ? 'text-emerald-mint' : 'text-copper'}">${avg.toFixed(2)}</span>
-                </div>
-                <div class="space-y-2">
-                  ${p.criteria
-                    .map((c, cIdx) => `
-                      <div class="flex flex-wrap items-center justify-between gap-2">
-                        <span class="text-xs text-icemint">${escapeHtml(c.label)}</span>
-                        <div class="flex items-center gap-1">
-                          ${[1, 2, 3, 4, 5]
-                            .map((s) => `<button type="button" data-p="${pIdx}" data-c="${cIdx}" data-s="${s}" class="score-btn fives-score-btn ${c.score === s ? 'selected' : ''}">${s}</button>`)
-                            .join('')}
-                        </div>
-                      </div>
-                    `)
-                    .join('')}
-                </div>
-              </div>
-            `;
-          })
-          .join('');
-
-        box.querySelectorAll('.fives-score-btn').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const p = parseInt(e.target.dataset.p, 10);
-            const c = parseInt(e.target.dataset.c, 10);
-            const s = parseInt(e.target.dataset.s, 10);
-            state.fives.pillars[p].criteria[c].score = s;
-            render5S();
-            persistState();
-          });
-        });
-      }
-
-      function render5SActions() {
-        const tbody = document.getElementById('fives-actions-body');
-        tbody.innerHTML = state.fives.actions
-          .map((a, idx) => `
-            <tr class="hover:bg-navy-panel">
-              <td class="py-2 pr-2 font-mono text-xs font-bold text-rose-dusty">${escapeHtml(a.pillar)}</td>
-              <td class="py-2 px-2 text-icemint">${escapeHtml(a.item)}</td>
-              <td class="py-2 px-2 font-mono text-xs text-teal-slate">${escapeHtml(a.owner)}</td>
-              <td class="py-2 px-2">
-                <button type="button" data-idx="${idx}" class="fives-toggle-st px-2.5 py-1 text-xs font-mono font-bold rounded-xs border cursor-pointer ${a.status === 'Open' ? 'border-crimson text-crimson bg-navy-canvas' : 'border-emerald-mint text-emerald-mint bg-navy-canvas'}">${a.status}</button>
-              </td>
-              <td class="py-2 pl-2 text-right">
-                <button type="button" data-idx="${idx}" class="ind-btn ind-btn-danger py-1 px-2 text-xs fives-del-act">Delete</button>
-              </td>
-            </tr>
-          `)
-          .join('');
-
-        tbody.querySelectorAll('.fives-toggle-st').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.fives.actions[i].status = state.fives.actions[i].status === 'Open' ? 'Closed' : 'Open';
-            render5SRadarAndKPIs();
-            render5SActions();
-            persistState();
-          });
-        });
-
-        tbody.querySelectorAll('.fives-del-act').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.fives.actions.splice(i, 1);
-            render5SRadarAndKPIs();
-            render5SActions();
-            persistState();
-          });
-        });
-      }
-
-      function render5S() {
-        render5SRadarAndKPIs();
-        render5SMatrix();
-        render5SActions();
-      }
-
-      function bind5SEvents() {
-        document.getElementById('fives-sl-target').addEventListener('input', (e) => {
-          state.fives.target = parseFloat(e.target.value);
-          render5S();
-          persistState();
-        });
-        document.getElementById('btn-fives-add-action').addEventListener('click', () => {
-          const pillar = document.getElementById('fives-act-pillar').value;
-          const descEl = document.getElementById('fives-act-desc');
-          const ownEl = document.getElementById('fives-act-owner');
-          const desc = descEl.value.trim();
-          if (!desc) {
-            showToast('Enter corrective action description', true);
-            return;
-          }
-          state.fives.actions.unshift({
-            id: nextId(state.fives.actions),
-            pillar,
-            item: desc,
-            owner: ownEl.value.trim() || 'Unassigned',
-            status: 'Open',
-          });
-          descEl.value = '';
-          ownEl.value = '';
-          render5SRadarAndKPIs();
-          render5SActions();
-          persistState();
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 7: ISHIKAWA (Fishbone Root Cause Diagram)
-       * ===================================================================== */
-      const ISH_RIB_CFG = [
-        { key: 'Man', side: 'top', spineX: 250, headX: 165, color: PALETTE.emerald },
-        { key: 'Machine', side: 'top', spineX: 500, headX: 415, color: PALETTE.teal },
-        { key: 'Method', side: 'top', spineX: 745, headX: 660, color: PALETTE.copper },
-        { key: 'Material', side: 'bot', spineX: 250, headX: 165, color: PALETTE.indigo },
-        { key: 'Measurement', side: 'bot', spineX: 500, headX: 415, color: PALETTE.rose },
-        { key: 'Environment', side: 'bot', spineX: 745, headX: 660, color: PALETTE.olive },
-      ];
-
-      function renderIshikawaDiagram() {
-        const probInput = document.getElementById('ish-in-problem');
-        if (document.activeElement !== probInput) probInput.value = state.ishikawa.problem;
-
-        const svg = document.getElementById('svg-ishikawa');
-        const spineY = 240;
-        const spineStart = 44;
-        const headBoxX = 812;
-        const headBoxW = 166;
-
-        let html = `<rect x="0" y="0" width="1000" height="480" fill="${PALETTE.canvas}" />`;
-
-        // Tail fin decoration
-        html += `<polygon points="18,214 44,240 18,266 28,240" fill="${PALETTE.indigo}" stroke="${PALETTE.teal}" stroke-width="1.5" />`;
-
-        // Central Spine
-        html += `<line x1="${spineStart}" y1="${spineY}" x2="${headBoxX}" y2="${spineY}" stroke="${PALETTE.icemint}" stroke-width="4" />`;
-        html += `<polygon points="${headBoxX},${spineY} ${headBoxX - 12},${spineY - 8} ${headBoxX - 12},${spineY + 8}" fill="${PALETTE.icemint}" />`;
-
-        // Fish Head Problem Box
-        html += `<rect x="${headBoxX}" y="${spineY - 46}" width="${headBoxW}" height="92" rx="6" fill="${PALETTE.card}" stroke="${PALETTE.crimson}" stroke-width="3" />`;
-        html += `<rect x="${headBoxX}" y="${spineY - 46}" width="${headBoxW}" height="24" rx="4" fill="${PALETTE.crimson}" />`;
-        html += `<text x="${headBoxX + headBoxW / 2}" y="${spineY - 30}" text-anchor="middle" fill="#FFFFFF" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">PROBLEM</text>`;
-
-        // Wrap problem text into up to 3 lines
-        const words = (state.ishikawa.problem || 'Effect').split(/\s+/);
-        const lines = [];
-        let cur = '';
-        words.forEach((w) => {
-          if ((cur + ' ' + w).trim().length > 18 && cur) {
-            lines.push(cur);
-            cur = w;
-          } else {
-            cur = (cur + ' ' + w).trim();
-          }
-        });
-        if (cur) lines.push(cur);
-        lines.slice(0, 3).forEach((ln, lIdx) => {
-          html += `<text x="${headBoxX + headBoxW / 2}" y="${spineY - 4 + lIdx * 17}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700">${escapeHtml(truncateText(ln, 20))}</text>`;
-        });
-
-        // 6 Angled Ribs + Dynamic Non-Overlapping Sub-bones
-        ISH_RIB_CFG.forEach((rib) => {
-          const isTop = rib.side === 'top';
-          const tipY = isTop ? 58 : 422;
-          const causes = state.ishikawa.ribs[rib.key] || [];
-
-          // Main Rib Line
-          html += `<line x1="${rib.headX}" y1="${tipY}" x2="${rib.spineX}" y2="${spineY}" stroke="${rib.color}" stroke-width="3" />`;
-
-          // Rib Category Header Pill
-          const pillY = isTop ? 24 : 434;
-          html += `<rect x="${rib.headX - 64}" y="${pillY}" width="128" height="28" rx="4" fill="${PALETTE.card}" stroke="${rib.color}" stroke-width="2" />`;
-          html += `<text x="${rib.headX}" y="${pillY + 18}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700">${rib.key.toUpperCase()}</text>`;
-
-          // Distribute sub-bones cleanly along the rib (supports up to 6 cleanly without overlap)
-          const visibleCauses = causes.slice(0, 6);
-          const count = visibleCauses.length;
-          visibleCauses.forEach((c, idx) => {
-            const frac = (idx + 1) / (count + 1); // 0.16..0.84 along rib
-            const anchorX = rib.headX + (rib.spineX - rib.headX) * frac;
-            const anchorY = tipY + (spineY - tipY) * frac;
-            const boneLen = 46;
-            const endX = anchorX - boneLen;
-
-            const strokeCol = c.root ? PALETTE.magenta : PALETTE.icemint;
-            const textCol = c.root ? PALETTE.rose : PALETTE.icemint;
-
-            html += `<line x1="${endX.toFixed(1)}" y1="${anchorY.toFixed(1)}" x2="${anchorX.toFixed(1)}" y2="${anchorY.toFixed(1)}" stroke="${strokeCol}" stroke-width="${c.root ? 2.4 : 1.5}" />`;
-            html += `<circle cx="${anchorX.toFixed(1)}" cy="${anchorY.toFixed(1)}" r="${c.root ? 4 : 2.8}" fill="${c.root ? PALETTE.crimson : rib.color}" />`;
-
-            const displayTxt = truncateText(c.text, 22);
-            if (c.root) {
-              const tw = Math.min(160, Math.max(76, displayTxt.length * 6.5 + 14));
-              html += `<rect x="${(endX - tw - 4).toFixed(1)}" y="${(anchorY - 11).toFixed(1)}" width="${tw.toFixed(1)}" height="20" rx="3" fill="${PALETTE.crimson}" stroke="${PALETTE.magenta}" stroke-width="1.3" />`;
-              html += `<text x="${(endX - 10).toFixed(1)}" y="${(anchorY + 3).toFixed(1)}" text-anchor="end" fill="#FFFFFF" font-family="Inter, system-ui, sans-serif" font-size="10.5" font-weight="700">${escapeHtml(displayTxt)}</text>`;
-            } else {
-              html += `<text x="${(endX - 6).toFixed(1)}" y="${(anchorY + 3.5).toFixed(1)}" text-anchor="end" fill="${textCol}" font-family="Inter, system-ui, sans-serif" font-size="10.5" font-weight="600">${escapeHtml(displayTxt)}</text>`;
-            }
-          });
-        });
-
-        svg.innerHTML = html;
-      }
-
-      function renderIshikawaLists() {
-        const grid = document.getElementById('ish-ribs-grid');
-        grid.innerHTML = ISH_RIB_CFG.map((rib) => {
-          const list = state.ishikawa.ribs[rib.key] || [];
-          return `
-            <div class="ind-well p-3 space-y-2" style="border-top: 4px solid ${rib.color}">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-rose-dusty">${rib.key}</span>
-                <span class="font-mono text-xs text-teal-slate">${list.length}</span>
-              </div>
-              <div class="space-y-1.5">
-                ${
-                  list.length === 0
-                    ? '<div class="text-xs font-mono text-teal-slate py-1">No causes listed</div>'
-                    : list
-                        .map(
-                          (c, idx) => `
-                            <div class="flex items-center justify-between gap-2 p-2 rounded-xs bg-navy-card border ${c.root ? 'border-magenta' : 'border-navy-border'}">
-                              <span class="text-xs ${c.root ? 'text-rose-dusty font-bold' : 'text-icemint'} truncate" title="${escapeHtml(c.text)}">${escapeHtml(c.text)}</span>
-                              <div class="flex items-center gap-1 shrink-0">
-                                <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-toggle-root px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs border cursor-pointer ${c.root ? 'bg-crimson border-magenta text-white' : 'bg-navy-canvas border-navy-border text-icemint'}">Root</button>
-                                <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-del-cause px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-crimson text-crimson cursor-pointer">X</button>
-                              </div>
-                            </div>
-                          `
-                        )
-                        .join('')
-                }
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        grid.querySelectorAll('.ish-toggle-root').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const r = e.target.dataset.rib;
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.ishikawa.ribs[r][i].root = !state.ishikawa.ribs[r][i].root;
-            renderIshikawa();
-            persistState();
-          });
-        });
-
-        grid.querySelectorAll('.ish-del-cause').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const r = e.target.dataset.rib;
-            const i = parseInt(e.target.dataset.idx, 10);
-            state.ishikawa.ribs[r].splice(i, 1);
-            renderIshikawa();
-            persistState();
-          });
-        });
-      }
-
-      function renderIshikawa() {
-        renderIshikawaDiagram();
-        renderIshikawaLists();
-      }
-
-      function bindIshikawaEvents() {
-        document.getElementById('ish-in-problem').addEventListener('input', (e) => {
-          state.ishikawa.problem = e.target.value;
-          renderIshikawaDiagram();
-          persistState();
-        });
-        document.getElementById('btn-ish-add').addEventListener('click', () => {
-          const rib = document.getElementById('ish-sel-rib').value;
-          const inp = document.getElementById('ish-in-cause');
-          const txt = inp.value.trim();
-          if (!txt) {
-            showToast('Enter cause text', true);
-            return;
-          }
-          const arr = state.ishikawa.ribs[rib];
-          arr.push({ id: nextId(arr), text: txt, root: false });
-          inp.value = '';
-          renderIshikawa();
-          persistState();
-        });
-      }
-
-      /* =====================================================================
-       * MODULE 8: FULL EXPORT HUB (Blob Downloads: JSON, CSV, SVG, HTML Report)
-       * ===================================================================== */
-      function triggerDownload(filename, content, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }
-
-      function dateStamp() {
-        const d = new Date();
-        const pad = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
-      }
-
-      function serializeStandaloneSVG(moduleKey) {
-        const map = {
-          capability: 'svg-capability',
-          oee: 'svg-oee',
-          takt: 'svg-takt',
-          pareto: 'svg-pareto',
-          vsm: 'svg-vsm',
-          fives: 'svg-fives',
-          ishikawa: 'svg-ishikawa',
-        };
-        const svgEl = document.getElementById(map[moduleKey]);
-        if (!svgEl) return null;
-        const clone = svgEl.cloneNode(true);
-        clone.setAttribute('xmlns', SVG_NS);
-        clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-        const vb = (clone.getAttribute('viewBox') || '0 0 1000 480').split(/\s+/);
-        clone.setAttribute('width', vb[2]);
-        clone.setAttribute('height', vb[3]);
-        const styleEl = document.createElementNS(SVG_NS, 'style');
-        styleEl.textContent = `text { font-family: Inter, system-ui, -apple-system, sans-serif; }`;
-        clone.insertBefore(styleEl, clone.firstChild);
-        return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
-      }
-
-      function downloadSVG(moduleKey) {
-        renderAllModules();
-        const svgStr = serializeStandaloneSVG(moduleKey);
-        if (!svgStr) {
-          showToast('Switch to an analytical module to export SVG', true);
-          return;
-        }
-        triggerDownload(`lean_${moduleKey}_${dateStamp()}.svg`, svgStr, 'image/svg+xml;charset=utf-8');
-        showToast(`Exported ${TAB_NAMES[moduleKey]} SVG`);
-      }
-
-      function csvRow(fields) {
-        return fields
-          .map((v) => {
-            const s = String(v == null ? '' : v);
-            return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-          })
-          .join(',');
-      }
-
-      function buildModuleCSV(key) {
-        if (key === 'capability') {
-          const m = computeCapabilityMetrics();
-          return [
-            csvRow(['Metric', 'Value']),
-            csvRow(['Mean', m.mu.toFixed(2)]),
-            csvRow(['Sigma', m.sigma.toFixed(2)]),
-            csvRow(['LSL', m.lsl.toFixed(2)]),
-            csvRow(['USL', m.usl.toFixed(2)]),
-            csvRow(['Cp', m.cp.toFixed(4)]),
-            csvRow(['Cpk', m.cpk.toFixed(4)]),
-            csvRow(['Cpu', m.cpu.toFixed(4)]),
-            csvRow(['Cpl', m.cpl.toFixed(4)]),
-            csvRow(['PPM', m.ppm.toFixed(3)]),
-            csvRow(['YieldPct', m.yieldPct.toFixed(4)]),
-            csvRow(['SigmaLevel', m.zMin.toFixed(3)]),
-          ].join('\n');
-        }
-        if (key === 'oee') {
-          const m = computeOEEMetrics();
-          return [
-            csvRow(['Metric', 'Value']),
-            csvRow(['ShiftMin', state.oee.shift]),
-            csvRow(['DowntimeMin', state.oee.downtime]),
-            csvRow(['CycleSec', state.oee.cycle]),
-            csvRow(['OutputUnits', state.oee.output]),
-            csvRow(['ScrapUnits', state.oee.scrap]),
-            csvRow(['GoodUnits', m.goodUnits]),
-            csvRow(['AvailabilityPct', (m.avail * 100).toFixed(2)]),
-            csvRow(['PerformancePct', (m.perf * 100).toFixed(2)]),
-            csvRow(['QualityPct', (m.qual * 100).toFixed(2)]),
-            csvRow(['OEEPct', (m.oee * 100).toFixed(2)]),
-          ].join('\n');
-        }
-        if (key === 'takt') {
-          const m = computeTaktMetrics();
-          const lines = [csvRow(['Station', 'VA_Sec', 'BNVA_Sec', 'Waste_Sec', 'Total_Sec', 'Takt_Sec', 'Status'])];
-          state.takt.stations.forEach((s) => {
-            const tot = s.va + s.bnva + s.waste;
-            lines.push(csvRow([s.name, s.va, s.bnva, s.waste, tot, m.takt.toFixed(2), tot > m.takt ? 'Over' : 'Balanced']));
-          });
-          return lines.join('\n');
-        }
-        if (key === 'pareto') {
-          const { rows } = computeParetoSorted();
-          const lines = [csvRow(['Category', 'Count', 'SharePct', 'CumulativePct', 'Class'])];
-          rows.forEach((r) => lines.push(csvRow([r.name, r.count, r.share.toFixed(2), r.cum.toFixed(2), r.isVital ? 'Vital' : 'Trivial'])));
-          return lines.join('\n');
-        }
-        if (key === 'vsm') {
-          const lines = [csvRow(['Step', 'CycleSec', 'ChangeoverMin', 'UptimePct', 'Operators', 'QueueHrs'])];
-          state.vsm.steps.forEach((s) => lines.push(csvRow([s.name, s.cycle, s.changeover, s.uptime, s.operators, s.queue])));
-          return lines.join('\n');
-        }
-        if (key === 'fives') {
-          const lines = [csvRow(['Pillar', 'Criterion', 'Score', 'Target'])];
-          state.fives.pillars.forEach((p) => {
-            p.criteria.forEach((c) => lines.push(csvRow([p.name, c.label, c.score, state.fives.target])));
-          });
-          return lines.join('\n');
-        }
-        if (key === 'ishikawa') {
-          const lines = [csvRow(['Problem', 'Rib', 'Cause', 'RootSuspect'])];
-          Object.keys(state.ishikawa.ribs).forEach((rib) => {
-            state.ishikawa.ribs[rib].forEach((c) => lines.push(csvRow([state.ishikawa.problem, rib, c.text, c.root ? 'Yes' : 'No'])));
-          });
-          return lines.join('\n');
-        }
-        return '';
-      }
-
-      function downloadCSV(key) {
-        if (key === 'all') {
-          const keys = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa'];
-          const combined = keys.map((k) => `### ${TAB_NAMES[k].toUpperCase()} ###\n${buildModuleCSV(k)}`).join('\n\n');
-          triggerDownload(`lean_suite_all_tables_${dateStamp()}.csv`, combined, 'text/csv;charset=utf-8');
-          showToast('Exported Combined CSV');
-          return;
-        }
-        triggerDownload(`lean_${key}_${dateStamp()}.csv`, buildModuleCSV(key), 'text/csv;charset=utf-8');
-        showToast(`Exported ${TAB_NAMES[key]} CSV`);
-      }
-
-      function downloadJSONWorkspace() {
-        const payload = JSON.stringify(state, null, 2);
-        triggerDownload(`lean_suite_workspace_${dateStamp()}.json`, payload, 'application/json;charset=utf-8');
-        showToast('Saved Workspace JSON');
-      }
-
-      function importJSONFile(file) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const parsed = JSON.parse(ev.target.result);
-            if (!parsed || !parsed.capability || !parsed.oee || !parsed.takt || !parsed.pareto || !parsed.vsm || !parsed.fives || !parsed.ishikawa) {
-              showToast('Invalid workspace JSON structure', true);
-              return;
-            }
-            state = Object.assign(createDefaultState(), parsed);
-            persistState();
-            renderAllModules();
-            switchTab(state.activeTab || 'capability');
-            showToast('Workspace JSON Loaded');
-          } catch (err) {
-            showToast('Failed to parse JSON file', true);
-          }
-        };
-        reader.readAsText(file);
-      }
-
-      function downloadHTMLReport() {
-        renderAllModules();
-        const cap = computeCapabilityMetrics();
-        const oee = computeOEEMetrics();
-        const takt = computeTaktMetrics();
-        const par = computeParetoSorted();
-        const vsm = computeVSMMetrics();
-        const f5 = compute5SMetrics();
-        const nowStr = new Date().toLocaleString();
-
-        const svgSnap = (k) => (serializeStandaloneSVG(k) || '').replace(/^<\?xml[^>]*\?>\s*/, '');
-
-        const reportHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LEAN Executive Report</title>
-  <style>
-    body { background: #0A113E; color: #B4DDD8; font-family: Inter, system-ui, sans-serif; margin: 0; padding: 32px; }
-    .wrap { max-width: 1080px; margin: 0 auto; }
-    .hdr { background: #111952; border: 2px solid #D929CF; border-radius: 8px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    h1 { margin: 0; color: #E9C7C5; font-size: 24px; letter-spacing: 1px; }
-    h2 { color: #E9C7C5; margin: 0 0 12px 0; font-size: 18px; border-bottom: 2px solid #253182; padding-bottom: 6px; }
-    .sec { background: #111952; border: 2px solid #253182; border-radius: 8px; padding: 20px; margin-bottom: 24px; page-break-inside: avoid; }
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .kpi { background: #0A113E; border: 2px solid #253182; border-radius: 6px; padding: 12px; }
-    .kpi-l { font-size: 11px; text-transform: uppercase; color: #E9C7C5; font-weight: 700; }
-    .kpi-v { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 20px; font-weight: 700; color: #45E1A5; margin-top: 4px; }
-    .svg-box { background: #0A113E; border: 2px solid #253182; border-radius: 6px; padding: 8px; }
-    .svg-box svg { width: 100%; height: auto; display: block; }
-    .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #59A8A2; }
-    @media print { body { padding: 12px; } .sec { break-inside: avoid; } }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="hdr">
-      <div>
-        <h1>LEAN EXECUTIVE REPORT</h1>
-        <div class="mono">Operational Excellence Snapshot</div>
-      </div>
-      <div class="mono">${escapeHtml(nowStr)}</div>
-    </div>
-
-    <div class="sec">
-      <h2>Capability</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">Cp</div><div class="kpi-v">${cap.cp.toFixed(2)}</div></div>
-        <div class="kpi"><div class="kpi-l">Cpk</div><div class="kpi-v">${cap.cpk.toFixed(2)}</div></div>
-        <div class="kpi"><div class="kpi-l">Cpu</div><div class="kpi-v">${cap.cpu.toFixed(2)}</div></div>
-        <div class="kpi"><div class="kpi-l">Cpl</div><div class="kpi-v">${cap.cpl.toFixed(2)}</div></div>
-        <div class="kpi"><div class="kpi-l">PPM</div><div class="kpi-v">${formatPPM(cap.ppm)}</div></div>
-        <div class="kpi"><div class="kpi-l">Sigma</div><div class="kpi-v">${cap.zMin.toFixed(2)}σ</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('capability')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>OEE</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">OEE</div><div class="kpi-v">${(oee.oee * 100).toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Availability</div><div class="kpi-v">${(oee.avail * 100).toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Performance</div><div class="kpi-v">${(oee.perf * 100).toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Quality</div><div class="kpi-v">${(oee.qual * 100).toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Good Units</div><div class="kpi-v">${oee.goodUnits}</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('oee')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>Takt</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">Takt</div><div class="kpi-v">${takt.takt.toFixed(1)}s</div></div>
-        <div class="kpi"><div class="kpi-l">Bottleneck</div><div class="kpi-v">${takt.bottleneck.total.toFixed(1)}s</div></div>
-        <div class="kpi"><div class="kpi-l">Efficiency</div><div class="kpi-v">${takt.eff.toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Headcount</div><div class="kpi-v">${takt.headcount.toFixed(2)}</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('takt')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>Pareto</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">Total</div><div class="kpi-v">${par.total}</div></div>
-        <div class="kpi"><div class="kpi-l">Vital</div><div class="kpi-v">${par.vitalCount}</div></div>
-        <div class="kpi"><div class="kpi-l">Top</div><div class="kpi-v">${par.rows[0] ? escapeHtml(par.rows[0].name) : 'None'}</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('pareto')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>VSM</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">Lead Time</div><div class="kpi-v">${vsm.totalLeadHrs.toFixed(2)}h</div></div>
-        <div class="kpi"><div class="kpi-l">Value Time</div><div class="kpi-v">${vsm.totalVASec.toFixed(0)}s</div></div>
-        <div class="kpi"><div class="kpi-l">PCE</div><div class="kpi-v">${vsm.pce.toFixed(2)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Steps</div><div class="kpi-v">${vsm.count}</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('vsm')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>5S</h2>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-l">Score</div><div class="kpi-v">${f5.overallPct.toFixed(1)}%</div></div>
-        <div class="kpi"><div class="kpi-l">Target</div><div class="kpi-v">${f5.target.toFixed(2)}</div></div>
-        <div class="kpi"><div class="kpi-l">Lowest</div><div class="kpi-v">${escapeHtml(f5.lowest.name)}</div></div>
-        <div class="kpi"><div class="kpi-l">Actions</div><div class="kpi-v">${f5.openActions}</div></div>
-      </div>
-      <div class="svg-box">${svgSnap('fives')}</div>
-    </div>
-
-    <div class="sec">
-      <h2>Ishikawa</h2>
-      <div class="mono" style="margin-bottom:12px;">Problem: ${escapeHtml(state.ishikawa.problem)}</div>
-      <div class="svg-box">${svgSnap('ishikawa')}</div>
-    </div>
-  </div>
-</body>
-</html>`;
-
-        triggerDownload(`lean_executive_report_${dateStamp()}.html`, reportHtml, 'text/html;charset=utf-8');
-        showToast('Downloaded Executive HTML Report');
-      }
-
-      function bindExportAndNavEvents() {
-        // Tab Switching
-        document.querySelectorAll('.rail-tab').forEach((btn) => {
-          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-        });
-
-        // Header quick actions
-        document.getElementById('btn-quick-svg').addEventListener('click', () => {
-          const target = state.activeTab === 'export' ? 'capability' : state.activeTab;
-          downloadSVG(target);
-        });
-        document.getElementById('btn-quick-json-save').addEventListener('click', downloadJSONWorkspace);
-
-        const fileInput = document.getElementById('global-json-file-input');
-        document.getElementById('btn-quick-json-load').addEventListener('click', () => fileInput.click());
-        document.getElementById('exp-btn-json-import').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => {
-          if (e.target.files && e.target.files[0]) {
-            importJSONFile(e.target.files[0]);
-            e.target.value = '';
-          }
-        });
-
-        // Export Hub actions
-        document.getElementById('exp-btn-json-export').addEventListener('click', downloadJSONWorkspace);
-        document.getElementById('exp-btn-html').addEventListener('click', downloadHTMLReport);
-        document.getElementById('exp-btn-print').addEventListener('click', () => window.print());
-
-        document.querySelectorAll('.exp-csv-btn').forEach((btn) => {
-          btn.addEventListener('click', () => downloadCSV(btn.dataset.csv));
-        });
-        document.querySelectorAll('.exp-svg-btn').forEach((btn) => {
-          btn.addEventListener('click', () => downloadSVG(btn.dataset.svg));
-        });
-
-        // Inline confirmation for Reset Defaults (never window.confirm)
-        const confirmBox = document.getElementById('exp-reset-confirm');
-        document.getElementById('exp-btn-reset').addEventListener('click', () => {
-          confirmBox.classList.remove('hidden');
-        });
-        document.getElementById('exp-btn-reset-no').addEventListener('click', () => {
-          confirmBox.classList.add('hidden');
-        });
-        document.getElementById('exp-btn-reset-yes').addEventListener('click', () => {
-          state = createDefaultState();
-          persistState();
-          renderAllModules();
-          confirmBox.classList.add('hidden');
-          showToast('Factory Defaults Restored');
-        });
-      }
-
-      function switchTab(tabKey) {
-        if (!TAB_NAMES[tabKey]) tabKey = 'capability';
-        state.activeTab = tabKey;
-        document.getElementById('header-active-label').textContent = TAB_NAMES[tabKey];
-
-        document.querySelectorAll('.rail-tab').forEach((b) => {
-          b.classList.toggle('active', b.dataset.tab === tabKey);
-        });
-        document.querySelectorAll('.module-section').forEach((sec) => {
-          sec.classList.toggle('hidden', sec.id !== `module-${tabKey}`);
-        });
-        persistState();
-      }
-
-      function updateExportClock() {
-        const now = new Date();
-        document.getElementById('exp-clock').textContent = now.toLocaleTimeString();
-        document.getElementById('exp-date').textContent = now.toLocaleDateString();
-      }
-
-      function renderAllModules() {
-        renderCapability();
-        renderOEE();
-        renderTakt();
-        renderPareto();
-        renderVSM();
-        render5S();
-        renderIshikawa();
-      }
-
-      /* Bootstrap Application */
-      initCapabilityGrid();
-      bindCapabilityEvents();
-      bindOEEEvents();
-      bindTaktEvents();
-      bindParetoEvents();
-      bindVSMEvents();
-      bind5SEvents();
-      bindIshikawaEvents();
-      bindExportAndNavEvents();
-
-      renderAllModules();
-      switchTab(state.activeTab);
-      updateExportClock();
-      setInterval(updateExportClock, 1000);
-    })();
-  </script>
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>
