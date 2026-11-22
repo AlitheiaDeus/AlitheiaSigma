@@ -17,6 +17,10 @@ GEMINI.md
 node_modules/
 dist/
 
+# --- Local Spreadsheets & Data Drops ---
+*.xlsx
+*.xls
+
 # --- OS & Editor Artifacts ---
 .DS_Store
 Thumbs.db

@@ -3,9 +3,22 @@ import { escapeHtml } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
 import { computeEmpiricalCapability } from '../modules/capabilityMath.js';
-import { parseDelimitedText, parseSpreadsheetFile, SAMPLE_CSV_BY_MODULE } from './parser.js';
+import {
+  detectTableLayout,
+  normalizeTable,
+  parseDelimitedMatrix,
+  parseSpreadsheetFile,
+  SAMPLE_CSV_BY_MODULE,
+} from './parser.js';
 import { MODULE_SCHEMAS, suggestMapping, transformMappedRows } from './mapper.js';
 
+let rawWorkbook = {
+  matrix: [],
+  sheets: null,
+  sheetNames: [],
+  activeSheet: '',
+  sourceName: '',
+};
 let parsedTable = { headers: [], rows: [], sourceName: '' };
 let currentMapping = {};
 
@@ -67,6 +80,10 @@ function refreshMapperAndPreview() {
   const previewTable = document.getElementById('imp-preview-table');
   const mapperGrid = document.getElementById('imp-mapper-grid');
   const applyBtn = document.getElementById('imp-btn-apply');
+  const layoutBar = document.getElementById('imp-layout-bar');
+
+  const hasRaw = Array.isArray(rawWorkbook.matrix) && rawWorkbook.matrix.length > 0;
+  layoutBar?.classList.toggle('hidden', !hasRaw);
 
   if (!parsedTable.headers.length || !parsedTable.rows.length) {
     if (metaEl) metaEl.textContent = 'Drop a .xlsx / .csv file or paste Excel cells above to preview and map columns.';
@@ -80,10 +97,10 @@ function refreshMapperAndPreview() {
   currentMapping = suggestMapping(parsedTable.headers, parsedTable.rows, target);
 
   if (metaEl) {
-    metaEl.textContent = `Parsed ${parsedTable.rows.length} rows × ${parsedTable.headers.length} columns${parsedTable.sourceName ? ` from ${parsedTable.sourceName}` : ''}`;
+    const sheetNote = rawWorkbook.activeSheet ? ` [${rawWorkbook.activeSheet}]` : '';
+    metaEl.textContent = `Parsed ${parsedTable.rows.length} rows × ${parsedTable.headers.length} columns${sheetNote}${parsedTable.sourceName ? ` from ${parsedTable.sourceName}` : ''}`;
   }
 
-  // Render preview (first 5 rows)
   if (previewTable) {
     const thead = `<thead><tr class="border-b border-navy-border text-teal-slate font-mono text-[11px]">${parsedTable.headers
       .map((h) => `<th class="py-1.5 px-2 text-left whitespace-nowrap">${escapeHtml(h)}</th>`)
@@ -100,7 +117,6 @@ function refreshMapperAndPreview() {
     previewTable.innerHTML = thead + tbody;
   }
 
-  // Render mapping selectors
   if (mapperGrid && schema) {
     mapperGrid.innerHTML = schema.fields
       .map((f) => {
@@ -136,15 +152,63 @@ function refreshMapperAndPreview() {
   refreshCapSpecSuggestion();
 }
 
-function handleParsedResult(result) {
+function applyLayoutControlsToMatrix() {
+  const hasHeadersEl = document.getElementById('imp-has-headers');
+  const startRowEl = document.getElementById('imp-header-row');
+  const hasHeaders = hasHeadersEl ? hasHeadersEl.checked : true;
+  const startRow1Based = Math.max(1, parseInt(startRowEl?.value || '1', 10) || 1);
+
+  const normalized = normalizeTable(rawWorkbook.matrix, {
+    hasHeaders,
+    headerRowIndex: startRow1Based - 1,
+  });
+
   parsedTable = {
-    headers: result.headers || [],
-    rows: result.rows || [],
-    sourceName: result.sourceName || 'Pasted Data',
+    headers: normalized.headers,
+    rows: normalized.rows,
+    sourceName: rawWorkbook.sourceName,
   };
   document.getElementById('imp-cap-lsl')?.removeAttribute('data-user-edited');
   document.getElementById('imp-cap-usl')?.removeAttribute('data-user-edited');
   refreshMapperAndPreview();
+}
+
+function loadMatrixWithAutoLayout(matrix) {
+  rawWorkbook.matrix = matrix || [];
+  const layout = detectTableLayout(rawWorkbook.matrix);
+  const hasHeadersEl = document.getElementById('imp-has-headers');
+  const startRowEl = document.getElementById('imp-header-row');
+  if (hasHeadersEl) hasHeadersEl.checked = layout.hasHeaders;
+  if (startRowEl) {
+    startRowEl.max = String(Math.max(1, rawWorkbook.matrix.length));
+    startRowEl.value = String(layout.headerRowIndex + 1);
+  }
+  applyLayoutControlsToMatrix();
+}
+
+function handleParsedFileResult(res) {
+  rawWorkbook = {
+    matrix: res.matrix || [],
+    sheets: res.sheets || null,
+    sheetNames: res.sheetNames || [],
+    activeSheet: res.activeSheet || '',
+    sourceName: res.sourceName || 'Pasted Data',
+  };
+
+  const sheetWrap = document.getElementById('imp-sheet-wrap');
+  const sheetSel = document.getElementById('imp-sheet-select');
+  if (sheetWrap && sheetSel) {
+    const hasSheets = rawWorkbook.sheetNames.length > 0;
+    sheetWrap.classList.toggle('hidden', !hasSheets);
+    if (hasSheets) {
+      sheetSel.innerHTML = rawWorkbook.sheetNames
+        .map((s) => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)
+        .join('');
+      sheetSel.value = rawWorkbook.activeSheet || rawWorkbook.sheetNames[0];
+    }
+  }
+
+  loadMatrixWithAutoLayout(rawWorkbook.matrix);
 }
 
 export function bindImportDrawer({ renderAll }) {
@@ -160,6 +224,17 @@ export function bindImportDrawer({ renderAll }) {
 
   document.getElementById('imp-target-module')?.addEventListener('change', refreshMapperAndPreview);
 
+  document.getElementById('imp-sheet-select')?.addEventListener('change', (e) => {
+    const sheetName = e.target.value;
+    if (rawWorkbook.sheets && rawWorkbook.sheets[sheetName]) {
+      rawWorkbook.activeSheet = sheetName;
+      loadMatrixWithAutoLayout(rawWorkbook.sheets[sheetName]);
+    }
+  });
+
+  document.getElementById('imp-has-headers')?.addEventListener('change', applyLayoutControlsToMatrix);
+  document.getElementById('imp-header-row')?.addEventListener('input', applyLayoutControlsToMatrix);
+
   ['imp-cap-lsl', 'imp-cap-usl'].forEach((id) => {
     document.getElementById(id)?.addEventListener('input', (e) => {
       e.target.setAttribute('data-user-edited', 'true');
@@ -170,8 +245,9 @@ export function bindImportDrawer({ renderAll }) {
     if (!file) return;
     try {
       const res = await parseSpreadsheetFile(file);
-      handleParsedResult(res);
-      showToast(`Loaded ${res.rows.length} rows from ${file.name}`);
+      handleParsedFileResult(res);
+      const sheetInfo = res.sheetNames?.length > 1 ? ` (${res.sheetNames.length} sheets found)` : '';
+      showToast(`Loaded ${res.rows.length} rows from ${file.name}${sheetInfo}`);
     } catch (err) {
       showToast(err.message || 'Could not read file', true);
     }
@@ -201,20 +277,33 @@ export function bindImportDrawer({ renderAll }) {
   pasteArea?.addEventListener('input', (e) => {
     const val = e.target.value;
     if (!val.trim()) {
+      rawWorkbook = { matrix: [], sheets: null, sheetNames: [], activeSheet: '', sourceName: '' };
       parsedTable = { headers: [], rows: [], sourceName: '' };
       refreshMapperAndPreview();
       return;
     }
-    const parsed = parseDelimitedText(val);
-    handleParsedResult({ ...parsed, sourceName: 'Clipboard Paste' });
+    const { matrix } = parseDelimitedMatrix(val);
+    handleParsedFileResult({
+      matrix,
+      sheetNames: [],
+      sheets: null,
+      activeSheet: '',
+      sourceName: 'Clipboard Paste',
+    });
   });
 
   document.getElementById('imp-btn-sample')?.addEventListener('click', () => {
     const target = getTargetModule();
     const sample = SAMPLE_CSV_BY_MODULE[target] || SAMPLE_CSV_BY_MODULE.capability;
     if (pasteArea) pasteArea.value = sample;
-    const parsed = parseDelimitedText(sample);
-    handleParsedResult({ ...parsed, sourceName: `${target} sample` });
+    const { matrix } = parseDelimitedMatrix(sample);
+    handleParsedFileResult({
+      matrix,
+      sheetNames: [],
+      sheets: null,
+      activeSheet: '',
+      sourceName: `${target} sample`,
+    });
   });
 
   document.getElementById('imp-btn-apply')?.addEventListener('click', () => {

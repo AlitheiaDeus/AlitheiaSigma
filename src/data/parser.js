@@ -62,12 +62,11 @@ export function detectDelimiter(text) {
 }
 
 /**
- * RFC-4180 compliant delimiter parser supporting quoted fields, escaped quotes,
- * CRLF/LF, and headerless single-column numeric Excel pastes.
+ * Parses raw delimited text into a 2D matrix of trimmed strings.
  */
-export function parseDelimitedText(text, forcedDelimiter = null) {
+export function parseDelimitedMatrix(text, forcedDelimiter = null) {
   const raw = String(text || '').replace(/^\uFEFF/, '').trim();
-  if (!raw) return { headers: [], rows: [], delimiter: ',' };
+  if (!raw) return { matrix: [], delimiter: ',' };
 
   const delimiter = forcedDelimiter || detectDelimiter(raw);
   const matrix = [];
@@ -112,49 +111,109 @@ export function parseDelimitedText(text, forcedDelimiter = null) {
   row.push(cell.trim());
   if (row.some((c) => c !== '')) matrix.push(row);
 
-  if (matrix.length === 0) return { headers: [], rows: [], delimiter };
-
-  // Handle headerless numeric pastes (e.g., copying a column of numbers directly from Excel)
-  const firstRow = matrix[0];
-  const firstRowAllNumeric = firstRow.length > 0 && firstRow.every((c) => isNumericToken(c));
-  if (firstRowAllNumeric) {
-    const synthHeaders = firstRow.length === 1 ? ['Value'] : firstRow.map((_, idx) => `Value_${idx + 1}`);
-    return { ...normalizeTable([synthHeaders, ...matrix]), delimiter };
-  }
-
-  return { ...normalizeTable(matrix), delimiter };
+  return { matrix, delimiter };
 }
 
 /**
- * Ensures unique non-empty header names and rectangular row lengths.
+ * Detects the best starting/header row index (skipping blank rows and single-cell
+ * title banners) and whether that row looks like headers vs headerless numeric data.
  */
-export function normalizeTable(matrix) {
+export function detectTableLayout(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return { headerRowIndex: 0, hasHeaders: true };
+  }
+
+  const scanLimit = Math.min(matrix.length, 25);
+  let firstNonEmpty = -1;
+  let headerRowIndex = -1;
+
+  for (let r = 0; r < scanLimit; r++) {
+    const row = Array.isArray(matrix[r]) ? matrix[r] : [];
+    const nonEmptyCount = row.filter((c) => String(c == null ? '' : c).trim() !== '').length;
+    if (nonEmptyCount > 0 && firstNonEmpty === -1) firstNonEmpty = r;
+    if (nonEmptyCount >= 2) {
+      headerRowIndex = r;
+      break;
+    }
+  }
+
+  if (headerRowIndex === -1) {
+    headerRowIndex = firstNonEmpty === -1 ? 0 : firstNonEmpty;
+  }
+
+  const candRow = (Array.isArray(matrix[headerRowIndex]) ? matrix[headerRowIndex] : [])
+    .map((c) => String(c == null ? '' : c).trim())
+    .filter(Boolean);
+
+  const allNumeric = candRow.length > 0 && candRow.every((c) => isNumericToken(c));
+  return {
+    headerRowIndex,
+    hasHeaders: !allNumeric,
+  };
+}
+
+/**
+ * Normalizes a 2D matrix into { headers, rows }, trimming completely empty outer
+ * columns, skipping blank rows, deduplicating headers, and supporting headerless mode.
+ */
+export function normalizeTable(matrix, options = {}) {
   if (!Array.isArray(matrix) || matrix.length === 0) {
     return { headers: [], rows: [] };
   }
 
-  const maxCols = matrix.reduce((m, r) => Math.max(m, Array.isArray(r) ? r.length : 0), 0);
-  if (maxCols === 0) return { headers: [], rows: [] };
+  const headerRowIndex = Math.max(0, Math.min(matrix.length - 1, Number(options.headerRowIndex) || 0));
+  const hasHeaders = options.hasHeaders !== false;
 
-  const rawHeaders = Array.isArray(matrix[0]) ? matrix[0] : [];
-  const seen = new Map();
-  const headers = [];
+  const activeSlice = matrix.slice(headerRowIndex);
+  if (activeSlice.length === 0) return { headers: [], rows: [] };
 
-  for (let c = 0; c < maxCols; c++) {
-    let base = String(rawHeaders[c] == null ? '' : rawHeaders[c]).trim();
-    if (!base) base = `Column ${c + 1}`;
-    const count = seen.get(base) || 0;
-    seen.set(base, count + 1);
-    headers.push(count === 0 ? base : `${base} (${count + 1})`);
+  const rawMaxCols = activeSlice.reduce((m, r) => Math.max(m, Array.isArray(r) ? r.length : 0), 0);
+  if (rawMaxCols === 0) return { headers: [], rows: [] };
+
+  // Find non-empty column bounds so leading/trailing blank Excel columns are stripped
+  let minCol = rawMaxCols;
+  let maxCol = -1;
+  for (const r of activeSlice) {
+    if (!Array.isArray(r)) continue;
+    for (let c = 0; c < r.length; c++) {
+      if (String(r[c] == null ? '' : r[c]).trim() !== '') {
+        if (c < minCol) minCol = c;
+        if (c > maxCol) maxCol = c;
+      }
+    }
   }
 
+  if (maxCol < minCol) return { headers: [], rows: [] };
+
+  const colCount = maxCol - minCol + 1;
+  const headers = [];
+  const seen = new Map();
+
+  if (hasHeaders) {
+    const rawHeaders = Array.isArray(activeSlice[0]) ? activeSlice[0] : [];
+    for (let c = 0; c < colCount; c++) {
+      let base = String(rawHeaders[minCol + c] == null ? '' : rawHeaders[minCol + c]).trim();
+      if (!base) base = `Column ${c + 1}`;
+      const count = seen.get(base) || 0;
+      seen.set(base, count + 1);
+      headers.push(count === 0 ? base : `${base} (${count + 1})`);
+    }
+  } else if (colCount === 1) {
+    headers.push('Value');
+  } else {
+    for (let c = 0; c < colCount; c++) {
+      headers.push(`Column ${c + 1}`);
+    }
+  }
+
+  const dataStart = hasHeaders ? 1 : 0;
   const rows = [];
-  for (let r = 1; r < matrix.length; r++) {
-    const src = Array.isArray(matrix[r]) ? matrix[r] : [];
-    const normalized = new Array(maxCols);
+  for (let r = dataStart; r < activeSlice.length; r++) {
+    const src = Array.isArray(activeSlice[r]) ? activeSlice[r] : [];
+    const normalized = new Array(colCount);
     let nonEmpty = false;
-    for (let c = 0; c < maxCols; c++) {
-      const val = src[c] == null ? '' : String(src[c]).trim();
+    for (let c = 0; c < colCount; c++) {
+      const val = src[minCol + c] == null ? '' : String(src[minCol + c]).trim();
       if (val !== '') nonEmpty = true;
       normalized[c] = val;
     }
@@ -165,8 +224,20 @@ export function normalizeTable(matrix) {
 }
 
 /**
- * Browser spreadsheet parser supporting .xlsx/.xls via SheetJS (window.XLSX)
- * and text formats (.csv, .tsv, .txt) via parseDelimitedText.
+ * RFC-4180 compliant delimiter parser supporting quoted fields, escaped quotes,
+ * CRLF/LF, and auto-detected headerless numeric Excel pastes.
+ */
+export function parseDelimitedText(text, forcedDelimiter = null) {
+  const { matrix, delimiter } = parseDelimitedMatrix(text, forcedDelimiter);
+  if (matrix.length === 0) return { headers: [], rows: [], matrix: [], delimiter };
+  const layout = detectTableLayout(matrix);
+  const { headers, rows } = normalizeTable(matrix, layout);
+  return { headers, rows, matrix, layout, delimiter };
+}
+
+/**
+ * Browser spreadsheet parser supporting multi-sheet .xlsx/.xls via SheetJS (window.XLSX)
+ * and text formats (.csv, .tsv, .txt) via parseDelimitedMatrix.
  */
 export async function parseSpreadsheetFile(file) {
   if (!file) throw new Error('No file provided');
@@ -182,13 +253,30 @@ export async function parseSpreadsheetFile(file) {
     const workbook = xlsxLib.read(buf, { type: 'array' });
     const sheetNames = workbook.SheetNames || [];
     if (sheetNames.length === 0) throw new Error('Workbook contains no sheets');
-    const firstSheet = workbook.Sheets[sheetNames[0]];
-    const matrix = xlsxLib.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-    const normalized = normalizeTable(matrix);
-    return { ...normalized, sheetNames, sourceName: name };
+
+    const sheets = {};
+    for (const sName of sheetNames) {
+      const ws = workbook.Sheets[sName];
+      sheets[sName] = xlsxLib.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    }
+
+    const activeSheet = sheetNames[0];
+    const matrix = sheets[activeSheet];
+    const layout = detectTableLayout(matrix);
+    const normalized = normalizeTable(matrix, layout);
+    return { ...normalized, matrix, layout, sheetNames, sheets, activeSheet, sourceName: name };
   }
 
   const text = await file.text();
   const parsed = parseDelimitedText(text);
-  return { headers: parsed.headers, rows: parsed.rows, sheetNames: [], sourceName: name };
+  return {
+    headers: parsed.headers,
+    rows: parsed.rows,
+    matrix: parsed.matrix,
+    layout: parsed.layout,
+    sheetNames: [],
+    sheets: null,
+    activeSheet: '',
+    sourceName: name,
+  };
 }

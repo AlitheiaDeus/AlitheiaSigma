@@ -151,10 +151,24 @@
         </div>
 
         <!-- Column Mapping Selectors -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold uppercase text-rose-dusty">Column Mapping</h3>
+        <div class="space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-xs font-bold uppercase text-rose-dusty">Sheet &amp; Column Mapping</h3>
             <span id="imp-preview-meta" class="text-xs font-mono text-emerald-mint"></span>
+          </div>
+          <div id="imp-layout-bar" class="hidden ind-well p-2.5 flex flex-wrap items-center gap-4 text-xs">
+            <div id="imp-sheet-wrap" class="hidden flex items-center gap-2">
+              <label for="imp-sheet-select" class="font-bold uppercase text-teal-slate">Sheet</label>
+              <select id="imp-sheet-select" class="ind-input ind-input-text text-xs py-1"></select>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer text-icemint">
+              <input id="imp-has-headers" type="checkbox" checked class="accent-emerald-mint w-4 h-4" />
+              <span class="font-semibold">First row is headers</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <label for="imp-header-row" class="font-bold uppercase text-teal-slate">Start Row #</label>
+              <input id="imp-header-row" type="number" min="1" value="1" class="ind-input w-16 text-right text-xs py-1" />
+            </div>
           </div>
           <div id="imp-mapper-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
         </div>

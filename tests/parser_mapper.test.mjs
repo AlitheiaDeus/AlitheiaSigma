@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectDelimiter, normalizeTable, parseDelimitedText } from '../src/data/parser.js';
+import { detectDelimiter, detectTableLayout, normalizeTable, parseDelimitedText } from '../src/data/parser.js';
 import { detectColumnTypes, suggestMapping, transformMappedRows } from '../src/data/mapper.js';
 
 test('detectDelimiter distinguishes TSV, CSV, and semicolon with quoted commas', () => {
@@ -74,4 +74,27 @@ test('transformMappedRows cleans currency/percent strings for Pareto & VSM', () 
   assert.equal(vOut.importedCount, 1);
   assert.equal(vOut.data[0].uptime, 96);
   assert.equal(vOut.data[0].queue, 4.5);
+});
+
+test('detectTableLayout and normalizeTable handle title banners, empty leading columns, and headerless tables', () => {
+  const messyMatrix = [
+    ['', '', '', ''],
+    ['', 'Q4 Inspection Report', '', ''],
+    ['', 'Part', 'Diameter', 'Line'],
+    ['', 'A1', '50.1', 'CNC-1'],
+    ['', 'A2', '49.9', 'CNC-2'],
+  ];
+  const layout = detectTableLayout(messyMatrix);
+  assert.equal(layout.headerRowIndex, 2);
+  assert.equal(layout.hasHeaders, true);
+
+  const cleaned = normalizeTable(messyMatrix, layout);
+  assert.deepEqual(cleaned.headers, ['Part', 'Diameter', 'Line']);
+  assert.equal(cleaned.rows.length, 2);
+  assert.deepEqual(cleaned.rows[0], ['A1', '50.1', 'CNC-1']);
+
+  const headerless = normalizeTable([['Burr', '50'], ['Scratch', '30']], { hasHeaders: false, headerRowIndex: 0 });
+  assert.deepEqual(headerless.headers, ['Column 1', 'Column 2']);
+  assert.equal(headerless.rows.length, 2);
+  assert.deepEqual(headerless.rows[0], ['Burr', '50']);
 });
