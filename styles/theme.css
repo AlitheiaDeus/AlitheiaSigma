@@ -25,7 +25,11 @@ html, body {
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.ind-well svg {
+  max-height: 70vh;
 }
 
 /* Tactile industrial range sliders (no gradients, solid precision thumbs) */

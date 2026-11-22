@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MudaSlayer</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230A113E' stroke='%23D929CF' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' fill='%2345E1A5' font-family='monospace' font-size='26' font-weight='700'%3EMS%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <!-- Load Tailwind CSS for responsive layout utilities -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -51,11 +51,8 @@
 <body class="min-h-screen flex flex-col">
 
   <!-- TOP HEADER BAR -->
-  <header id="top-bar" class="bg-navy-card border-b-2 border-navy-border px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-30">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-md bg-navy-canvas border-2 border-magenta flex items-center justify-center font-mono font-bold text-sm text-emerald-mint">
-        MS
-      </div>
+  <header id="top-bar" class="bg-navy-card border-b-2 border-navy-border px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 xl:sticky xl:top-0 z-30">
+    <div class="flex items-center gap-3 min-w-0">
       <div>
         <h1 class="text-base sm:text-lg font-bold tracking-wider text-rose-dusty leading-none">
           MUDASLAYER
@@ -175,10 +172,10 @@
   </div>
 
   <!-- MAIN APPLICATION SHELL -->
-  <div class="flex-1 flex flex-col lg:flex-row min-h-0">
+  <div class="flex-1 flex flex-col lg:flex-row min-h-0 min-w-0">
 
     <!-- LEFT NAVIGATION RAIL (8 Atomic Tabs + Shortcut Hints) -->
-    <nav id="left-rail" aria-label="Module Navigation" class="bg-navy-card border-b-2 lg:border-b-0 lg:border-r-2 border-navy-border p-3 lg:w-52 shrink-0">
+    <nav id="left-rail" aria-label="Module Navigation" class="bg-navy-card border-b-2 lg:border-b-0 lg:border-r-2 border-navy-border p-3 lg:w-48 shrink-0">
       <div class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
         <button type="button" class="rail-tab active" data-tab="capability">
           <span class="flex items-center gap-2"><span class="kbd-chip">1</span><span>Capability</span></span>
@@ -216,7 +213,7 @@
     </nav>
 
     <!-- MAIN WORKSPACE AREA -->
-    <main id="main-workspace" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
+    <main id="main-workspace" class="flex-1 min-w-0 p-4 sm:p-6 space-y-6">
 
       <!-- ================================================================= -->
       <!-- MODULE 1: CAPABILITY (Empirical Data + Interactive Simulator)     -->
