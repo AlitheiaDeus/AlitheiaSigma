@@ -724,16 +724,12 @@ export function bindCapabilityEvents({ onOpenImport }) {
 
   document.getElementById('cap-mode-data')?.addEventListener('click', () => {
     getState().capability.mode = 'data';
-    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
-    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-mode-sim')?.addEventListener('click', () => {
     getState().capability.mode = 'simulator';
-    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
-    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('btn-cap-import')?.addEventListener('click', () => {
@@ -757,16 +753,12 @@ export function bindCapabilityEvents({ onOpenImport }) {
   // Data Mode inputs
   document.getElementById('cap-data-label')?.addEventListener('input', (e) => {
     getState().capability.label = e.target.value;
-    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
-    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-data-unit')?.addEventListener('input', (e) => {
     getState().capability.unit = e.target.value;
-    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
-    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-data-lsl')?.addEventListener('input', (e) => {
@@ -788,8 +780,9 @@ export function bindCapabilityEvents({ onOpenImport }) {
   document.getElementById('btn-cap-apply-raw')?.addEventListener('click', () => {
     const raw = document.getElementById('cap-data-raw')?.value || '';
     const nums = raw
-      .split(/[\s,;\t\n]+/)
-      .map((s) => parseFloat(s.trim()))
+      .replace(/\$/g, '')
+      .split(/[\n\t;]+|,(?!\d{3}(?:\D|$))|\s+/)
+      .map((s) => Number(s.trim().replace(/,/g, '')))
       .filter((v) => Number.isFinite(v));
     if (nums.length < 2) {
       showToast('Provide at least 2 numeric measurements', true);
