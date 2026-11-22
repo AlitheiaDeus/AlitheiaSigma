@@ -483,16 +483,29 @@ function renderDataModeView(capState) {
   valSig.style.color = m.imr.isStable ? PALETTE.emerald : PALETTE.crimson;
   document.getElementById('cap-sub-sigma').textContent = `UCL ${m.imr.uclI.toFixed(2)} | LCL ${m.imr.lclI.toFixed(2)}`;
 
-  // Render Dynamic-Axis Empirical Histogram + Fitted Normal Curve in #cap-data-root
+  // Render Dynamic-Axis Empirical Histogram + Fitted Curve in #cap-data-root
   const left = 72;
   const right = 940;
   const top = 66;
-  const bottom = 380;
+  const bottom = 354;
   const plotW = right - left;
   const plotH = bottom - top;
 
-  const domMin = Math.min(m.min, m.lsl) - m.overallSigma * 0.85;
-  const domMax = Math.max(m.max, m.usl) + m.overallSigma * 0.85;
+  const spreadLow =
+    distModel === 'normal'
+      ? m.mean - 3 * m.overallSigma
+      : distModel === 'lognormal'
+      ? m.lognormal.qLow
+      : m.quantiles.p00135;
+  const spreadHigh =
+    distModel === 'normal'
+      ? m.mean + 3 * m.overallSigma
+      : distModel === 'lognormal'
+      ? m.lognormal.qHigh
+      : m.quantiles.p99865;
+
+  const domMin = Math.min(m.min, m.lsl, spreadLow) - m.overallSigma * 0.45;
+  const domMax = Math.max(m.max, m.usl, spreadHigh) + m.overallSigma * 0.45;
   const domSpan = Math.max(1e-6, domMax - domMin);
   const xAt = (v) => left + ((v - domMin) / domSpan) * plotW;
 
@@ -601,12 +614,30 @@ function renderDataModeView(capState) {
     const val = domMin + (domSpan * i) / tickN;
     const tx = xAt(val);
     h += `<line x1="${tx.toFixed(1)}" y1="${bottom}" x2="${tx.toFixed(1)}" y2="${bottom + 6}" stroke="${PALETTE.icemint}" stroke-width="1.5" />`;
-    h += `<text x="${tx.toFixed(1)}" y="${bottom + 22}" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${val.toFixed(2)}</text>`;
+    h += `<text x="${tx.toFixed(1)}" y="${bottom + 20}" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">${val.toFixed(2)}</text>`;
+  }
+
+  // ±3σ / 6σ Equivalent Process Spread Bar (99.73% band)
+  const xSpLow = Math.max(left, Math.min(right, xAt(spreadLow)));
+  const xSpHigh = Math.max(left, Math.min(right, xAt(spreadHigh)));
+  const xSpMid = Math.max(left, Math.min(right, xAt(centerVal)));
+  const lowTag = distModel === 'normal' ? `-3σ (${spreadLow.toFixed(2)})` : `P0.135 (${spreadLow.toFixed(2)})`;
+  const highTag = distModel === 'normal' ? `+3σ (${spreadHigh.toFixed(2)})` : `P99.865 (${spreadHigh.toFixed(2)})`;
+  const spreadTitle = distModel === 'normal' ? `6σ = ${(spreadHigh - spreadLow).toFixed(2)}` : `99.73% Spread = ${(spreadHigh - spreadLow).toFixed(2)}`;
+
+  h += `<line x1="${xSpLow.toFixed(1)}" y1="${top}" x2="${xSpLow.toFixed(1)}" y2="404" stroke="${PALETTE.copper}" stroke-width="1.4" stroke-dasharray="3 3" />`;
+  h += `<line x1="${xSpHigh.toFixed(1)}" y1="${top}" x2="${xSpHigh.toFixed(1)}" y2="404" stroke="${PALETTE.copper}" stroke-width="1.4" stroke-dasharray="3 3" />`;
+  h += `<rect x="${xSpLow.toFixed(1)}" y="392" width="${Math.max(2, xSpHigh - xSpLow).toFixed(1)}" height="12" rx="3" fill="${PALETTE.copper}" fill-opacity="0.35" stroke="${PALETTE.copper}" stroke-width="1.5" />`;
+  h += `<line x1="${xSpMid.toFixed(1)}" y1="390" x2="${xSpMid.toFixed(1)}" y2="406" stroke="${PALETTE.emerald}" stroke-width="2" />`;
+  h += `<text x="${xSpLow.toFixed(1)}" y="421" text-anchor="${xSpLow < left + 75 ? 'start' : 'middle'}" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${lowTag}</text>`;
+  h += `<text x="${xSpHigh.toFixed(1)}" y="421" text-anchor="${xSpHigh > right - 75 ? 'end' : 'middle'}" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${highTag}</text>`;
+  if (xSpHigh - xSpLow > 180) {
+    h += `<text x="${((xSpLow + xSpHigh) / 2).toFixed(1)}" y="421" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${spreadTitle}</text>`;
   }
 
   // Bottom summary strip
-  h += `<rect x="${left}" y="432" width="${plotW}" height="28" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
-  h += `<text x="506" y="450" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">Solid: Overall (Ppk ${m.ppk.toFixed(2)})   |   Dashed: Within (Cpk ${m.cpk.toFixed(2)})   |   Observed Yield: ${m.observedYieldPct.toFixed(2)}%</text>`;
+  h += `<rect x="${left}" y="440" width="${plotW}" height="28" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
+  h += `<text x="506" y="458" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${distModel === 'normal' ? `Overall Ppk ${m.ppk.toFixed(2)}  |  Within Cpk ${m.cpk.toFixed(2)}` : `${distModel === 'lognormal' ? 'Lognormal' : 'ISO Non-Param'} Ppk ${m.ppk.toFixed(2)}`}   |   ${spreadTitle}   |   Observed Yield: ${m.observedYieldPct.toFixed(2)}%</text>`;
 
   dataRoot.innerHTML = h;
 
