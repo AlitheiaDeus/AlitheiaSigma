@@ -33,6 +33,7 @@ export function openImportDrawer(defaultModule = 'capability') {
   if (sel && MODULE_SCHEMAS[defaultModule]) {
     sel.value = defaultModule;
   }
+  document.getElementById('imp-cap-label')?.removeAttribute('data-user-edited');
   modal?.classList.remove('hidden');
   refreshMapperAndPreview();
 }
@@ -70,7 +71,14 @@ function refreshCapSpecSuggestion() {
     if (lslEl && !lslEl.value) lslEl.value = cap.lsl;
     if (uslEl && !uslEl.value) uslEl.value = cap.usl;
   }
-  if (lblEl && !lblEl.value) lblEl.value = cap.label || 'Measurements';
+  if (lblEl && !lblEl.dataset.userEdited) {
+    const mappedCol =
+      currentMapping.value >= 0 && parsedTable.headers[currentMapping.value]
+        ? String(parsedTable.headers[currentMapping.value]).trim()
+        : '';
+    const isGeneric = !mappedCol || /^(Value|Value_\d+|Column \d+)$/i.test(mappedCol);
+    lblEl.value = isGeneric ? 'Measurements' : mappedCol;
+  }
 }
 
 function refreshMapperAndPreview() {
@@ -168,6 +176,7 @@ function applyLayoutControlsToMatrix() {
     rows: normalized.rows,
     sourceName: rawWorkbook.sourceName,
   };
+  document.getElementById('imp-cap-label')?.removeAttribute('data-user-edited');
   document.getElementById('imp-cap-lsl')?.removeAttribute('data-user-edited');
   document.getElementById('imp-cap-usl')?.removeAttribute('data-user-edited');
   refreshMapperAndPreview();
@@ -235,7 +244,7 @@ export function bindImportDrawer({ renderAll }) {
   document.getElementById('imp-has-headers')?.addEventListener('change', applyLayoutControlsToMatrix);
   document.getElementById('imp-header-row')?.addEventListener('input', applyLayoutControlsToMatrix);
 
-  ['imp-cap-lsl', 'imp-cap-usl'].forEach((id) => {
+  ['imp-cap-label', 'imp-cap-lsl', 'imp-cap-usl'].forEach((id) => {
     document.getElementById(id)?.addEventListener('input', (e) => {
       e.target.setAttribute('data-user-edited', 'true');
     });
@@ -326,10 +335,13 @@ export function bindImportDrawer({ renderAll }) {
       }
       state.capability.mode = 'data';
       state.capability.samples = res.data;
-      const lbl = document.getElementById('imp-cap-label')?.value.trim();
+      const lbl = document.getElementById('imp-cap-label')?.value.trim() || 'Measurements';
       const lsl = parseFloat(document.getElementById('imp-cap-lsl')?.value);
       const usl = parseFloat(document.getElementById('imp-cap-usl')?.value);
-      if (lbl) state.capability.label = lbl;
+      if (lbl !== state.capability.label) {
+        state.capability.unit = '';
+      }
+      state.capability.label = lbl;
       if (Number.isFinite(lsl)) state.capability.lsl = lsl;
       if (Number.isFinite(usl)) state.capability.usl = usl;
     } else if (target === 'oee') {
