@@ -13,6 +13,10 @@ GEMINI.md
 *.local.env
 .env
 
+# --- Dependencies & Build Output ---
+node_modules/
+dist/
+
 # --- OS & Editor Artifacts ---
 .DS_Store
 Thumbs.db
