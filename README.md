@@ -14,13 +14,18 @@
 
 ## Chart Previews
 
-| Capability & SPC | OEE Trend & Time-Loss |
-| :---: | :---: |
-| <img src="docs/screenshots/capability.png" alt="AlitheiaSigma Capability & SPC" width="420" /> | <img src="docs/screenshots/oee.png" alt="AlitheiaSigma OEE" width="420" /> |
+| Capability & SPC | OEE Trend & Time-Loss | Takt (Yamazumi) |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/capability.png" alt="AlitheiaSigma Capability & SPC" width="280" /> | <img src="docs/screenshots/oee.png" alt="AlitheiaSigma OEE" width="280" /> | <img src="docs/screenshots/takt.png" alt="AlitheiaSigma Takt" width="280" /> |
 
-| Value Stream Map (VSM) | Ishikawa 6M Fishbone |
-| :---: | :---: |
-| <img src="docs/screenshots/vsm.png" alt="AlitheiaSigma VSM" width="420" /> | <img src="docs/screenshots/ishikawa.png" alt="AlitheiaSigma Ishikawa" width="420" /> |
+| Pareto 80/20 | Value Stream Map (VSM) | 5S Audit Radar |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/pareto.png" alt="AlitheiaSigma Pareto" width="280" /> | <img src="docs/screenshots/vsm.png" alt="AlitheiaSigma VSM" width="280" /> | <img src="docs/screenshots/fives.png" alt="AlitheiaSigma 5S" width="280" /> |
+
+<p align="center">
+  <strong>Ishikawa 6M Fishbone</strong><br />
+  <img src="docs/screenshots/ishikawa.png" alt="AlitheiaSigma Ishikawa" width="320" />
+</p>
 
 ---
 
