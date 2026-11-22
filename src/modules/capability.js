@@ -15,6 +15,8 @@ const CAP_MAX_H = 195;
 
 let capDragging = null;
 let capDragOffset = 0;
+let capDataDragging = null;
+let capDataDomain = { left: 72, plotW: 868, domMin: 0, domSpan: 100, step: 0.1 };
 
 function capDomToX(val) {
   return CAP_LEFT + ((val - CAP_DOM_MIN) / (CAP_DOM_MAX - CAP_DOM_MIN)) * CAP_WIDTH;
@@ -513,6 +515,10 @@ function renderDataModeView(capState) {
   const domSpan = Math.max(1e-6, domMax - domMin);
   const xAt = (v) => left + ((v - domMin) / domSpan) * plotW;
 
+  // Save domain mapping for interactive Data Mode LSL/USL dragging
+  const decimals = domSpan < 1 ? 4 : domSpan < 10 ? 3 : domSpan < 100 ? 2 : 1;
+  capDataDomain = { left, plotW, domMin, domSpan, decimals };
+
   const kdeBw = Math.max(1e-6, 1.06 * m.overallSigma * Math.pow(m.n, -0.2));
   const kdePdf = (x) => {
     let s = 0;
@@ -537,7 +543,7 @@ function renderDataModeView(capState) {
   let h = '';
   const modelLabel = distModel === 'normal' ? `Cpk=${m.cpk.toFixed(2)}, Ppk=${m.ppk.toFixed(2)}` : `${activeDistLabel} Ppk=${m.ppk.toFixed(2)}`;
   const titleText = `${capState.label || 'Measurements'}${capState.unit ? ` (${capState.unit})` : ''} — n=${m.n}, ${modelLabel}`;
-  h += `<text x="${left}" y="30" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700">${escapeHtml(titleText)}</text>`;
+  h += `<text x="${left}" y="30" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700" data-cap-dbl="label" style="cursor:pointer;"><title>Double-click to rename Characteristic</title>${escapeHtml(titleText)}</text>`;
 
   for (let i = 0; i <= 4; i++) {
     const y = top + (plotH * i) / 4;
@@ -592,15 +598,25 @@ function renderDataModeView(capState) {
   h += `<rect x="${(xCenter - 46).toFixed(1)}" y="${top - 22}" width="92" height="20" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.emerald}" stroke-width="1.5" />`;
   h += `<text x="${xCenter.toFixed(1)}" y="${top - 8}" text-anchor="middle" fill="${PALETTE.emerald}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${centerLbl}</text>`;
 
-  // LSL & USL lines
-  const drawSpec = (val, label, yOff) => {
-    const xp = Math.max(left, Math.min(right, xAt(val)));
+  // Draggable & OOB-safe LSL & USL lines
+  const xLslRaw = Math.max(left, Math.min(right, xAt(m.lsl)));
+  const xUslRaw = Math.max(left, Math.min(right, xAt(m.usl)));
+  const badgeW = 96;
+  const halfB = badgeW / 2;
+  const xLslBadge = Math.max(left + halfB, Math.min(right - halfB, xLslRaw));
+  const xUslBadge = Math.max(left + halfB, Math.min(right - halfB, xUslRaw));
+  const specsOverlap = Math.abs(xUslBadge - xLslBadge) < badgeW + 6;
+
+  const drawSpec = (xp, bx, val, label, key, yOff) => {
+    h += `<g class="drag-ew" data-cap-data-drag="${key}" data-cap-dbl="${key}">`;
     h += `<line x1="${xp.toFixed(1)}" y1="${top - 6}" x2="${xp.toFixed(1)}" y2="${bottom + 8}" stroke="${PALETTE.magenta}" stroke-width="2.5" stroke-dasharray="6 4" />`;
-    h += `<rect x="${(xp - 46).toFixed(1)}" y="${yOff}" width="92" height="22" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.magenta}" stroke-width="1.8" />`;
-    h += `<text x="${xp.toFixed(1)}" y="${yOff + 15}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${label} ${val.toFixed(2)}</text>`;
+    h += `<line x1="${xp.toFixed(1)}" y1="${top - 6}" x2="${xp.toFixed(1)}" y2="${bottom + 8}" stroke="transparent" stroke-width="22" />`;
+    h += `<rect x="${(bx - halfB).toFixed(1)}" y="${yOff}" width="${badgeW}" height="22" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.magenta}" stroke-width="1.8" />`;
+    h += `<text x="${bx.toFixed(1)}" y="${yOff + 15}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" font-weight="700">${label} ${val.toFixed(2)}</text>`;
+    h += `<title>Drag to move ${label}, double-click to type exact value</title></g>`;
   };
-  drawSpec(m.lsl, 'LSL', top + 8);
-  drawSpec(m.usl, 'USL', top + 8);
+  drawSpec(xLslRaw, xLslBadge, m.lsl, 'LSL', 'lsl', top + 8);
+  drawSpec(xUslRaw, xUslBadge, m.usl, 'USL', 'usl', specsOverlap ? top + 34 : top + 8);
 
   // Dynamic X Axis ticks
   h += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
@@ -877,10 +893,109 @@ export function bindCapabilityEvents({ onOpenImport }) {
   }
 
   function endDrag() {
+    if (capDataDragging) {
+      capDataDragging = null;
+      status.textContent = `Empirical (n=${(getState().capability.samples || []).length})`;
+      renderCapability();
+      return;
+    }
     if (!capDragging) return;
     capDragging = null;
     status.textContent = 'Ready';
   }
+
+  // Data Mode LSL/USL Dragging + Double-Click Inline Editor
+  svg?.addEventListener('mousedown', (e) => {
+    if (getState().capability.mode !== 'data') return;
+    const hit = e.target.closest('[data-cap-data-drag]');
+    if (!hit) return;
+    e.preventDefault();
+    capDataDragging = hit.dataset.capDataDrag;
+    status.textContent = `Adjusting ${capDataDragging.toUpperCase()}`;
+  });
+  svg?.addEventListener(
+    'touchstart',
+    (e) => {
+      if (getState().capability.mode !== 'data' || !e.touches.length) return;
+      const hit = e.target.closest('[data-cap-data-drag]');
+      if (!hit) return;
+      e.preventDefault();
+      capDataDragging = hit.dataset.capDataDrag;
+      status.textContent = `Adjusting ${capDataDragging.toUpperCase()}`;
+    },
+    { passive: false }
+  );
+
+  function moveDataDrag(cx, cy) {
+    const cap = getState().capability;
+    const svgX = toSvgPt(cx, cy).x;
+    const { left, plotW, domMin, domSpan, decimals } = capDataDomain;
+    const ratio = Math.max(0, Math.min(1, (svgX - left) / plotW));
+    const rawVal = domMin + ratio * domSpan;
+    const factor = Math.pow(10, decimals);
+    const val = Math.round(rawVal * factor) / factor;
+    const minGap = Math.max(1 / factor, domSpan * 0.01);
+    if (capDataDragging === 'lsl') {
+      cap.lsl = Math.min(cap.usl - minGap, val);
+    } else if (capDataDragging === 'usl') {
+      cap.usl = Math.max(cap.lsl + minGap, val);
+    }
+    renderCapability();
+    persistState();
+  }
+
+  const inlineInput = document.getElementById('cap-inline-edit');
+  let inlineField = null;
+
+  function commitInlineEdit() {
+    if (!inlineField || !inlineInput) return;
+    const cap = getState().capability;
+    const raw = inlineInput.value.trim();
+    if (inlineField === 'label') {
+      if (raw) cap.label = raw;
+    } else {
+      const num = parseFloat(raw);
+      if (Number.isFinite(num)) {
+        if (inlineField === 'lsl') cap.lsl = num;
+        else if (inlineField === 'usl') cap.usl = num;
+      }
+    }
+    inlineField = null;
+    inlineInput.classList.add('hidden');
+    renderCapability();
+    persistState();
+  }
+
+  svg?.addEventListener('dblclick', (e) => {
+    if (getState().capability.mode !== 'data' || !inlineInput) return;
+    const hit = e.target.closest('[data-cap-dbl]');
+    if (!hit) return;
+    const field = hit.dataset.capDbl;
+    const cap = getState().capability;
+    const wellRect = svg.parentElement.getBoundingClientRect();
+    const tgtRect = hit.getBoundingClientRect();
+
+    inlineField = field;
+    inlineInput.value = field === 'label' ? cap.label || '' : String(cap[field]);
+    inlineInput.style.left = `${Math.max(8, Math.min(wellRect.width - 180, tgtRect.left - wellRect.left))}px`;
+    inlineInput.style.top = `${Math.max(8, tgtRect.top - wellRect.top)}px`;
+    inlineInput.style.width = field === 'label' ? '220px' : '110px';
+    inlineInput.classList.remove('hidden');
+    inlineInput.focus();
+    inlineInput.select();
+  });
+
+  inlineInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      commitInlineEdit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      inlineField = null;
+      inlineInput.classList.add('hidden');
+    }
+  });
+  inlineInput?.addEventListener('blur', commitInlineEdit);
 
   [
     ['cap-fills', 'mu'],
@@ -909,12 +1024,16 @@ export function bindCapabilityEvents({ onOpenImport }) {
   });
 
   window.addEventListener('mousemove', (e) => {
-    if (capDragging) moveDrag(e.clientX, e.clientY);
+    if (capDataDragging) moveDataDrag(e.clientX, e.clientY);
+    else if (capDragging) moveDrag(e.clientX, e.clientY);
   });
   window.addEventListener(
     'touchmove',
     (e) => {
-      if (capDragging && e.touches.length) {
+      if (capDataDragging && e.touches.length) {
+        e.preventDefault();
+        moveDataDrag(e.touches[0].clientX, e.touches[0].clientY);
+      } else if (capDragging && e.touches.length) {
         e.preventDefault();
         moveDrag(e.touches[0].clientX, e.touches[0].clientY);
       }
