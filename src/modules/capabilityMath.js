@@ -29,6 +29,59 @@ export function normalCDF(z) {
   return 0.5 * erfc(-z / Math.SQRT2);
 }
 
+/**
+ * Anderson-Darling Normality Test (Stephens 1986 modified A^2* and p-value).
+ */
+export function computeAndersonDarling(rawSamples) {
+  const samples = (Array.isArray(rawSamples) ? rawSamples : [])
+    .map(Number)
+    .filter((v) => Number.isFinite(v));
+  const n = samples.length;
+  if (n < 4) {
+    return { a2: 0, a2Star: 0, pValue: 1, isNormal: true, testable: false };
+  }
+  const sorted = [...samples].sort((a, b) => a - b);
+  const mean = sorted.reduce((a, b) => a + b, 0) / n;
+  const variance = sorted.reduce((a, x) => a + (x - mean) ** 2, 0) / (n - 1);
+  const s = Math.sqrt(variance);
+  if (s <= 1e-12) {
+    return { a2: 0, a2Star: 0, pValue: 0.0001, isNormal: false, testable: true };
+  }
+
+  let sum = 0;
+  const eps = 1e-12;
+  for (let i = 0; i < n; i++) {
+    const phiLow = Math.min(1 - eps, Math.max(eps, normalCDF((sorted[i] - mean) / s)));
+    const phiHigh = Math.min(1 - eps, Math.max(eps, normalCDF((sorted[n - 1 - i] - mean) / s)));
+    sum += ((2 * (i + 1) - 1) / n) * (Math.log(phiLow) + Math.log(1 - phiHigh));
+  }
+  const a2 = -n - sum;
+  const a2Star = a2 * (1 + 0.75 / n + 2.25 / (n * n));
+
+  let p;
+  if (a2Star >= 0.6) {
+    p = Math.exp(1.2937 - 5.709 * a2Star + 0.0186 * a2Star * a2Star);
+  } else if (a2Star > 0.34) {
+    p = Math.exp(0.9177 - 4.279 * a2Star - 1.38 * a2Star * a2Star);
+  } else if (a2Star > 0.2) {
+    p = 1 - Math.exp(-8.318 + 42.796 * a2Star - 59.938 * a2Star * a2Star);
+  } else {
+    p = 1 - Math.exp(-13.436 + 101.14 * a2Star - 223.73 * a2Star * a2Star);
+  }
+  const pValue = Math.min(0.9999, Math.max(0.0001, p));
+  return { a2, a2Star, pValue, isNormal: pValue >= 0.05, testable: true };
+}
+
+export function empiricalQuantile(sorted, q) {
+  if (!sorted.length) return NaN;
+  if (sorted.length === 1) return sorted[0];
+  const pos = (sorted.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  const frac = pos - lo;
+  return sorted[lo] * (1 - frac) + sorted[hi] * frac;
+}
+
 export function computeParametricCapability({ mu, sigma, lsl, usl }) {
   const safeSigma = Math.max(1e-9, sigma);
   const specW = usl - lsl;
@@ -51,7 +104,7 @@ export function computeParametricCapability({ mu, sigma, lsl, usl }) {
  * Pp/Ppk overall sample std dev), observed defects, histogram bins, and I-MR
  * statistical control limits + Western Electric Run Rules 1 & 2.
  */
-export function computeEmpiricalCapability(rawSamples, lslInput, uslInput) {
+export function computeEmpiricalCapability(rawSamples, lslInput, uslInput, distModel = 'normal') {
   const samples = (Array.isArray(rawSamples) ? rawSamples : [])
     .map(Number)
     .filter((v) => Number.isFinite(v));
@@ -61,6 +114,9 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput) {
   }
 
   const n = samples.length;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const median = empiricalQuantile(sorted, 0.5);
+  const ad = computeAndersonDarling(samples);
   const mean = samples.reduce((a, b) => a + b, 0) / n;
   const variance = samples.reduce((a, x) => a + (x - mean) ** 2, 0) / (n - 1);
   const overallSigma = Math.max(1e-9, Math.sqrt(variance));
@@ -79,17 +135,17 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput) {
   const upperM = usl - mean;
   const lowerM = mean - lsl;
 
-  // Potential / Within-subgroup capability
+  // Potential / Within-subgroup capability (Normal)
   const cp = specW / (6 * withinSigma);
   const cpu = upperM / (3 * withinSigma);
   const cpl = lowerM / (3 * withinSigma);
   const cpk = Math.min(cpu, cpl);
 
-  // Overall performance indices
-  const pp = specW / (6 * overallSigma);
-  const ppu = upperM / (3 * overallSigma);
-  const ppl = lowerM / (3 * overallSigma);
-  const ppk = Math.min(ppu, ppl);
+  // Overall performance indices (Normal default)
+  let pp = specW / (6 * overallSigma);
+  let ppu = upperM / (3 * overallSigma);
+  let ppl = lowerM / (3 * overallSigma);
+  let ppk = Math.min(ppu, ppl);
 
   // Observed out-of-spec defects
   let oobLow = 0;
@@ -102,12 +158,52 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput) {
   const observedPPM = (oobCount / n) * 1e6;
   const observedYieldPct = ((n - oobCount) / n) * 100;
 
-  // Expected normal tail defect rate using overall sigma
+  // Expected tail defect rate
   const pLower = normalCDF((lsl - mean) / overallSigma);
   const pUpper = normalCDF((mean - usl) / overallSigma);
-  const expectedPPM = (pLower + pUpper) * 1e6;
-  const expectedYieldPct = Math.max(0, (1 - (pLower + pUpper)) * 100);
+  let expectedPPM = (pLower + pUpper) * 1e6;
+  let expectedYieldPct = Math.max(0, (1 - (pLower + pUpper)) * 100);
   const zMin = Math.min(upperM / overallSigma, lowerM / overallSigma);
+
+  // Non-Normal Distribution / Percentile Overrides
+  const allPositive = sorted[0] > 0;
+  let lognormal = null;
+  if (allPositive) {
+    const logs = samples.map((v) => Math.log(v));
+    const muLog = logs.reduce((a, b) => a + b, 0) / n;
+    const varLog = logs.reduce((a, v) => a + (v - muLog) ** 2, 0) / (n - 1);
+    const sigLog = Math.max(1e-9, Math.sqrt(varLog));
+    const qLow = Math.exp(muLog - 3 * sigLog);
+    const qMid = Math.exp(muLog);
+    const qHigh = Math.exp(muLog + 3 * sigLog);
+    lognormal = { muLog, sigLog, qLow, qMid, qHigh };
+  }
+
+  const p00135 = empiricalQuantile(sorted, 0.00135);
+  const p99865 = empiricalQuantile(sorted, 0.99865);
+
+  let activeDistModel = distModel;
+  if (activeDistModel === 'lognormal') {
+    if (lognormal) {
+      pp = specW / Math.max(1e-9, lognormal.qHigh - lognormal.qLow);
+      ppu = (usl - lognormal.qMid) / Math.max(1e-9, lognormal.qHigh - lognormal.qMid);
+      ppl = (lognormal.qMid - lsl) / Math.max(1e-9, lognormal.qMid - lognormal.qLow);
+      ppk = Math.min(ppu, ppl);
+      const lnPLow = lsl > 0 ? normalCDF((Math.log(lsl) - lognormal.muLog) / lognormal.sigLog) : 0;
+      const lnPHigh = usl > 0 ? 1 - normalCDF((Math.log(usl) - lognormal.muLog) / lognormal.sigLog) : 1;
+      expectedPPM = (lnPLow + lnPHigh) * 1e6;
+      expectedYieldPct = Math.max(0, (1 - (lnPLow + lnPHigh)) * 100);
+    } else {
+      activeDistModel = 'normal';
+    }
+  } else if (activeDistModel === 'nonparametric') {
+    pp = specW / Math.max(1e-9, p99865 - p00135);
+    ppu = (usl - median) / Math.max(1e-9, p99865 - median);
+    ppl = (median - lsl) / Math.max(1e-9, median - p00135);
+    ppk = Math.min(ppu, ppl);
+    expectedPPM = observedPPM;
+    expectedYieldPct = observedYieldPct;
+  }
 
   // Histogram bins
   let minVal = samples[0];
@@ -179,9 +275,14 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput) {
     n,
     samples,
     mean,
+    median,
     overallSigma,
     withinSigma,
     mrBar,
+    ad,
+    distModel: activeDistModel,
+    lognormal,
+    quantiles: { p00135, p50: median, p99865 },
     lsl,
     usl,
     specW,

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { computeEmpiricalCapability, computeParametricCapability } from '../src/modules/capabilityMath.js';
+import { computeAndersonDarling, computeEmpiricalCapability, computeParametricCapability } from '../src/modules/capabilityMath.js';
 import { computeShiftLogOEE, computeSingleOEE } from '../src/modules/oeeMath.js';
 import { aggregateParetoEvents, computeParetoSorted } from '../src/modules/paretoMath.js';
 import { computeTaktMetrics } from '../src/modules/taktMath.js';
@@ -35,6 +35,24 @@ test('computeEmpiricalCapability computes within/overall indices, bins, and I-MR
   const mRun = computeEmpiricalCapability(shiftRun, 0, 30);
   assert.ok(mRun.imr.oocRule2.length >= 8);
   assert.equal(mRun.imr.isStable, false);
+});
+
+test('computeAndersonDarling and non-normal capability modes handle skewed data', () => {
+  // Strongly right-skewed failure-time style dataset
+  const skewed = [2.1, 2.4, 2.8, 3.0, 3.2, 3.5, 4.1, 4.8, 5.5, 7.2, 9.8, 14.5, 22.0, 35.0];
+  const ad = computeAndersonDarling(skewed);
+  assert.equal(ad.testable, true);
+  assert.equal(ad.isNormal, false);
+  assert.ok(ad.pValue < 0.05);
+
+  const lnCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'lognormal');
+  assert.equal(lnCap.distModel, 'lognormal');
+  assert.ok(Number.isFinite(lnCap.ppk));
+
+  const npCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'nonparametric');
+  assert.equal(npCap.distModel, 'nonparametric');
+  assert.ok(Number.isFinite(npCap.ppk));
+  assert.ok(npCap.median > 0);
 });
 
 test('computeSingleOEE and computeShiftLogOEE aggregate and filter properly', () => {
