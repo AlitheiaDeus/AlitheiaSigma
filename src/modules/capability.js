@@ -1,5 +1,6 @@
 import { PALETTE } from '../constants.js';
-import { getState, persistState } from '../state.js';
+import { getState, persistState, setModuleSource } from '../state.js';
+import { renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { escapeHtml, formatPPM } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { computeEmpiricalCapability, computeParametricCapability } from './capabilityMath.js';
@@ -675,12 +676,16 @@ export function bindCapabilityEvents({ onOpenImport }) {
 
   document.getElementById('cap-mode-data')?.addEventListener('click', () => {
     getState().capability.mode = 'data';
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-mode-sim')?.addEventListener('click', () => {
     getState().capability.mode = 'simulator';
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('btn-cap-import')?.addEventListener('click', () => {
@@ -690,12 +695,16 @@ export function bindCapabilityEvents({ onOpenImport }) {
   // Data Mode inputs
   document.getElementById('cap-data-label')?.addEventListener('input', (e) => {
     getState().capability.label = e.target.value;
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-data-unit')?.addEventListener('input', (e) => {
     getState().capability.unit = e.target.value;
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
   });
   document.getElementById('cap-data-lsl')?.addEventListener('input', (e) => {
@@ -732,7 +741,9 @@ export function bindCapabilityEvents({ onOpenImport }) {
       cap.lsl = Number((emp.mean - 3.5 * emp.overallSigma).toFixed(3));
       cap.usl = Number((emp.mean + 3.5 * emp.overallSigma).toFixed(3));
     }
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
     showToast(`Updated ${nums.length} measurements`);
   });
@@ -775,7 +786,9 @@ export function bindCapabilityEvents({ onOpenImport }) {
     } else if (capDragging === 'usl') {
       cap.usl = Math.min(100, Math.max(cap.lsl + 1, val));
     }
+    setModuleSource('capability', 'manual', `Manual / Pasted (${nums.length} samples)`);
     renderCapability();
+    renderAllSourceBadges();
     persistState();
   }
 

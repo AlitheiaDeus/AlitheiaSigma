@@ -8,6 +8,7 @@ import { bindIshikawaEvents, renderIshikawa } from './modules/ishikawa.js';
 import { bindExportAndHeaderEvents, syncScenarioSelect, updateExportClock } from './modules/export.js';
 import { bindImportDrawer, closeImportDrawer, isImportDrawerOpen, openImportDrawer } from './data/importDrawer.js';
 import { bindNavigationEvents, resolveInitialTab, switchTab } from './ui/navigation.js';
+import { renderAllSourceBadges } from './ui/sourceBadge.js';
 
 export function renderAllModules() {
   renderCapability();
@@ -17,6 +18,7 @@ export function renderAllModules() {
   renderVSM();
   render5S();
   renderIshikawa();
+  renderAllSourceBadges();
 }
 
 function bootstrap() {

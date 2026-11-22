@@ -64,21 +64,10 @@
       </div>
     </div>
 
-    <!-- Scenario Preset + Import + Quick Export Controls -->
+    <!-- Import & Workspace JSON Controls -->
     <div class="flex flex-wrap items-center gap-2">
-      <select id="scenario-select" aria-label="Sample Factory Scenario" class="ind-input ind-input-text text-xs py-1.5">
-        <option value="cnc">Scenario: Precision CNC Cell</option>
-        <option value="smt">Scenario: SMT Electronics Line</option>
-        <option value="packaging">Scenario: High-Speed Packaging</option>
-      </select>
       <button type="button" id="btn-open-import" class="ind-btn ind-btn-primary" title="Import Excel / CSV or paste cells (Shortcut: i)">
         Import Data
-      </button>
-      <button type="button" id="btn-quick-png" class="ind-btn ind-btn-ok" title="Download active chart as PNG">
-        Export PNG
-      </button>
-      <button type="button" id="btn-quick-svg" class="ind-btn" title="Download active chart as SVG">
-        Export SVG
       </button>
       <button type="button" id="btn-quick-json-save" class="ind-btn" title="Save workspace JSON">
         Save JSON
@@ -186,6 +175,22 @@
     </div>
   </div>
 
+  <!-- RAW DATA VIEWER MODAL -->
+  <div id="raw-data-modal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="raw-modal-title">
+    <div class="modal-panel shadow-2xl">
+      <div class="px-5 py-3.5 border-b-2 border-navy-border flex items-center justify-between bg-navy-panel">
+        <div>
+          <h2 id="raw-modal-title" class="text-base font-bold uppercase tracking-wider text-rose-dusty">Raw Table Data</h2>
+          <p id="raw-modal-sub" class="text-xs text-teal-slate font-mono"></p>
+        </div>
+        <button type="button" id="raw-modal-close" class="ind-btn py-1 px-3 text-xs">Close</button>
+      </div>
+      <div class="p-4 overflow-auto flex-1">
+        <table id="raw-modal-table" class="w-full text-left border-collapse"></table>
+      </div>
+    </div>
+  </div>
+
   <!-- MAIN APPLICATION SHELL -->
   <div class="flex-1 flex flex-col lg:flex-row min-h-0 min-w-0">
 
@@ -220,8 +225,9 @@
           <span class="flex items-center gap-2"><span class="kbd-chip">7</span><span>Ishikawa</span></span>
           <span class="tab-dot"></span>
         </button>
+        <div class="hidden lg:block border-t border-navy-border my-1"></div>
         <button type="button" class="rail-tab" data-tab="export">
-          <span class="flex items-center gap-2"><span class="kbd-chip">8</span><span>Export</span></span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">8</span><span>Data &amp; Export</span></span>
           <span class="tab-dot"></span>
         </button>
       </div>
@@ -238,6 +244,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">Capability &amp; SPC</h2>
             <p class="text-xs text-icemint mt-0.5">Analyze actual measurement samples (Cp/Cpk, Pp/Ppk, I-MR control) or simulate distributions interactively</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-capability"></span>
+              <button type="button" data-raw-mod="capability" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-2.5 no-print">
             <div class="mode-switch" role="group" aria-label="Capability Mode">
@@ -329,7 +339,11 @@
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-xs bg-crimson"></span> Out of Spec</span>
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> LSL / USL</span>
             </div>
-            <span id="cap-drag-status" class="text-emerald-mint">Ready</span>
+            <div class="flex items-center gap-2">
+              <span id="cap-drag-status" class="text-emerald-mint">Ready</span>
+              <button type="button" data-mod="capability" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="capability" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
+            </div>
           </div>
 
           <div class="ind-well p-2">
@@ -502,6 +516,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">OEE</h2>
             <p class="text-xs text-icemint mt-0.5">Multi-shift equipment effectiveness trend &amp; time loss waterfall</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-oee"></span>
+              <button type="button" data-raw-mod="oee" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-2.5 no-print">
             <div class="mode-switch" role="group" aria-label="OEE Mode">
@@ -582,11 +600,13 @@
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Time Loss Waterfall</span>
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-crimson"></span> Availability Loss</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-copper"></span> Performance Loss</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-magenta"></span> Quality Loss</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-emerald-mint"></span> Productive</span>
+              <button type="button" data-mod="oee" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="oee" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
             </div>
           </div>
           <div class="ind-well p-2">
@@ -689,6 +709,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">Takt</h2>
             <p class="text-xs text-icemint mt-0.5">Yamazumi workstation cycle balance against customer demand pace</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-takt"></span>
+              <button type="button" data-raw-mod="takt" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-3 no-print">
             <button type="button" id="btn-takt-import" class="ind-btn ind-btn-primary">Import Stations</button>
@@ -730,11 +754,13 @@
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Yamazumi Balance Chart</span>
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-emerald-mint"></span> VA</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-teal-slate"></span> BNVA</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-crimson"></span> Waste</span>
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> Takt</span>
+              <button type="button" data-mod="takt" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="takt" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
             </div>
           </div>
           <div class="ind-well p-2">
@@ -774,6 +800,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">Pareto</h2>
             <p class="text-xs text-icemint mt-0.5">Group raw defect/downtime logs by frequency or cost/duration to isolate vital drivers</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-pareto"></span>
+              <button type="button" data-raw-mod="pareto" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-2.5 no-print">
             <div class="mode-switch" role="group" aria-label="Pareto Mode">
@@ -813,12 +843,14 @@
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Defect Distribution</span>
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-crimson"></span> Top</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-indigo-royal"></span> Vital Few</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-teal-slate"></span> Trivial Many</span>
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> Cumulative</span>
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-copper"></span> 80% Line</span>
+              <button type="button" data-mod="pareto" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="pareto" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
             </div>
           </div>
           <div class="ind-well p-2 relative">
@@ -883,6 +915,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">VSM</h2>
             <p class="text-xs text-icemint mt-0.5">End-to-end production process boxes, inventory queues, sawtooth lead time ladder</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-vsm"></span>
+              <button type="button" data-raw-mod="vsm" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-2 no-print">
             <button type="button" id="btn-vsm-import" class="ind-btn ind-btn-primary">Import Steps</button>
@@ -917,10 +953,12 @@
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Process Flow Map</span>
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-copper"></span> Queue Wait</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-crimson"></span> Wait Tooth</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-emerald-mint"></span> Value Trough</span>
+              <button type="button" data-mod="vsm" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="vsm" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
             </div>
           </div>
           <div class="ind-well p-2">
@@ -960,6 +998,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">5S</h2>
             <p class="text-xs text-icemint mt-0.5">Workplace discipline audit scoring matrix, radar benchmark, corrective log</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-fives"></span>
+              <button type="button" data-raw-mod="fives" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex items-center gap-3 no-print">
             <label for="fives-sl-target" class="text-xs font-bold uppercase text-rose-dusty">Target</label>
@@ -995,9 +1037,11 @@
           <div class="xl:col-span-5 ind-card p-4 space-y-3">
             <div class="flex items-center justify-between text-xs font-mono">
               <span class="font-bold text-rose-dusty uppercase">Pillar Radar</span>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-emerald-mint"></span> Actual</span>
                 <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 inline-block bg-magenta"></span> Target</span>
+                <button type="button" data-mod="fives" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+                <button type="button" data-mod="fives" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
               </div>
             </div>
             <div class="ind-well p-2">
@@ -1050,6 +1094,10 @@
           <div>
             <h2 class="text-xl font-bold text-rose-dusty">Ishikawa</h2>
             <p class="text-xs text-icemint mt-0.5">Structured six-rib fishbone cause mapping with root suspect highlighting</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-ishikawa"></span>
+              <button type="button" data-raw-mod="ishikawa" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
           </div>
           <div class="flex items-center gap-2 no-print w-full sm:w-auto">
             <label for="ish-in-problem" class="text-xs font-bold uppercase text-rose-dusty shrink-0">Problem</label>
@@ -1060,9 +1108,11 @@
         <div class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
             <span class="font-bold text-rose-dusty uppercase">Fishbone Diagram</span>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-icemint"></span> Factor</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block bg-magenta"></span> Root Suspect</span>
+              <button type="button" data-mod="ishikawa" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="ishikawa" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
             </div>
           </div>
           <div class="ind-well p-2">
@@ -1088,34 +1138,55 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- MODULE 8: EXPORT (Full Export & Clipboard Hub)                    -->
+      <!-- MODULE 8: DATA & EXPORT HUB                                       -->
       <!-- ================================================================= -->
       <section id="module-export" class="module-section hidden space-y-5">
         <div>
-          <h2 class="text-xl font-bold text-rose-dusty">Export &amp; Reporting Hub</h2>
-          <p class="text-xs text-icemint mt-0.5">Download CSV/TSV tables, PNG/SVG charts, Markdown executive summaries, HTML bundles, and JSON snapshots</p>
+          <h2 class="text-xl font-bold text-rose-dusty">Data &amp; Export Hub</h2>
+          <p class="text-xs text-icemint mt-0.5">Inspect module data sources, view raw tables, load demo datasets, or export charts and reports</p>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div class="ind-card p-4">
-            <span class="text-xs font-bold uppercase text-rose-dusty">Modules</span>
-            <div class="font-mono text-2xl font-bold text-emerald-mint mt-1">7</div>
-            <div class="font-mono text-[11px] text-teal-slate mt-1">Active Analytical Models</div>
+        <!-- Module Data Sources & Raw Table Overview -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+          <div class="xl:col-span-8 ind-card p-5 space-y-3">
+            <div class="flex items-center justify-between border-b-2 border-navy-border pb-2">
+              <h3 class="text-base font-bold uppercase text-rose-dusty">Module Data Sources</h3>
+              <span class="font-mono text-xs text-teal-slate">Provenance &amp; Raw Tables</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-navy-border text-xs font-mono uppercase text-teal-slate">
+                    <th class="py-1.5 pr-3">Module</th>
+                    <th class="py-1.5 px-2">Active Data Source</th>
+                    <th class="py-1.5 pl-2 text-right">Inspect / Replace</th>
+                  </tr>
+                </thead>
+                <tbody id="exp-sources-body" class="divide-y divide-navy-border"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="ind-card p-4">
-            <span class="text-xs font-bold uppercase text-rose-dusty">Charts</span>
-            <div class="font-mono text-2xl font-bold text-icemint mt-1">SVG + PNG</div>
-            <div class="font-mono text-[11px] text-teal-slate mt-1">Vector &amp; 2x Raster</div>
-          </div>
-          <div class="ind-card p-4">
-            <span class="text-xs font-bold uppercase text-rose-dusty">Storage</span>
-            <div id="exp-storage-status" class="font-mono text-2xl font-bold text-emerald-mint mt-1">Synced</div>
-            <div class="font-mono text-[11px] text-teal-slate mt-1">Local Browser Persistence</div>
-          </div>
-          <div class="ind-card p-4">
-            <span class="text-xs font-bold uppercase text-rose-dusty">Timestamp</span>
-            <div id="exp-clock" class="font-mono text-lg font-bold text-rose-dusty mt-2">00:00:00</div>
-            <div id="exp-date" class="font-mono text-[11px] text-teal-slate mt-1">2026</div>
+
+          <div class="xl:col-span-4 ind-card p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between border-b-2 border-navy-border pb-2">
+                <h3 class="text-base font-bold uppercase text-rose-dusty">Demo Scenarios</h3>
+                <span class="font-mono text-xs text-teal-slate">Sample Data</span>
+              </div>
+              <p class="text-xs text-icemint">
+                Load a complete sample factory dataset across all 7 modules to explore the workbench.
+              </p>
+              <select id="exp-scenario-select" aria-label="Sample Factory Scenario" class="ind-input ind-input-text w-full text-xs">
+                <option value="cnc">Precision CNC Cell</option>
+                <option value="smt">SMT Electronics Line</option>
+                <option value="packaging">High-Speed Packaging</option>
+              </select>
+              <button type="button" id="btn-exp-load-scenario" class="ind-btn w-full">Load Demo Scenario</button>
+            </div>
+            <div class="pt-3 border-t border-navy-border flex items-center justify-between text-xs font-mono text-teal-slate">
+              <span>Storage: <strong id="exp-storage-status" class="text-emerald-mint">Synced</strong></span>
+              <span><span id="exp-clock">00:00:00</span> · <span id="exp-date">2026</span></span>
+            </div>
           </div>
         </div>
 
@@ -1200,7 +1271,6 @@
               <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="vsm">PNG VSM</button>
               <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="fives">PNG 5S</button>
               <button type="button" class="ind-btn ind-btn-ok exp-png-btn" data-png="ishikawa">PNG Fishbone</button>
-              <button type="button" id="exp-btn-png-copy" class="ind-btn ind-btn-primary">Copy PNG</button>
             </div>
             <div class="pt-2 border-t border-navy-border flex flex-wrap items-center gap-2">
               <span class="text-xs font-mono text-teal-slate">Vector SVG:</span>

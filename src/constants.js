@@ -26,7 +26,7 @@ export const TAB_NAMES = {
   vsm: 'VSM',
   fives: '5S',
   ishikawa: 'Ishikawa',
-  export: 'Export',
+  export: 'Data & Export',
 };
 
 export const TAB_ORDER = [

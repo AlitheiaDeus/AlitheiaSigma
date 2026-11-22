@@ -1,4 +1,4 @@
-import { getState, persistState } from '../state.js';
+import { getState, persistState, setModuleSource } from '../state.js';
 import { escapeHtml } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
@@ -351,6 +351,21 @@ export function bindImportDrawer({ renderAll }) {
     } else if (target === 'vsm') {
       state.vsm.steps = res.data.slice(0, 7);
     }
+
+    const srcKind = rawWorkbook.sourceName === 'Clipboard Paste' ? 'paste' : 'file';
+    const sheetPart = rawWorkbook.activeSheet ? ` [${rawWorkbook.activeSheet}]` : '';
+    const primaryCol =
+      target === 'capability'
+        ? parsedTable.headers[currentMapping.value]
+        : target === 'pareto'
+        ? parsedTable.headers[currentMapping.category]
+        : '';
+    const colPart = primaryCol ? ` • ${primaryCol}` : '';
+    setModuleSource(
+      target,
+      srcKind,
+      `${rawWorkbook.sourceName || 'Import'}${sheetPart}${colPart} (${res.importedCount} rows)`
+    );
 
     persistState();
     if (renderAll) renderAll();

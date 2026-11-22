@@ -1,8 +1,9 @@
 import { SAMPLE_SCENARIOS } from '../constants.js';
 import { getState, loadScenario, resetState } from '../state.js';
 import { showToast } from '../ui/toast.js';
+import { closeRawDataModal, openRawDataModal, renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { downloadSVG } from '../export/svg.js';
-import { copyPNGToClipboard, downloadPNG } from '../export/png.js';
+import { downloadPNG } from '../export/png.js';
 import { copyModuleTSV, downloadCSV } from '../export/csv.js';
 import { copyMarkdown, downloadMarkdown } from '../export/markdown.js';
 import { downloadJSONWorkspace, importJSONFile } from '../export/json.js';
@@ -17,7 +18,7 @@ export function updateExportClock() {
 }
 
 export function syncScenarioSelect() {
-  const sel = document.getElementById('scenario-select');
+  const sel = document.getElementById('exp-scenario-select');
   if (!sel) return;
   const key = getState().scenarioKey || 'cnc';
   if (SAMPLE_SCENARIOS[key]) sel.value = key;
@@ -29,22 +30,6 @@ export function bindExportAndHeaderEvents({ renderAll, onOpenImport }) {
     const active = getState().activeTab;
     const target = ['capability', 'oee', 'pareto', 'takt', 'vsm'].includes(active) ? active : 'capability';
     if (onOpenImport) onOpenImport(target);
-  });
-
-  document.getElementById('scenario-select')?.addEventListener('change', (e) => {
-    const next = loadScenario(e.target.value);
-    if (renderAll) renderAll();
-    showToast(`Loaded Scenario: ${next.scenarioName}`);
-  });
-
-  document.getElementById('btn-quick-svg')?.addEventListener('click', () => {
-    const target = getState().activeTab === 'export' ? 'capability' : getState().activeTab;
-    downloadSVG(target, renderAll);
-  });
-
-  document.getElementById('btn-quick-png')?.addEventListener('click', () => {
-    const target = getState().activeTab === 'export' ? 'capability' : getState().activeTab;
-    downloadPNG(target, renderAll);
   });
 
   document.getElementById('btn-quick-json-save')?.addEventListener('click', downloadJSONWorkspace);
@@ -62,16 +47,46 @@ export function bindExportAndHeaderEvents({ renderAll, onOpenImport }) {
     }
   });
 
+  // Per-chart quick export buttons alongside each chart
+  document.querySelectorAll('.quick-chart-png').forEach((btn) => {
+    btn.addEventListener('click', () => downloadPNG(btn.dataset.mod, renderAll));
+  });
+  document.querySelectorAll('.quick-chart-svg').forEach((btn) => {
+    btn.addEventListener('click', () => downloadSVG(btn.dataset.mod, renderAll));
+  });
+
+  // Raw Data Modal bindings
+  document.getElementById('raw-modal-close')?.addEventListener('click', closeRawDataModal);
+  document.getElementById('raw-data-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'raw-data-modal') closeRawDataModal();
+  });
+  document.addEventListener('click', (e) => {
+    const rawBtn = e.target.closest('.btn-view-raw');
+    if (rawBtn && rawBtn.dataset.rawMod) {
+      openRawDataModal(rawBtn.dataset.rawMod);
+      return;
+    }
+    const impBtn = e.target.closest('.btn-hub-import');
+    if (impBtn && impBtn.dataset.impMod && onOpenImport) {
+      onOpenImport(impBtn.dataset.impMod);
+    }
+  });
+
+  // Tucked-away Demo Scenario loader in Data & Export Hub
+  document.getElementById('btn-exp-load-scenario')?.addEventListener('click', () => {
+    const sel = document.getElementById('exp-scenario-select');
+    const key = sel?.value || 'cnc';
+    const next = loadScenario(key);
+    if (renderAll) renderAll();
+    showToast(`Loaded Demo Scenario: ${next.scenarioName}`);
+  });
+
   // Export Hub actions
   document.getElementById('exp-btn-json-export')?.addEventListener('click', downloadJSONWorkspace);
   document.getElementById('exp-btn-html')?.addEventListener('click', () => downloadHTMLReport(renderAll));
   document.getElementById('exp-btn-print')?.addEventListener('click', () => window.print());
   document.getElementById('exp-btn-md-download')?.addEventListener('click', downloadMarkdown);
   document.getElementById('exp-btn-md-copy')?.addEventListener('click', copyMarkdown);
-  document.getElementById('exp-btn-png-copy')?.addEventListener('click', () => {
-    const target = getState().activeTab === 'export' ? 'capability' : getState().activeTab;
-    copyPNGToClipboard(target, renderAll);
-  });
 
   document.querySelectorAll('.exp-csv-btn').forEach((btn) => {
     btn.addEventListener('click', () => downloadCSV(btn.dataset.csv));
@@ -98,6 +113,7 @@ export function bindExportAndHeaderEvents({ renderAll, onOpenImport }) {
     resetState('cnc');
     syncScenarioSelect();
     if (renderAll) renderAll();
+    renderAllSourceBadges();
     confirmBox?.classList.add('hidden');
     showToast('Factory Defaults Restored');
   });

@@ -1,5 +1,6 @@
 import { PALETTE } from '../constants.js';
-import { getState, nextId, persistState } from '../state.js';
+import { getState, nextId, persistState, setModuleSource } from '../state.js';
+import { renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
@@ -164,7 +165,9 @@ export function seedIshikawaFromCrossLink({ problem, rib = 'Machine', cause = ''
       arr.unshift({ id: nextId(arr), text: cause, root: true });
     }
   }
+  setModuleSource('ishikawa', 'link', `Cross-linked (${rib})`);
   renderIshikawa();
+  renderAllSourceBadges();
   persistState();
   switchTab('ishikawa');
   showToast(`Sent to Ishikawa: ${truncateText(problem || cause, 34)}`);

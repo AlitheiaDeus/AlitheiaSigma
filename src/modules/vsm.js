@@ -1,5 +1,6 @@
 import { PALETTE } from '../constants.js';
-import { getState, nextId, persistState } from '../state.js';
+import { getState, nextId, persistState, setModuleSource } from '../state.js';
+import { renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
@@ -227,7 +228,9 @@ export function bindVSMEvents({ onOpenImport }) {
         waste,
       };
     });
+    setModuleSource('takt', 'link', `Synced from VSM (${state.takt.stations.length} steps)`);
     renderTakt();
+    renderAllSourceBadges();
     persistState();
     switchTab('takt');
     showToast(`Synced ${state.takt.stations.length} VSM steps into Takt Yamazumi`);
