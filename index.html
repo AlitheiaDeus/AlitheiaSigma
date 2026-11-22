@@ -257,8 +257,11 @@
             <div id="cap-data-presets" class="flex flex-wrap items-center gap-2">
               <span id="cap-ad-badge" class="px-2 py-1 text-[11px] font-mono font-bold rounded-xs bg-navy-canvas border border-emerald-mint text-emerald-mint">AD: Normal</span>
               <div class="mode-switch" role="group" aria-label="Distribution Model">
-                <button type="button" id="cap-dist-normal" class="mode-pill active">Normal</button>
-                <button type="button" id="cap-dist-lognormal" class="mode-pill">Lognormal</button>
+                <button type="button" id="cap-dist-auto" class="mode-pill active" title="Auto-select best fit by Anderson-Darling A²">Auto</button>
+                <button type="button" id="cap-dist-normal" class="mode-pill">Normal</button>
+                <button type="button" id="cap-dist-lognormal" class="mode-pill">Lognorm</button>
+                <button type="button" id="cap-dist-weibull" class="mode-pill">Weibull</button>
+                <button type="button" id="cap-dist-loglogistic" class="mode-pill">LogLog</button>
                 <button type="button" id="cap-dist-nonparam" class="mode-pill">Non-Param</button>
               </div>
               <button type="button" id="btn-cap-import" class="ind-btn ind-btn-primary">Import Measurements</button>

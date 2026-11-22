@@ -43,7 +43,7 @@ export function migrateState(parsed) {
   const cap = { ...def.capability, ...(parsed.capability || {}) };
   if (!Array.isArray(cap.samples)) cap.samples = def.capability.samples;
   if (!cap.mode) cap.mode = Array.isArray(parsed.capability?.samples) ? 'data' : 'simulator';
-  if (!cap.distModel) cap.distModel = 'normal';
+  if (!cap.distModel) cap.distModel = 'auto';
   cap.source = fallbackSource(parsed.capability, def.capability.source);
 
   const oee = { ...def.oee, ...(parsed.oee || {}) };

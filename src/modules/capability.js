@@ -375,25 +375,30 @@ function renderSimulatorView(capState) {
 }
 
 function renderDataModeView(capState) {
-  const m = computeEmpiricalCapability(capState.samples, capState.lsl, capState.usl, capState.distModel || 'normal');
-  const distModel = m ? m.distModel : (capState.distModel || 'normal');
+  const requested = capState.distModel || 'auto';
+  const m = computeEmpiricalCapability(capState.samples, capState.lsl, capState.usl, requested);
+  const distModel = m ? m.distModel : requested;
 
-  document.getElementById('cap-dist-normal')?.classList.toggle('active', distModel === 'normal');
-  document.getElementById('cap-dist-lognormal')?.classList.toggle('active', distModel === 'lognormal');
-  document.getElementById('cap-dist-nonparam')?.classList.toggle('active', distModel === 'nonparametric');
+  document.getElementById('cap-dist-auto')?.classList.toggle('active', requested === 'auto');
+  document.getElementById('cap-dist-normal')?.classList.toggle('active', requested === 'normal');
+  document.getElementById('cap-dist-lognormal')?.classList.toggle('active', requested === 'lognormal');
+  document.getElementById('cap-dist-weibull')?.classList.toggle('active', requested === 'weibull');
+  document.getElementById('cap-dist-loglogistic')?.classList.toggle('active', requested === 'loglogistic');
+  document.getElementById('cap-dist-nonparam')?.classList.toggle('active', requested === 'nonparametric');
 
   const adBadge = document.getElementById('cap-ad-badge');
   if (adBadge && m) {
+    const bestLabel = m.fitRankings?.find((r) => r.key === m.bestFitKey)?.label || m.bestFitKey;
     if (!m.ad.testable) {
       adBadge.textContent = 'AD: n<4';
       adBadge.style.borderColor = PALETTE.border;
       adBadge.style.color = PALETTE.icemint;
     } else if (m.ad.isNormal) {
-      adBadge.textContent = `AD Normal (p=${m.ad.pValue.toFixed(3)})`;
+      adBadge.textContent = `AD Normal (p=${m.ad.pValue.toFixed(3)}) • Best: ${bestLabel}`;
       adBadge.style.borderColor = PALETTE.emerald;
       adBadge.style.color = PALETTE.emerald;
     } else {
-      adBadge.textContent = `Non-Normal (AD p=${m.ad.pValue.toFixed(3)})`;
+      adBadge.textContent = `Non-Normal (p=${m.ad.pValue.toFixed(3)}) • Best: ${bestLabel}`;
       adBadge.style.borderColor = PALETTE.copper;
       adBadge.style.color = PALETTE.copper;
     }
@@ -432,8 +437,17 @@ function renderDataModeView(capState) {
     distModel === 'normal' ? `Pp: ${m.pp.toFixed(2)} (Spec ${m.specW.toFixed(2)})` : `Model: ${distModel}`;
   styleCapBadge(document.getElementById('cap-badge-cp'), distModel === 'normal' ? m.cp : m.pp);
 
+  const distLabelMap = {
+    normal: 'Normal',
+    lognormal: 'Lognormal',
+    weibull: 'Weibull',
+    loglogistic: 'Log-Logistic',
+    nonparametric: 'ISO Non-Param',
+  };
+  const activeDistLabel = distLabelMap[distModel] || distModel;
+
   const primaryCap = distModel === 'normal' ? m.cpk : m.ppk;
-  document.getElementById('cap-lbl-2').textContent = distModel === 'normal' ? 'Cpk / Ppk' : distModel === 'lognormal' ? 'Ppk (Lognorm)' : 'Ppk (ISO NP)';
+  document.getElementById('cap-lbl-2').textContent = distModel === 'normal' ? 'Cpk / Ppk' : `Ppk (${activeDistLabel})`;
   document.getElementById('cap-val-cpk').textContent = primaryCap.toFixed(2);
   document.getElementById('cap-val-cpk').style.color = primaryCap < 1 ? PALETTE.crimson : primaryCap < 1.33 ? PALETTE.copper : PALETTE.emerald;
   document.getElementById('cap-bottleneck').textContent =
@@ -445,7 +459,7 @@ function renderDataModeView(capState) {
   cardCpu.style.borderColor = PALETTE.border;
   cardCpl.style.borderColor = PALETTE.border;
 
-  const centerVal = distModel === 'normal' ? m.mean : distModel === 'lognormal' ? m.lognormal.qMid : m.median;
+  const centerVal = m.activeFit ? m.activeFit.qMid : m.median;
   document.getElementById('cap-lbl-3').textContent = distModel === 'normal' ? 'Sample Mean' : 'Median (P50)';
   document.getElementById('cap-val-cpu').textContent = centerVal.toFixed(3);
   document.getElementById('cap-sub-cpu').textContent = `n = ${m.n} ${capState.unit || ''}`.trim();
@@ -491,33 +505,14 @@ function renderDataModeView(capState) {
   const plotW = right - left;
   const plotH = bottom - top;
 
-  const spreadLow =
-    distModel === 'normal'
-      ? m.mean - 3 * m.overallSigma
-      : distModel === 'lognormal'
-      ? m.lognormal.qLow
-      : m.quantiles.p00135;
-  const spreadHigh =
-    distModel === 'normal'
-      ? m.mean + 3 * m.overallSigma
-      : distModel === 'lognormal'
-      ? m.lognormal.qHigh
-      : m.quantiles.p99865;
+  const spreadLow = m.activeFit ? m.activeFit.qLow : m.quantiles.p00135;
+  const spreadHigh = m.activeFit ? m.activeFit.qHigh : m.quantiles.p99865;
 
   const domMin = Math.min(m.min, m.lsl, spreadLow) - m.overallSigma * 0.45;
   const domMax = Math.max(m.max, m.usl, spreadHigh) + m.overallSigma * 0.45;
   const domSpan = Math.max(1e-6, domMax - domMin);
   const xAt = (v) => left + ((v - domMin) / domSpan) * plotW;
 
-  const normalPdf = (x) => {
-    const z = (x - m.mean) / m.overallSigma;
-    return Math.exp(-0.5 * z * z) / (m.overallSigma * Math.sqrt(2 * Math.PI));
-  };
-  const lognormalPdf = (x) => {
-    if (!m.lognormal || x <= 0) return 0;
-    const z = (Math.log(x) - m.lognormal.muLog) / m.lognormal.sigLog;
-    return Math.exp(-0.5 * z * z) / (x * m.lognormal.sigLog * Math.sqrt(2 * Math.PI));
-  };
   const kdeBw = Math.max(1e-6, 1.06 * m.overallSigma * Math.pow(m.n, -0.2));
   const kdePdf = (x) => {
     let s = 0;
@@ -527,20 +522,20 @@ function renderDataModeView(capState) {
     }
     return s / (m.n * kdeBw * Math.sqrt(2 * Math.PI));
   };
-  const activePdf = distModel === 'lognormal' ? lognormalPdf : distModel === 'nonparametric' ? kdePdf : normalPdf;
+  const activePdf = m.activeFit ? m.activeFit.pdf : kdePdf;
 
-  let peakCurve = normalPdf(m.mean);
+  let peakCurve = 0;
   const steps = 160;
   for (let i = 0; i <= steps; i++) {
     const xv = domMin + (i / steps) * domSpan;
     const d = activePdf(xv);
-    if (d > peakCurve) peakCurve = d;
+    if (Number.isFinite(d) && d > peakCurve) peakCurve = d;
   }
   const maxDensity = Math.max(peakCurve * 1.15, ...m.bins.map((b) => b.density * 1.12), 1e-6);
   const yAtDensity = (d) => bottom - (d / maxDensity) * plotH;
 
   let h = '';
-  const modelLabel = distModel === 'normal' ? `Cpk=${m.cpk.toFixed(2)}, Ppk=${m.ppk.toFixed(2)}` : `${distModel === 'lognormal' ? 'Lognormal' : 'Non-Param'} Ppk=${m.ppk.toFixed(2)}`;
+  const modelLabel = distModel === 'normal' ? `Cpk=${m.cpk.toFixed(2)}, Ppk=${m.ppk.toFixed(2)}` : `${activeDistLabel} Ppk=${m.ppk.toFixed(2)}`;
   const titleText = `${capState.label || 'Measurements'}${capState.unit ? ` (${capState.unit})` : ''} — n=${m.n}, ${modelLabel}`;
   h += `<text x="${left}" y="30" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700">${escapeHtml(titleText)}</text>`;
 
@@ -637,7 +632,7 @@ function renderDataModeView(capState) {
 
   // Bottom summary strip
   h += `<rect x="${left}" y="440" width="${plotW}" height="28" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
-  h += `<text x="506" y="458" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${distModel === 'normal' ? `Overall Ppk ${m.ppk.toFixed(2)}  |  Within Cpk ${m.cpk.toFixed(2)}` : `${distModel === 'lognormal' ? 'Lognormal' : 'ISO Non-Param'} Ppk ${m.ppk.toFixed(2)}`}   |   ${spreadTitle}   |   Observed Yield: ${m.observedYieldPct.toFixed(2)}%</text>`;
+  h += `<text x="506" y="458" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${distModel === 'normal' ? `Overall Ppk ${m.ppk.toFixed(2)}  |  Within Cpk ${m.cpk.toFixed(2)}` : `${activeDistLabel} Ppk ${m.ppk.toFixed(2)}`}   |   ${spreadTitle}   |   Observed Yield: ${m.observedYieldPct.toFixed(2)}%</text>`;
 
   dataRoot.innerHTML = h;
 
@@ -769,16 +764,19 @@ export function bindCapabilityEvents({ onOpenImport }) {
 
   const setDist = (model) => {
     const cap = getState().capability;
-    if (model === 'lognormal' && (cap.samples || []).some((v) => v <= 0)) {
-      showToast('Lognormal requires all measurements > 0', true);
+    if (['lognormal', 'weibull', 'loglogistic'].includes(model) && (cap.samples || []).some((v) => v <= 0)) {
+      showToast(`${model} requires all measurements > 0`, true);
       return;
     }
     cap.distModel = model;
     renderCapability();
     persistState();
   };
+  document.getElementById('cap-dist-auto')?.addEventListener('click', () => setDist('auto'));
   document.getElementById('cap-dist-normal')?.addEventListener('click', () => setDist('normal'));
   document.getElementById('cap-dist-lognormal')?.addEventListener('click', () => setDist('lognormal'));
+  document.getElementById('cap-dist-weibull')?.addEventListener('click', () => setDist('weibull'));
+  document.getElementById('cap-dist-loglogistic')?.addEventListener('click', () => setDist('loglogistic'));
   document.getElementById('cap-dist-nonparam')?.addEventListener('click', () => setDist('nonparametric'));
 
   // Data Mode inputs

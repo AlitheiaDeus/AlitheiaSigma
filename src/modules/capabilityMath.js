@@ -82,6 +82,155 @@ export function empiricalQuantile(sorted, q) {
   return sorted[lo] * (1 - frac) + sorted[hi] * frac;
 }
 
+function computeADFromSortedCDF(sortedU) {
+  const n = sortedU.length;
+  if (n < 2) return Infinity;
+  const eps = 1e-12;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const uLow = Math.min(1 - eps, Math.max(eps, sortedU[i]));
+    const uHigh = Math.min(1 - eps, Math.max(eps, sortedU[n - 1 - i]));
+    sum += ((2 * (i + 1) - 1) / n) * (Math.log(uLow) + Math.log(1 - uHigh));
+  }
+  return -n - sum;
+}
+
+function olsSlopeIntercept(xs, ys) {
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0;
+  let den = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx;
+    num += dx * (ys[i] - my);
+    den += dx * dx;
+  }
+  const slope = den > 1e-12 ? num / den : 1;
+  const intercept = my - slope * mx;
+  return { slope, intercept };
+}
+
+/**
+ * Fits Normal, Lognormal, Weibull, and Log-Logistic to samples and ranks them
+ * by Anderson-Darling A^2 statistic.
+ */
+export function fitCandidateDistributions(sorted, mean, overallSigma, adNorm) {
+  const n = sorted.length;
+  const candidates = {};
+
+  // 1. Normal
+  const normU = sorted.map((x) => normalCDF((x - mean) / overallSigma));
+  candidates.normal = {
+    key: 'normal',
+    label: 'Normal',
+    a2: adNorm.testable ? adNorm.a2 : computeADFromSortedCDF(normU),
+    qLow: mean - 3 * overallSigma,
+    qMid: mean,
+    qHigh: mean + 3 * overallSigma,
+    cdf: (x) => normalCDF((x - mean) / overallSigma),
+    pdf: (x) => {
+      const z = (x - mean) / overallSigma;
+      return Math.exp(-0.5 * z * z) / (overallSigma * Math.sqrt(2 * Math.PI));
+    },
+  };
+
+  if (sorted[0] > 0 && n >= 3) {
+    const logs = sorted.map((x) => Math.log(x));
+    const muLog = logs.reduce((a, b) => a + b, 0) / n;
+    const varLog = logs.reduce((a, v) => a + (v - muLog) ** 2, 0) / (n - 1);
+    const sigLog = Math.max(1e-9, Math.sqrt(varLog));
+
+    // 2. Lognormal
+    const lnU = logs.map((y) => normalCDF((y - muLog) / sigLog));
+    candidates.lognormal = {
+      key: 'lognormal',
+      label: 'Lognormal',
+      muLog,
+      sigLog,
+      a2: computeADFromSortedCDF(lnU),
+      qLow: Math.exp(muLog - 3 * sigLog),
+      qMid: Math.exp(muLog),
+      qHigh: Math.exp(muLog + 3 * sigLog),
+      cdf: (x) => (x > 0 ? normalCDF((Math.log(x) - muLog) / sigLog) : 0),
+      pdf: (x) => {
+        if (x <= 0) return 0;
+        const z = (Math.log(x) - muLog) / sigLog;
+        return Math.exp(-0.5 * z * z) / (x * sigLog * Math.sqrt(2 * Math.PI));
+      },
+    };
+
+    // Benard's median ranks for probability plotting
+    const ranks = sorted.map((_, i) => (i + 1 - 0.3) / (n + 0.4));
+
+    // 3. Weibull (2-parameter via rank regression on ln(x) vs ln(-ln(1-F)))
+    const wY = ranks.map((f) => Math.log(-Math.log(1 - f)));
+    const wFit = olsSlopeIntercept(logs, wY);
+    const k = Math.max(0.05, wFit.slope);
+    const lambda = Math.exp(-wFit.intercept / k);
+    if (Number.isFinite(lambda) && lambda > 0) {
+      const wCdf = (x) => (x > 0 ? 1 - Math.exp(-Math.pow(x / lambda, k)) : 0);
+      const wQuant = (p) => lambda * Math.pow(-Math.log(1 - p), 1 / k);
+      candidates.weibull = {
+        key: 'weibull',
+        label: 'Weibull',
+        k,
+        lambda,
+        a2: computeADFromSortedCDF(sorted.map(wCdf)),
+        qLow: wQuant(0.00135),
+        qMid: wQuant(0.5),
+        qHigh: wQuant(0.99865),
+        cdf: wCdf,
+        pdf: (x) => {
+          if (x <= 0) return 0;
+          const r = x / lambda;
+          return (k / lambda) * Math.pow(r, k - 1) * Math.exp(-Math.pow(r, k));
+        },
+      };
+    }
+
+    // 4. Log-Logistic (2-parameter via rank regression on ln(x) vs ln(F/(1-F)))
+    const llY = ranks.map((f) => Math.log(f / (1 - f)));
+    const llFit = olsSlopeIntercept(logs, llY);
+    const beta = Math.max(0.05, llFit.slope);
+    const alpha = Math.exp(-llFit.intercept / beta);
+    if (Number.isFinite(alpha) && alpha > 0) {
+      const llCdf = (x) => (x > 0 ? 1 / (1 + Math.pow(x / alpha, -beta)) : 0);
+      const llQuant = (p) => alpha * Math.pow(p / (1 - p), 1 / beta);
+      candidates.loglogistic = {
+        key: 'loglogistic',
+        label: 'Log-Logistic',
+        beta,
+        alpha,
+        a2: computeADFromSortedCDF(sorted.map(llCdf)),
+        qLow: llQuant(0.00135),
+        qMid: alpha,
+        qHigh: llQuant(0.99865),
+        cdf: llCdf,
+        pdf: (x) => {
+          if (x <= 0) return 0;
+          const r = x / alpha;
+          const rb = Math.pow(r, beta);
+          return ((beta / alpha) * Math.pow(r, beta - 1)) / Math.pow(1 + rb, 2);
+        },
+      };
+    }
+  }
+
+  const rankings = Object.values(candidates)
+    .filter((c) => Number.isFinite(c.a2))
+    .sort((a, b) => a.a2 - b.a2);
+
+  let bestKey = rankings[0]?.key || 'normal';
+  if (adNorm.testable && adNorm.isNormal && candidates.normal && rankings[0]) {
+    if (candidates.normal.a2 - rankings[0].a2 < 0.08) {
+      bestKey = 'normal';
+    }
+  }
+
+  return { candidates, rankings, bestKey };
+}
+
 export function computeParametricCapability({ mu, sigma, lsl, usl }) {
   const safeSigma = Math.max(1e-9, sigma);
   const specW = usl - lsl;
@@ -104,7 +253,7 @@ export function computeParametricCapability({ mu, sigma, lsl, usl }) {
  * Pp/Ppk overall sample std dev), observed defects, histogram bins, and I-MR
  * statistical control limits + Western Electric Run Rules 1 & 2.
  */
-export function computeEmpiricalCapability(rawSamples, lslInput, uslInput, distModel = 'normal') {
+export function computeEmpiricalCapability(rawSamples, lslInput, uslInput, distModel = 'auto') {
   const samples = (Array.isArray(rawSamples) ? rawSamples : [])
     .map(Number)
     .filter((v) => Number.isFinite(v));
@@ -165,37 +314,27 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput, distM
   let expectedYieldPct = Math.max(0, (1 - (pLower + pUpper)) * 100);
   const zMin = Math.min(upperM / overallSigma, lowerM / overallSigma);
 
-  // Non-Normal Distribution / Percentile Overrides
-  const allPositive = sorted[0] > 0;
-  let lognormal = null;
-  if (allPositive) {
-    const logs = samples.map((v) => Math.log(v));
-    const muLog = logs.reduce((a, b) => a + b, 0) / n;
-    const varLog = logs.reduce((a, v) => a + (v - muLog) ** 2, 0) / (n - 1);
-    const sigLog = Math.max(1e-9, Math.sqrt(varLog));
-    const qLow = Math.exp(muLog - 3 * sigLog);
-    const qMid = Math.exp(muLog);
-    const qHigh = Math.exp(muLog + 3 * sigLog);
-    lognormal = { muLog, sigLog, qLow, qMid, qHigh };
-  }
-
+  // Fit candidate distributions (Normal, Lognormal, Weibull, Log-Logistic)
+  const fit = fitCandidateDistributions(sorted, mean, overallSigma, ad);
   const p00135 = empiricalQuantile(sorted, 0.00135);
   const p99865 = empiricalQuantile(sorted, 0.99865);
 
-  let activeDistModel = distModel;
-  if (activeDistModel === 'lognormal') {
-    if (lognormal) {
-      pp = specW / Math.max(1e-9, lognormal.qHigh - lognormal.qLow);
-      ppu = (usl - lognormal.qMid) / Math.max(1e-9, lognormal.qHigh - lognormal.qMid);
-      ppl = (lognormal.qMid - lsl) / Math.max(1e-9, lognormal.qMid - lognormal.qLow);
-      ppk = Math.min(ppu, ppl);
-      const lnPLow = lsl > 0 ? normalCDF((Math.log(lsl) - lognormal.muLog) / lognormal.sigLog) : 0;
-      const lnPHigh = usl > 0 ? 1 - normalCDF((Math.log(usl) - lognormal.muLog) / lognormal.sigLog) : 1;
-      expectedPPM = (lnPLow + lnPHigh) * 1e6;
-      expectedYieldPct = Math.max(0, (1 - (lnPLow + lnPHigh)) * 100);
-    } else {
-      activeDistModel = 'normal';
-    }
+  const requestedModel = distModel || 'auto';
+  let activeDistModel = requestedModel === 'auto' ? fit.bestKey : requestedModel;
+  if (activeDistModel !== 'nonparametric' && !fit.candidates[activeDistModel]) {
+    activeDistModel = 'normal';
+  }
+
+  if (activeDistModel !== 'normal' && activeDistModel !== 'nonparametric') {
+    const c = fit.candidates[activeDistModel];
+    pp = specW / Math.max(1e-9, c.qHigh - c.qLow);
+    ppu = (usl - c.qMid) / Math.max(1e-9, c.qHigh - c.qMid);
+    ppl = (c.qMid - lsl) / Math.max(1e-9, c.qMid - c.qLow);
+    ppk = Math.min(ppu, ppl);
+    const fLow = c.cdf(lsl);
+    const fHigh = 1 - c.cdf(usl);
+    expectedPPM = (fLow + fHigh) * 1e6;
+    expectedYieldPct = Math.max(0, (1 - (fLow + fHigh)) * 100);
   } else if (activeDistModel === 'nonparametric') {
     pp = specW / Math.max(1e-9, p99865 - p00135);
     ppu = (usl - median) / Math.max(1e-9, p99865 - median);
@@ -280,8 +419,12 @@ export function computeEmpiricalCapability(rawSamples, lslInput, uslInput, distM
     withinSigma,
     mrBar,
     ad,
+    requestedModel,
     distModel: activeDistModel,
-    lognormal,
+    bestFitKey: fit.bestKey,
+    fitRankings: fit.rankings.map((r) => ({ key: r.key, label: r.label, a2: r.a2 })),
+    activeFit: fit.candidates[activeDistModel] || null,
+    lognormal: fit.candidates.lognormal || null,
     quantiles: { p00135, p50: median, p99865 },
     lsl,
     usl,

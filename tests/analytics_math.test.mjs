@@ -49,6 +49,18 @@ test('computeAndersonDarling and non-normal capability modes handle skewed data'
   assert.equal(lnCap.distModel, 'lognormal');
   assert.ok(Number.isFinite(lnCap.ppk));
 
+  const wbCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'weibull');
+  assert.equal(wbCap.distModel, 'weibull');
+  assert.ok(Number.isFinite(wbCap.ppk));
+
+  const llCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'loglogistic');
+  assert.equal(llCap.distModel, 'loglogistic');
+  assert.ok(Number.isFinite(llCap.ppk));
+
+  const autoCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'auto');
+  assert.notEqual(autoCap.distModel, 'normal');
+  assert.ok(autoCap.fitRankings.length === 4);
+
   const npCap = computeEmpiricalCapability(skewed, 1.0, 40.0, 'nonparametric');
   assert.equal(npCap.distModel, 'nonparametric');
   assert.ok(Number.isFinite(npCap.ppk));
