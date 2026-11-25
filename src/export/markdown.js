@@ -31,7 +31,7 @@ export function buildMarkdownReport(state, timestampStr = new Date().toISOString
   const f5 = compute5SMetrics(state.fives);
 
   const lines = [];
-  lines.push(`# AlitheiaSigma Operational Excellence Report`);
+  lines.push(`# SigmaShack Operational Excellence Report`);
   lines.push('');
   lines.push(`- **Scenario**: ${state.scenarioName || 'Custom Workspace'}`);
   lines.push(`- **Generated**: ${timestampStr}`);
@@ -124,7 +124,7 @@ export function buildMarkdownReport(state, timestampStr = new Date().toISOString
 
 export function downloadMarkdown() {
   const md = buildMarkdownReport(getState());
-  triggerDownload(`alitheiasigma_report_${dateStamp()}.md`, md, 'text/markdown;charset=utf-8');
+  triggerDownload(`sigmashack_report_${dateStamp()}.md`, md, 'text/markdown;charset=utf-8');
   showToast('Downloaded Markdown Executive Report');
 }
 

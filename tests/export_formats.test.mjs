@@ -7,7 +7,7 @@ import { buildModuleCSV, buildModuleTSV } from '../src/export/csv.js';
 test('buildMarkdownReport generates all 7 sections for Data Mode and Simulator Mode', () => {
   const dataState = createDefaultState('cnc');
   const mdData = buildMarkdownReport(dataState, '2026-11-22T16:50:00Z');
-  assert.match(mdData, /# AlitheiaSigma Operational Excellence Report/);
+  assert.match(mdData, /# SigmaShack Operational Excellence Report/);
   assert.match(mdData, /Empirical Data: Bore Diameter/);
   assert.match(mdData, /## 2\. OEE \(7 Shift Logs/);
   assert.match(mdData, /## 4\. Pareto 80\/20 Analysis/);

@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="favicon.svg" alt="AlitheiaSigma" width="64" height="64" />
-  <h1>AlitheiaSigma</h1>
+  <img src="favicon.svg" alt="SigmaShack" width="64" height="64" />
+  <h1>SigmaShack</h1>
   <p><strong>Zero-build, local-first Lean &amp; Six Sigma analytical workbench for turning messy shop-floor spreadsheets into SPC, OEE, Pareto, VSM, and Root-Cause visuals.</strong></p>
 
   <p>
@@ -16,15 +16,15 @@
 
 | Capability & SPC | OEE Trend & Time-Loss | Takt (Yamazumi) |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/capability.png" alt="AlitheiaSigma Capability & SPC" width="280" /> | <img src="docs/screenshots/oee.png" alt="AlitheiaSigma OEE" width="280" /> | <img src="docs/screenshots/takt.png" alt="AlitheiaSigma Takt" width="280" /> |
+| <img src="docs/screenshots/capability.png" alt="SigmaShack Capability & SPC" width="280" /> | <img src="docs/screenshots/oee.png" alt="SigmaShack OEE" width="280" /> | <img src="docs/screenshots/takt.png" alt="SigmaShack Takt" width="280" /> |
 
 | Pareto 80/20 | Value Stream Map (VSM) | 5S Audit Radar |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/pareto.png" alt="AlitheiaSigma Pareto" width="280" /> | <img src="docs/screenshots/vsm.png" alt="AlitheiaSigma VSM" width="280" /> | <img src="docs/screenshots/fives.png" alt="AlitheiaSigma 5S" width="280" /> |
+| <img src="docs/screenshots/pareto.png" alt="SigmaShack Pareto" width="280" /> | <img src="docs/screenshots/vsm.png" alt="SigmaShack VSM" width="280" /> | <img src="docs/screenshots/fives.png" alt="SigmaShack 5S" width="280" /> |
 
 <p align="center">
   <strong>Ishikawa 6M Fishbone</strong><br />
-  <img src="docs/screenshots/ishikawa.png" alt="AlitheiaSigma Ishikawa" width="320" />
+  <img src="docs/screenshots/ishikawa.png" alt="SigmaShack Ishikawa" width="320" />
 </p>
 
 ---
@@ -85,7 +85,7 @@ Then open **http://localhost:8000** (or `http://localhost:3000`).
 ## Project Structure
 
 ```text
-AlitheiaSigma/
+SigmaShack/
 ├── index.html                 # Application shell & module views
 ├── favicon.svg / favicon.ico  # App icons
 ├── styles/theme.css           # Industrial navy/mint/crimson tokens & print stylesheet

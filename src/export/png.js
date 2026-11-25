@@ -53,7 +53,7 @@ export async function downloadPNG(moduleKey, renderAll) {
   }
   try {
     const blob = await svgToPngBlob(svgStr, 2);
-    triggerDownload(`alitheiasigma_${moduleKey}_${dateStamp()}.png`, blob, 'image/png');
+    triggerDownload(`sigmashack_${moduleKey}_${dateStamp()}.png`, blob, 'image/png');
     showToast(`Exported ${TAB_NAMES[moduleKey] || moduleKey} PNG`);
   } catch (err) {
     showToast(err.message || 'PNG export failed', true);

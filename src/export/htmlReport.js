@@ -53,7 +53,7 @@ export function downloadHTMLReport(renderAll) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AlitheiaSigma Executive Report</title>
+  <title>SigmaShack Executive Report</title>
   <style>
     body { background: #0A113E; color: #B4DDD8; font-family: Inter, system-ui, sans-serif; margin: 0; padding: 32px; }
     .wrap { max-width: 1080px; margin: 0 auto; }
@@ -81,7 +81,7 @@ export function downloadHTMLReport(renderAll) {
   <div class="wrap">
     <div class="hdr">
       <div>
-        <h1>ALITHEIASIGMA EXECUTIVE REPORT</h1>
+        <h1>SIGMASHACK EXECUTIVE REPORT</h1>
         <div class="mono">${escapeHtml(state.scenarioName || 'Operational Excellence Snapshot')}</div>
       </div>
       <div class="mono">${escapeHtml(nowStr)}</div>
@@ -157,6 +157,6 @@ export function downloadHTMLReport(renderAll) {
 </body>
 </html>`;
 
-  triggerDownload(`alitheiasigma_executive_report_${dateStamp()}.html`, reportHtml, 'text/html;charset=utf-8');
+  triggerDownload(`sigmashack_executive_report_${dateStamp()}.html`, reportHtml, 'text/html;charset=utf-8');
   showToast('Downloaded Executive HTML Report');
 }
