@@ -4,6 +4,7 @@ import { renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
+import { seed5WhysFromCause, seedFMEAFromCause } from './fmea.js';
 
 export const ISH_RIB_CFG = [
   { key: 'Man', side: 'top', spineX: 250, headX: 165, color: PALETTE.emerald },
@@ -116,6 +117,8 @@ export function renderIshikawaLists() {
                       <div class="flex items-center justify-between gap-2 p-2 rounded-xs bg-navy-card border ${c.root ? 'border-magenta' : 'border-navy-border'}">
                         <span class="text-xs ${c.root ? 'text-rose-dusty font-bold' : 'text-icemint'} truncate" title="${escapeHtml(c.text)}">${escapeHtml(c.text)}</span>
                         <div class="flex items-center gap-1 shrink-0">
+                          <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-to-whys px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-xs border border-teal-slate bg-navy-canvas text-icemint cursor-pointer" title="Drill down with 5-Whys">5-Whys</button>
+                          <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-to-fmea px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-xs border border-copper bg-navy-canvas text-copper cursor-pointer" title="Push to PFMEA">→FMEA</button>
                           <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-toggle-root px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs border cursor-pointer ${c.root ? 'bg-crimson border-magenta text-white' : 'bg-navy-canvas border-navy-border text-icemint'}">Root</button>
                           <button type="button" data-rib="${rib.key}" data-idx="${idx}" class="ish-del-cause px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-navy-canvas border border-crimson text-crimson cursor-pointer">X</button>
                         </div>
@@ -136,6 +139,24 @@ export function renderIshikawaLists() {
       state.ishikawa.ribs[r][i].root = !state.ishikawa.ribs[r][i].root;
       renderIshikawa();
       persistState();
+    });
+  });
+
+  grid.querySelectorAll('.ish-to-whys').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const r = e.target.dataset.rib;
+      const i = parseInt(e.target.dataset.idx, 10);
+      const cause = state.ishikawa.ribs[r]?.[i]?.text;
+      if (cause) seed5WhysFromCause({ rib: r, cause });
+    });
+  });
+
+  grid.querySelectorAll('.ish-to-fmea').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const r = e.target.dataset.rib;
+      const i = parseInt(e.target.dataset.idx, 10);
+      const cause = state.ishikawa.ribs[r]?.[i]?.text;
+      if (cause) seedFMEAFromCause({ rib: r, cause, problem: state.ishikawa.problem });
     });
   });
 

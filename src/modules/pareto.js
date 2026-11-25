@@ -1,9 +1,13 @@
 import { PALETTE } from '../constants.js';
-import { getState, nextId, persistState } from '../state.js';
+import { getState, nextId, persistState, recordUndoSnapshot } from '../state.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
+import { bindSvgHoverTargets } from '../ui/svgTooltip.js';
 import { aggregateParetoEvents, computeParetoSorted, getParetoGroups } from './paretoMath.js';
 import { seedIshikawaFromCrossLink } from './ishikawa.js';
+
+let paretoDragging = false;
+let paretoDomain = { top: 46, bottom: 324, plotH: 278 };
 
 function getActiveItems(parState) {
   if (parState.mode === 'events') {
@@ -17,8 +21,9 @@ function getActiveItems(parState) {
 
 export function renderParetoChartOnly() {
   const par = getState().pareto;
+  const cutoff = par.cutoffPct ?? 80;
   const items = getActiveItems(par);
-  const { rows, total, vitalCount } = computeParetoSorted(items);
+  const { rows, total, vitalCount } = computeParetoSorted(items, cutoff);
 
   document.getElementById('par-val-total').textContent =
     par.mode === 'events' && par.metric === 'weight'
@@ -61,10 +66,14 @@ export function renderParetoChartOnly() {
   html += `<line x1="${right}" y1="${top}" x2="${right}" y2="${bottom}" stroke="${PALETTE.magenta}" stroke-width="1.5" />`;
   html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
 
-  const y80 = yPct(80);
+  const y80 = yPct(cutoff);
+  paretoDomain = { top, bottom, plotH };
+  html += `<g id="par-drag-cutoff" style="cursor:ns-resize;">`;
   html += `<line x1="${left}" y1="${y80.toFixed(1)}" x2="${right}" y2="${y80.toFixed(1)}" stroke="${PALETTE.copper}" stroke-width="2" stroke-dasharray="7 4" />`;
-  html += `<rect x="${left + 8}" y="${(y80 - 22).toFixed(1)}" width="74" height="18" rx="3" fill="${PALETTE.panel}" stroke="${PALETTE.copper}" stroke-width="1.2" />`;
-  html += `<text x="${left + 45}" y="${(y80 - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">80% RULE</text>`;
+  html += `<line x1="${left}" y1="${y80.toFixed(1)}" x2="${right}" y2="${y80.toFixed(1)}" stroke="transparent" stroke-width="18" />`;
+  html += `<rect x="${left + 8}" y="${(y80 - 22).toFixed(1)}" width="88" height="18" rx="3" fill="${PALETTE.panel}" stroke="${PALETTE.copper}" stroke-width="1.2" />`;
+  html += `<text x="${left + 52}" y="${(y80 - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">${cutoff}% RULE ↕</text>`;
+  html += `<title>Drag vertically to adjust Vital Few cutoff (50%–95%)</title></g>`;
 
   if (rows.length > 0) {
     const slotW = (right - left) / rows.length;
@@ -126,7 +135,7 @@ export function renderParetoTable() {
     }
 
     const items = getActiveItems(par);
-    const { rows } = computeParetoSorted(items);
+    const { rows } = computeParetoSorted(items, par.cutoffPct ?? 80);
     tbody.innerHTML = rows
       .map(
         (r) => `
@@ -189,7 +198,7 @@ export function renderParetoTable() {
   }
 
   // Summary Table Mode
-  const { rows } = computeParetoSorted(par.items);
+  const { rows } = computeParetoSorted(par.items, par.cutoffPct ?? 80);
   const mapById = new Map(rows.map((r) => [r.id, r]));
   tbody.innerHTML = par.items
     .map((item, idx) => {
@@ -353,5 +362,36 @@ export function bindParetoEvents({ onOpenImport }) {
     catEl.value = '';
     renderPareto();
     persistState();
+  });
+
+  const svg = document.getElementById('svg-pareto');
+  const toSvgY = (cy) => {
+    if (!svg) return 0;
+    const pt = svg.createSVGPoint();
+    pt.x = 0;
+    pt.y = cy;
+    const ctm = svg.getScreenCTM();
+    return ctm ? pt.matrixTransform(ctm.inverse()).y : 0;
+  };
+  svg?.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#par-drag-cutoff')) {
+      e.preventDefault();
+      paretoDragging = true;
+    }
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!paretoDragging) return;
+    const y = toSvgY(e.clientY);
+    const { bottom, plotH } = paretoDomain;
+    const pct = Math.max(50, Math.min(95, Math.round(((bottom - y) / plotH) * 100)));
+    getState().pareto.cutoffPct = pct;
+    renderPareto();
+    persistState();
+  });
+  window.addEventListener('mouseup', () => {
+    if (paretoDragging) {
+      paretoDragging = false;
+      recordUndoSnapshot('Adjust Pareto Cutoff');
+    }
   });
 }

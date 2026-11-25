@@ -22,6 +22,10 @@
 | :---: | :---: | :---: |
 | <img src="docs/screenshots/pareto.png" alt="SigmaShack Pareto" width="280" /> | <img src="docs/screenshots/vsm.png" alt="SigmaShack VSM" width="280" /> | <img src="docs/screenshots/fives.png" alt="SigmaShack 5S" width="280" /> |
 
+| Gage R&R (MSA) | A/B Kaizen Comparator | 5-Whys & PFMEA |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/msa.png" alt="SigmaShack Gage R&R" width="280" /> | <img src="docs/screenshots/comparator.png" alt="SigmaShack A/B Comparator" width="280" /> | <img src="docs/screenshots/fmea.png" alt="SigmaShack 5-Whys & PFMEA" width="280" /> |
+
 <p align="center">
   <strong>Ishikawa 6M Fishbone</strong><br />
   <img src="docs/screenshots/ishikawa.png" alt="SigmaShack Ishikawa" width="320" />
@@ -37,15 +41,23 @@
 - **Messy-Sheet Cleanup**: Auto-skips leading blank rows, single-cell title banners, and empty leading columns, with manual **First row is headers** and **Start Row #** overrides.
 - **Data Provenance**: Every module displays a live **Data Source badge** (imported file/sheet/column vs. manual edit vs. cross-link vs. sample demo) and a **Raw Data** modal to inspect the underlying rows.
 
-### 2. Eight Modules (`1`–`8` Shortcuts · `#capability`..`#export` URL Hash)
-1. **Capability & SPC** — Empirical $C_p/C_{pk}$ (within-subgroup via $\overline{MR}/d_2$), $P_p/P_{pk}$ (overall), **Anderson-Darling** normality test badge, **Normal / Lognormal / Non-Parametric (ISO 22514-2)** toggle, observed vs. expected PPM, and companion **I-MR Control Chart** (Rule 1 & 8-pt run detection), plus an interactive Simulator toggle.
-2. **OEE** — Multi-shift production log with line filtering, OEE/Availability/Performance/Quality trendlines (vs. 85% World Class), and time-loss waterfall, plus Single Shift sliders.
-3. **Takt** — Yamazumi stacked cycle balance (`VA`, `BNVA`, `Waste`) against Takt time with bottleneck handoff to Ishikawa.
-4. **Pareto** — Group raw defect/downtime logs by **Count** or **Weighted Impact** (cost/minutes) with group filtering and one-click **→ Ishikawa** seeding.
-5. **VSM** — Value Stream Map with queue triangles, process data boxes, sawtooth lead-time ladder, PCE calculation, **Sync Steps → Takt**, and **Bottleneck → Ishikawa**.
+### 2. Eleven Modules (`1`–`9`, `0`, `e` Shortcuts · `#capability`..`#export` URL Hash)
+1. **Capability & SPC** — Empirical $C_p/C_{pk}$ (within-subgroup via $\overline{MR}/d_2$), $P_p/P_{pk}$ (overall), Taguchi $C_{pm}$, **Anderson-Darling** normality test badge, **Normal / Lognormal / Weibull / Log-Logistic / Non-Parametric (ISO 22514-2)** toggle, draggable `LSL` / `Target (T)` / `USL` lines, **I-MR / Xbar-R / Xbar-S / p / u Control Charts** with **Nelson Rules 1–8**, **click-to-mask outliers**, and a **10,000-trial Monte Carlo Tolerance Stack-Up Simulator**, plus an interactive Simulator toggle.
+2. **OEE** — Multi-shift production log with line filtering, OEE/Availability/Performance/Quality trendlines (vs. 85% World Class), hover telemetry, and time-loss waterfall, plus Single Shift sliders.
+3. **Takt** — Yamazumi stacked cycle balance (`VA`, `BNVA`, `Waste`) with a **vertically draggable Takt line**, segment tooltips, and bottleneck handoff to Ishikawa.
+4. **Pareto** — Group raw defect/downtime logs by **Count** or **Weighted Impact** (cost/minutes) with group filtering, a **vertically draggable Vital Few cutoff (`50%–95%`)**, and one-click **→ Ishikawa** seeding.
+5. **VSM** — Value Stream Map with queue triangles, process data boxes, sawtooth lead-time ladder, PCE calculation, hover tooltips, **Sync Steps → Takt**, and **Bottleneck → Ishikawa**.
 6. **5S** — 5-axis workplace audit radar chart, 5×4 scoring matrix, benchmark slider, and corrective action log.
-7. **Ishikawa** — Six-rib Fishbone (6M) root cause builder with root-suspect highlighting.
-8. **Data & Export Hub** — Inspect all module data sources, load demo scenarios, and export **JSON**, **CSV**, **Copy TSV** (Excel-ready), **SVG**, **2x PNG**, **Markdown (`.md`)**, standalone **HTML**, or light-mode **Print / PDF**.
+7. **Ishikawa** — Six-rib Fishbone (6M) root cause builder with root-suspect highlighting and direct **5-Whys** / **→ FMEA** drill-down.
+8. **Gage R&R (MSA)** — Crossed **ANOVA & Xbar-R Range** Measurement System Analysis (`%GRR`, `%Tolerance`, `ndc`, Repeatability `EV` vs. Reproducibility `AV`), Variance Components bar chart, and Operator × Part interaction plot.
+9. **A/B Compare** — Before/After Kaizen hypothesis comparator with **Welch's 2-sample $t$-test**, **Brown-Forsythe** variance test, **Mann-Whitney $U$**, **Cohen's $d$**, and overlaid distributions + box-whisker plot.
+10. **5-Whys & FMEA** — Linked 5-Whys root-cause chains with one-click **Promote → PFMEA**, `S × O × D = RPN` prioritization matrix, and RPN risk bar chart.
+11. **Data & Export Hub** — Inspect all module data sources, manage **Saved Studies** (multi-workspace persistence), load demo scenarios, and export **JSON**, **CSV**, **Copy TSV** (Excel-ready), **SVG**, **2x PNG**, **Markdown (`.md`)**, standalone **HTML**, or light-mode **Print / PDF**.
+
+### 3. Power-User Controls & Cockpit HUD
+- **Cell Health Cockpit HUD**: Live Red/Amber/Green LED strip across key KPIs (`Cpk`, `OEE`, `Takt Gap`, `VSM PCE`, `5S`, `Gage R&R`, `Max RPN`) with actionable engineering **Insights** and **Pin Baseline** before/after comparisons.
+- **Command Palette (`Ctrl+K` / `/`)**: Fuzzy-search launcher for switching modules, loading scenarios, pinning baselines, toggling **High-Contrast Shop-Floor Theme**, and running exports.
+- **Undo / Redo (`Ctrl+Z` / `Ctrl+Y`)**: 40-step workspace history stack.
 
 ---
 
@@ -76,7 +88,9 @@ Then open **http://localhost:8000** (or `http://localhost:3000`).
 
 | Key | Action |
 | :--- | :--- |
-| `1` – `8` | Switch between modules |
+| `1` – `9`, `0`, `e` | Switch between modules (`0` = 5-Whys & FMEA, `e` = Data & Export) |
+| `Ctrl+K` / `/` | Open Command Palette |
+| `Ctrl+Z` / `Ctrl+Y` | Undo / Redo workspace changes |
 | `i` | Open Import Data modal |
 | `Esc` | Close open modal |
 
@@ -86,20 +100,20 @@ Then open **http://localhost:8000** (or `http://localhost:3000`).
 
 ```text
 SigmaShack/
-├── index.html                 # Application shell & module views
+├── index.html                 # Application shell & 11 module views
 ├── favicon.svg / favicon.ico  # App icons
-├── styles/theme.css           # Industrial navy/mint/crimson tokens & print stylesheet
+├── styles/theme.css           # Industrial navy & high-contrast tokens, print stylesheet
 ├── docs/screenshots/          # UI previews
 ├── samples/                   # Reference CSV datasets for testing & import
 ├── src/
 │   ├── constants.js           # Palette tokens, tab config, sample scenarios
-│   ├── state.js               # localStorage persistence, provenance & migration
+│   ├── state.js               # localStorage persistence, undo/redo, workspaces, baselines
 │   ├── utils.js               # Formatters, CSV/TSV builders, clipboard & downloads
 │   ├── main.js                # Application bootstrap
 │   ├── data/                  # parser.js, mapper.js, importDrawer.js
-│   ├── modules/               # Pure *Math.js engines + DOM/SVG module controllers
+│   ├── modules/               # Pure *Math.js engines + DOM/SVG module controllers (incl. msa, comparator, fmea)
 │   ├── export/                # json.js, csv.js, svg.js, png.js, markdown.js, htmlReport.js
-│   └── ui/                    # toast.js, navigation.js, sourceBadge.js
+│   └── ui/                    # cockpit.js, commandPalette.js, diagnostics.js, navigation.js, sourceBadge.js, svgTooltip.js, toast.js
 └── tests/                     # Native Node unit tests (node --test)
 ```
 

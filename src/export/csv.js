@@ -159,6 +159,36 @@ function getModuleMatrix(state, key) {
     return rows;
   }
 
+  if (key === 'msa') {
+    const rows = [['Operator', 'Part', 'Trial', 'Reading']];
+    const ops = state.msa?.operators || [];
+    const parts = state.msa?.parts || [];
+    const readings = state.msa?.readings || [];
+    ops.forEach((op, i) => {
+      parts.forEach((pt, j) => {
+        (readings[i * parts.length + j] || []).forEach((val, k) => {
+          rows.push([op, pt, k + 1, val]);
+        });
+      });
+    });
+    return rows;
+  }
+
+  if (key === 'comparator') {
+    const rows = [['Group', 'SampleIndex', 'Value']];
+    (state.comparator?.beforeSamples || []).forEach((v, i) => rows.push([state.comparator.beforeLabel || 'Before', i + 1, v]));
+    (state.comparator?.afterSamples || []).forEach((v, i) => rows.push([state.comparator.afterLabel || 'After', i + 1, v]));
+    return rows;
+  }
+
+  if (key === 'fmea') {
+    const rows = [['FailureMode', 'Cause', 'Effect', 'Severity', 'Occurrence', 'Detection', 'RPN', 'Action', 'Owner', 'Due', 'Status']];
+    (state.fmea?.rows || []).forEach((r) => {
+      rows.push([r.mode, r.cause, r.effect, r.sev, r.occ, r.det, r.sev * r.occ * r.det, r.action, r.owner, r.due, r.status]);
+    });
+    return rows;
+  }
+
   return [];
 }
 

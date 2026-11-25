@@ -180,6 +180,22 @@ export const MODULE_SCHEMAS = {
       },
     ],
   },
+  msa: {
+    label: 'Gage R&R (MSA Readings)',
+    fields: [
+      { key: 'operator', label: 'Operator', type: 'text', required: true, aliases: /^(op|operator|appraiser|inspector|tech)$/i },
+      { key: 'part', label: 'Part', type: 'text', required: true, aliases: /^(part|sample|unit|id|part_id)$/i },
+      { key: 'trial', label: 'Trial #', type: 'number', required: false, aliases: /^(trial|rep|replicate|run)$/i },
+      { key: 'value', label: 'Measurement', type: 'number', required: true, aliases: /^(val|value|reading|meas|measurement|result|x)$/i },
+    ],
+  },
+  comparator: {
+    label: 'A/B Compare (Before / After)',
+    fields: [
+      { key: 'before', label: 'Before Samples', type: 'number', required: true, aliases: /^(before|pre|baseline|old|a)$/i },
+      { key: 'after', label: 'After Samples', type: 'number', required: true, aliases: /^(after|post|kaizen|new|b)$/i },
+    ],
+  },
 };
 
 export function parseCleanNumber(val) {
@@ -400,6 +416,28 @@ export function transformMappedRows(headers, rows, mapping, moduleKey) {
         operators: Number.isFinite(operators) ? Math.max(1, Math.round(operators)) : 1,
         queue: Number.isFinite(queue) ? Math.max(0, queue) : 2.0,
       });
+    }
+  } else if (moduleKey === 'msa') {
+    for (const row of rows) {
+      const operator = String(getCell(row, 'operator') || '').trim();
+      const part = String(getCell(row, 'part') || '').trim();
+      const value = parseCleanNumber(getCell(row, 'value'));
+      const trial = parseCleanNumber(getCell(row, 'trial'));
+      if (!operator || !part || !Number.isFinite(value)) {
+        skippedCount++;
+        continue;
+      }
+      data.push({ operator, part, trial: Number.isFinite(trial) ? trial : 1, value });
+    }
+  } else if (moduleKey === 'comparator') {
+    for (const row of rows) {
+      const b = parseCleanNumber(getCell(row, 'before'));
+      const a = parseCleanNumber(getCell(row, 'after'));
+      if (!Number.isFinite(b) && !Number.isFinite(a)) {
+        skippedCount++;
+        continue;
+      }
+      data.push({ before: Number.isFinite(b) ? b : null, after: Number.isFinite(a) ? a : null });
     }
   }
 

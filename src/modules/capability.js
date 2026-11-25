@@ -1,9 +1,16 @@
 import { PALETTE } from '../constants.js';
-import { getState, persistState, setModuleSource } from '../state.js';
+import { getState, persistState, recordUndoSnapshot, setModuleSource } from '../state.js';
 import { renderAllSourceBadges } from '../ui/sourceBadge.js';
+import { bindSvgHoverTargets } from '../ui/svgTooltip.js';
 import { escapeHtml, formatPPM } from '../utils.js';
 import { showToast } from '../ui/toast.js';
-import { computeEmpiricalCapability, computeParametricCapability } from './capabilityMath.js';
+import {
+  computeAttributeChart,
+  computeEmpiricalCapability,
+  computeParametricCapability,
+  computeSubgroupSPC,
+  runMonteCarloStackup,
+} from './capabilityMath.js';
 
 const CAP_DOM_MIN = 0;
 const CAP_DOM_MAX = 100;
@@ -378,7 +385,12 @@ function renderSimulatorView(capState) {
 
 function renderDataModeView(capState) {
   const requested = capState.distModel || 'auto';
-  const m = computeEmpiricalCapability(capState.samples, capState.lsl, capState.usl, requested);
+  const m = computeEmpiricalCapability(capState.samples, capState.lsl, capState.usl, requested, {
+    target: capState.target,
+    subgroupSize: capState.subgroupSize,
+    maskedIndices: capState.maskedIndices,
+    nelsonRules: capState.nelsonRules,
+  });
   const distModel = m ? m.distModel : requested;
 
   document.getElementById('cap-dist-auto')?.classList.toggle('active', requested === 'auto');
@@ -414,6 +426,17 @@ function renderDataModeView(capState) {
   syncField('cap-data-unit', capState.unit || '');
   syncField('cap-data-lsl', capState.lsl);
   syncField('cap-data-usl', capState.usl);
+  syncField('cap-data-target', capState.target ?? Number(((capState.lsl + capState.usl) / 2).toFixed(3)));
+  const sgSel = document.getElementById('cap-subgroup-size');
+  if (sgSel && document.activeElement !== sgSel) sgSel.value = String(capState.subgroupSize || 1);
+
+  const maskPill = document.getElementById('cap-masked-pill');
+  const maskCnt = (capState.maskedIndices || []).length;
+  if (maskPill) {
+    maskPill.classList.toggle('hidden', maskCnt === 0);
+    const cntEl = document.getElementById('cap-masked-count');
+    if (cntEl) cntEl.textContent = String(maskCnt);
+  }
   const rawEl = document.getElementById('cap-data-raw');
   if (rawEl && document.activeElement !== rawEl) {
     rawEl.value = (capState.samples || []).join(', ');
@@ -558,7 +581,7 @@ function renderDataModeView(capState) {
     const fill = b.outOfSpec ? PALETTE.crimson : PALETTE.teal;
     const stroke = b.outOfSpec ? PALETTE.rose : PALETTE.emerald;
     if (bh > 0) {
-      h += `<rect x="${(bx + 1).toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" fill="${fill}" fill-opacity="0.72" stroke="${stroke}" stroke-width="1.2" rx="2" />`;
+      h += `<rect class="cap-hist-bin" data-range="${b.x0.toFixed(2)} – ${b.x1.toFixed(2)}" data-count="${b.count}" data-pct="${((b.count / m.n) * 100).toFixed(1)}" x="${(bx + 1).toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" fill="${fill}" fill-opacity="0.72" stroke="${stroke}" stroke-width="1.2" rx="2" />`;
       if (b.count > 0) {
         h += `<text x="${(bx + 1 + bw / 2).toFixed(1)}" y="${(by - 5).toFixed(1)}" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">${b.count}</text>`;
       }
@@ -618,6 +641,15 @@ function renderDataModeView(capState) {
   drawSpec(xLslRaw, xLslBadge, m.lsl, 'LSL', 'lsl', top + 8);
   drawSpec(xUslRaw, xUslBadge, m.usl, 'USL', 'usl', specsOverlap ? top + 34 : top + 8);
 
+  // Draggable Target (T) line
+  const xTargetRaw = Math.max(left, Math.min(right, xAt(m.target)));
+  h += `<g class="drag-ew" data-cap-data-drag="target" data-cap-dbl="target">`;
+  h += `<line x1="${xTargetRaw.toFixed(1)}" y1="${top}" x2="${xTargetRaw.toFixed(1)}" y2="${bottom + 4}" stroke="${PALETTE.copper}" stroke-width="2" stroke-dasharray="3 3" />`;
+  h += `<line x1="${xTargetRaw.toFixed(1)}" y1="${top}" x2="${xTargetRaw.toFixed(1)}" y2="${bottom + 4}" stroke="transparent" stroke-width="16" />`;
+  h += `<rect x="${(xTargetRaw - 40).toFixed(1)}" y="${bottom - 26}" width="80" height="18" rx="3" fill="${PALETTE.panel}" stroke="${PALETTE.copper}" stroke-width="1.3" />`;
+  h += `<text x="${xTargetRaw.toFixed(1)}" y="${bottom - 13}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" font-weight="700">T ${m.target.toFixed(2)}</text>`;
+  h += `<title>Drag to move Target (T), double-click to type exact value</title></g>`;
+
   // Dynamic X Axis ticks
   h += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.icemint}" stroke-width="2" />`;
   const tickN = 8;
@@ -651,11 +683,122 @@ function renderDataModeView(capState) {
   h += `<text x="506" y="458" text-anchor="middle" fill="${PALETTE.icemint}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${distModel === 'normal' ? `Overall Ppk ${m.ppk.toFixed(2)}  |  Within Cpk ${m.cpk.toFixed(2)}` : `${activeDistLabel} Ppk ${m.ppk.toFixed(2)}`}   |   ${spreadTitle}   |   Observed Yield: ${m.observedYieldPct.toFixed(2)}%</text>`;
 
   dataRoot.innerHTML = h;
+  bindSvgHoverTargets(dataRoot, '.cap-hist-bin', (el) => {
+    return `Bin <strong>${el.dataset.range}</strong><br/>Count: <strong>${el.dataset.count}</strong> (${el.dataset.pct}%)`;
+  });
 
-  // Render Companion I-MR Run Chart
+  // Render Companion SPC Chart (I-MR, Xbar-R/S, or Attribute p/u)
   if (imrSvg) {
-    renderIMRChart(imrSvg, m);
+    renderSPCChart(imrSvg, m, capState);
   }
+  renderStackupPanel(capState);
+}
+
+function renderSPCChart(svg, m, capState) {
+  const mode = capState.spcChartMode || 'imr';
+  if (mode === 'p' || mode === 'u') {
+    const attr = computeAttributeChart(capState.attrSubgroups, mode);
+    if (!attr) return;
+    const left = 72;
+    const right = 940;
+    const top = 36;
+    const bottom = 224;
+    const plotW = right - left;
+    const plotH = bottom - top;
+    const pts = attr.points;
+    const maxY = Math.max(...pts.map((p) => Math.max(p.val, p.ucl)), attr.cl * 1.5, 0.01);
+    const xIdx = (i) => left + (pts.length === 1 ? plotW / 2 : (i / (pts.length - 1)) * plotW);
+    const yVal = (v) => bottom - (v / maxY) * plotH;
+
+    let html = `<rect x="0" y="0" width="1000" height="270" fill="${PALETTE.canvas}" />`;
+    const yCl = yVal(attr.cl);
+    html += `<line x1="${left}" y1="${yCl.toFixed(1)}" x2="${right}" y2="${yCl.toFixed(1)}" stroke="${PALETTE.emerald}" stroke-width="1.8" stroke-dasharray="4 3" />`;
+    html += `<text x="${left - 8}" y="${(yCl + 4).toFixed(1)}" text-anchor="end" fill="${PALETTE.emerald}" font-family="ui-monospace, monospace" font-size="10" font-weight="700">CL ${(attr.cl * (mode === 'p' ? 100 : 1)).toFixed(mode === 'p' ? 1 : 3)}${mode === 'p' ? '%' : ''}</text>`;
+
+    // Stepped variable UCL/LCL
+    let uclPath = '';
+    let lclPath = '';
+    pts.forEach((p, i) => {
+      const x0 = i === 0 ? left : (xIdx(i - 1) + xIdx(i)) / 2;
+      const x1 = i === pts.length - 1 ? right : (xIdx(i) + xIdx(i + 1)) / 2;
+      uclPath += (i === 0 ? `M ${x0.toFixed(1)} ${yVal(p.ucl).toFixed(1)}` : ` L ${x0.toFixed(1)} ${yVal(p.ucl).toFixed(1)}`) + ` L ${x1.toFixed(1)} ${yVal(p.ucl).toFixed(1)}`;
+      lclPath += (i === 0 ? `M ${x0.toFixed(1)} ${yVal(p.lcl).toFixed(1)}` : ` L ${x0.toFixed(1)} ${yVal(p.lcl).toFixed(1)}`) + ` L ${x1.toFixed(1)} ${yVal(p.lcl).toFixed(1)}`;
+    });
+    html += `<path d="${uclPath}" fill="none" stroke="${PALETTE.crimson}" stroke-width="1.6" stroke-dasharray="6 4" />`;
+    html += `<path d="${lclPath}" fill="none" stroke="${PALETTE.crimson}" stroke-width="1.6" stroke-dasharray="6 4" />`;
+    html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
+
+    const polyPts = pts.map((p, i) => `${xIdx(i).toFixed(1)},${yVal(p.val).toFixed(1)}`).join(' ');
+    html += `<polyline points="${polyPts}" fill="none" stroke="${PALETTE.icemint}" stroke-width="2" />`;
+    pts.forEach((p, i) => {
+      const cx = xIdx(i);
+      const cy = yVal(p.val);
+      html += `<circle class="spc-attr-pt" data-label="${escapeHtml(p.label)}" data-val="${p.val.toFixed(4)}" data-def="${p.defects}" data-size="${p.size}" data-ucl="${p.ucl.toFixed(4)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${p.ooc ? 5.5 : 4}" fill="${p.ooc ? PALETTE.crimson : PALETTE.emerald}" stroke="${p.ooc ? PALETTE.rose : PALETTE.canvas}" stroke-width="1.5" />`;
+      html += `<text x="${cx.toFixed(1)}" y="${bottom + 18}" text-anchor="middle" fill="${PALETTE.teal}" font-family="ui-monospace, monospace" font-size="10">${escapeHtml(p.label)}</text>`;
+    });
+    const title = `${mode.toUpperCase()}-Chart (${attr.isStable ? 'In Control' : `${attr.oocIndices.length} OOC`}) · Total ${attr.totalDefects} defects / ${attr.totalUnits} units`;
+    html += `<text x="${left}" y="20" fill="${attr.isStable ? PALETTE.emerald : PALETTE.rose}" font-family="ui-monospace, monospace" font-size="11" font-weight="700">${escapeHtml(title)}</text>`;
+    svg.innerHTML = html;
+    bindSvgHoverTargets(svg, '.spc-attr-pt', (el) => {
+      return `<strong>${escapeHtml(el.dataset.label)}</strong><br/>Rate: ${el.dataset.val} (${el.dataset.def}/${el.dataset.size}) · UCL: ${el.dataset.ucl}`;
+    });
+    return;
+  }
+
+  if ((mode === 'xbar_r' || mode === 'xbar_s') && (capState.subgroupSize || 1) >= 2) {
+    const sg = computeSubgroupSPC(m.samples, capState.subgroupSize || 4, capState.nelsonRules);
+    if (sg) {
+      const left = 72;
+      const right = 940;
+      const top = 36;
+      const bottom = 224;
+      const plotW = right - left;
+      const plotH = bottom - top;
+      const ucl = mode === 'xbar_s' ? sg.uclXbarS : sg.uclXbarR;
+      const lcl = mode === 'xbar_s' ? sg.lclXbarS : sg.lclXbarR;
+      const vals = sg.subgroups.map((g) => g.mean);
+      const minY = Math.min(...vals, lcl);
+      const maxY = Math.max(...vals, ucl);
+      const pad = Math.max(1e-6, (maxY - minY) * 0.15);
+      const yMin = minY - pad;
+      const yMax = maxY + pad;
+      const xIdx = (i) => left + (sg.subgroups.length === 1 ? plotW / 2 : (i / (sg.subgroups.length - 1)) * plotW);
+      const yVal = (v) => bottom - ((v - yMin) / (yMax - yMin)) * plotH;
+
+      let html = `<rect x="0" y="0" width="1000" height="270" fill="${PALETTE.canvas}" />`;
+      [
+        { v: ucl, lbl: `UCL ${ucl.toFixed(2)}`, col: PALETTE.crimson, dash: '6 4' },
+        { v: sg.xDoubleBar, lbl: `X̿ ${sg.xDoubleBar.toFixed(2)}`, col: PALETTE.emerald, dash: '4 3' },
+        { v: lcl, lbl: `LCL ${lcl.toFixed(2)}`, col: PALETTE.crimson, dash: '6 4' },
+      ].forEach((line) => {
+        const y = yVal(line.v);
+        html += `<line x1="${left}" y1="${y.toFixed(1)}" x2="${right}" y2="${y.toFixed(1)}" stroke="${line.col}" stroke-width="1.8" stroke-dasharray="${line.dash}" />`;
+        html += `<text x="${left - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="${line.col}" font-family="ui-monospace, monospace" font-size="10" font-weight="700">${line.lbl}</text>`;
+      });
+      html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
+      const polyPts = sg.subgroups.map((g, i) => `${xIdx(i).toFixed(1)},${yVal(g.mean).toFixed(1)}`).join(' ');
+      html += `<polyline points="${polyPts}" fill="none" stroke="${PALETTE.icemint}" stroke-width="2" />`;
+      const oocSet = new Set(sg.oocIndices);
+      sg.subgroups.forEach((g, i) => {
+        const cx = xIdx(i);
+        const cy = yVal(g.mean);
+        const isOoc = oocSet.has(i);
+        const rules = (sg.pointRules.get(i) || []).join(', ');
+        html += `<circle class="spc-sg-pt" data-sg="${i + 1}" data-mean="${g.mean.toFixed(3)}" data-range="${g.range.toFixed(3)}" data-sd="${g.sd.toFixed(3)}" data-rules="${escapeHtml(rules || 'In Control')}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isOoc ? 5.5 : 4}" fill="${isOoc ? PALETTE.crimson : PALETTE.emerald}" stroke="${isOoc ? PALETTE.rose : PALETTE.canvas}" stroke-width="1.5" />`;
+        html += `<text x="${cx.toFixed(1)}" y="${bottom + 18}" text-anchor="middle" fill="${PALETTE.teal}" font-family="ui-monospace, monospace" font-size="10">G${i + 1}</text>`;
+      });
+      const chartName = mode === 'xbar_s' ? 'Xbar-S' : 'Xbar-R';
+      const title = `${chartName} (n=${sg.n}, ${sg.subgroups.length} subgroups): ${sg.isStable ? 'In Control' : `${sg.oocIndices.length} OOC`}`;
+      html += `<text x="${left}" y="20" fill="${sg.isStable ? PALETTE.emerald : PALETTE.rose}" font-family="ui-monospace, monospace" font-size="11" font-weight="700">${escapeHtml(title)}</text>`;
+      svg.innerHTML = html;
+      bindSvgHoverTargets(svg, '.spc-sg-pt', (el) => {
+        return `<strong>Subgroup #${el.dataset.sg}</strong> · X̄=${el.dataset.mean}<br/>R=${el.dataset.range} · S=${el.dataset.sd}<br/>Status: ${escapeHtml(el.dataset.rules)}`;
+      });
+      return;
+    }
+  }
+
+  renderIMRChart(svg, m);
 }
 
 function renderIMRChart(svg, m) {
@@ -666,14 +809,16 @@ function renderIMRChart(svg, m) {
   const plotW = right - left;
   const plotH = bottom - top;
 
-  const allVals = [...m.samples, m.imr.uclI, m.imr.lclI];
+  const pts = m.imr.points || m.samples.map((v, i) => ({ index: i, value: v, masked: false, ooc: false, rules: [] }));
+  const totalPts = pts.length;
+  const allVals = [...pts.map((p) => p.value), m.imr.uclI, m.imr.lclI];
   const minY = Math.min(...allVals);
   const maxY = Math.max(...allVals);
   const pad = Math.max(1e-6, (maxY - minY) * 0.14);
   const yMin = minY - pad;
   const yMax = maxY + pad;
 
-  const xIdx = (i) => left + (m.n === 1 ? plotW / 2 : (i / (m.n - 1)) * plotW);
+  const xIdx = (i) => left + (totalPts === 1 ? plotW / 2 : (i / (totalPts - 1)) * plotW);
   const yVal = (v) => bottom - ((v - yMin) / (yMax - yMin)) * plotH;
 
   let html = `<rect x="0" y="0" width="1000" height="270" fill="${PALETTE.canvas}" />`;
@@ -692,33 +837,135 @@ function renderIMRChart(svg, m) {
   // Baseline
   html += `<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="${PALETTE.border}" stroke-width="1.5" />`;
 
-  // Series polyline
-  const polyPts = m.samples.map((v, i) => `${xIdx(i).toFixed(1)},${yVal(v).toFixed(1)}`).join(' ');
+  // Series polyline (connect unmasked points)
+  const polyPts = pts.filter((p) => !p.masked).map((p) => `${xIdx(p.index).toFixed(1)},${yVal(p.value).toFixed(1)}`).join(' ');
   html += `<polyline points="${polyPts}" fill="none" stroke="${PALETTE.icemint}" stroke-width="2" />`;
 
-  const oocSet = new Set(m.imr.oocIndices);
-  m.samples.forEach((v, i) => {
-    const cx = xIdx(i);
-    const cy = yVal(v);
-    const isOoc = oocSet.has(i);
-    html += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isOoc ? 5.5 : 3.5}" fill="${isOoc ? PALETTE.crimson : PALETTE.emerald}" stroke="${isOoc ? PALETTE.rose : PALETTE.canvas}" stroke-width="1.5" />`;
-    if (isOoc) {
-      html += `<text x="${cx.toFixed(1)}" y="${(cy - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700">#${i + 1}</text>`;
+  pts.forEach((p) => {
+    const cx = xIdx(p.index);
+    const cy = yVal(p.value);
+    const z = ((p.value - m.mean) / m.withinSigma).toFixed(2);
+    const rulesStr = p.masked ? 'MASKED (Click to restore)' : p.rules.length ? p.rules.join(', ') : 'In Control';
+    if (p.masked) {
+      html += `<circle class="imr-pt" data-orig-idx="${p.index}" data-val="${p.value}" data-z="${z}" data-rules="${escapeHtml(rulesStr)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5" fill="${PALETTE.canvas}" stroke="${PALETTE.copper}" stroke-width="1.8" stroke-dasharray="2 2" style="cursor:pointer;" />`;
+      html += `<text x="${cx.toFixed(1)}" y="${(cy + 3.5).toFixed(1)}" text-anchor="middle" fill="${PALETTE.copper}" font-family="ui-monospace, monospace" font-size="9" font-weight="700" style="pointer-events:none;">×</text>`;
+    } else {
+      html += `<circle class="imr-pt" data-orig-idx="${p.index}" data-val="${p.value}" data-z="${z}" data-rules="${escapeHtml(rulesStr)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${p.ooc ? 5.5 : 3.8}" fill="${p.ooc ? PALETTE.crimson : PALETTE.emerald}" stroke="${p.ooc ? PALETTE.rose : PALETTE.canvas}" stroke-width="1.5" style="cursor:pointer;" />`;
+      if (p.ooc) {
+        html += `<text x="${cx.toFixed(1)}" y="${(cy - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700">#${p.index + 1}</text>`;
+      }
     }
   });
 
   // Sample index ticks
-  const step = Math.max(1, Math.ceil(m.n / 12));
-  for (let i = 0; i < m.n; i += step) {
+  const step = Math.max(1, Math.ceil(totalPts / 12));
+  for (let i = 0; i < totalPts; i += step) {
     html += `<text x="${xIdx(i).toFixed(1)}" y="${bottom + 18}" text-anchor="middle" fill="${PALETTE.teal}" font-family="ui-monospace, monospace" font-size="10">${i + 1}</text>`;
   }
 
+  const maskNote = m.maskedCount > 0 ? ` · ${m.maskedCount} masked` : '';
   const ruleText = m.imr.isStable
-    ? 'I-Chart: Process in statistical control (No Rule 1 or 8-pt run violations)'
-    : `I-Chart Alert: ${m.imr.oocIndices.length} special-cause point(s) at sample(s) ${m.imr.oocIndices.map((i) => `#${i + 1}`).join(', ')}`;
+    ? `I-Chart: Process in statistical control (Click any point to mask/unmask${maskNote})`
+    : `I-Chart Alert: ${m.imr.oocIndices.length} special-cause point(s) at ${m.imr.oocIndices.map((i) => `#${i + 1}`).join(', ')} (Click point to mask${maskNote})`;
   html += `<text x="${left}" y="20" fill="${m.imr.isStable ? PALETTE.emerald : PALETTE.rose}" font-family="ui-monospace, monospace" font-size="11" font-weight="700">${escapeHtml(ruleText)}</text>`;
 
   svg.innerHTML = html;
+
+  bindSvgHoverTargets(svg, '.imr-pt', (el) => {
+    const idx = Number(el.dataset.origIdx) + 1;
+    return `<strong>Sample #${idx}</strong>: ${el.dataset.val} (Z=${el.dataset.z})<br/>${escapeHtml(el.dataset.rules)}<br/><span style="opacity:.75">Click to toggle mask</span>`;
+  });
+
+  svg.querySelectorAll('.imr-pt').forEach((pt) => {
+    pt.addEventListener('click', () => {
+      const cap = getState().capability;
+      const origIdx = parseInt(pt.dataset.origIdx, 10);
+      if (!Array.isArray(cap.maskedIndices)) cap.maskedIndices = [];
+      const pos = cap.maskedIndices.indexOf(origIdx);
+      if (pos >= 0) {
+        cap.maskedIndices.splice(pos, 1);
+      } else {
+        if (cap.samples.length - cap.maskedIndices.length <= 2) {
+          showToast('Keep at least 2 unmasked samples', true);
+          return;
+        }
+        cap.maskedIndices.push(origIdx);
+      }
+      renderCapability();
+      persistState();
+      recordUndoSnapshot('Toggle Outlier Mask');
+    });
+  });
+}
+
+function renderStackupPanel(capState) {
+  const resEl = document.getElementById('cap-stackup-result');
+  const tbody = document.getElementById('cap-stackup-body');
+  if (!resEl || !tbody || !capState.stackup) return;
+
+  const su = capState.stackup;
+  const out = runMonteCarloStackup(su);
+  tbody.innerHTML = (su.components || [])
+    .map(
+      (c, idx) => `
+      <tr class="text-xs">
+        <td class="py-1 pr-2"><input type="text" data-idx="${idx}" data-f="name" value="${escapeHtml(c.name)}" class="ind-input ind-input-text w-28 text-xs su-edit" /></td>
+        <td class="py-1 px-1">
+          <select data-idx="${idx}" data-f="sign" class="ind-input text-xs su-edit">
+            <option value="1" ${Number(c.sign) >= 0 ? 'selected' : ''}>+</option>
+            <option value="-1" ${Number(c.sign) < 0 ? 'selected' : ''}>-</option>
+          </select>
+        </td>
+        <td class="py-1 px-1">
+          <select data-idx="${idx}" data-f="dist" class="ind-input text-xs su-edit">
+            <option value="normal" ${c.dist === 'normal' ? 'selected' : ''}>Normal</option>
+            <option value="uniform" ${c.dist === 'uniform' ? 'selected' : ''}>Uniform</option>
+            <option value="triangular" ${c.dist === 'triangular' ? 'selected' : ''}>Triangular</option>
+          </select>
+        </td>
+        <td class="py-1 px-1"><input type="number" step="any" data-idx="${idx}" data-f="mean" value="${c.mean}" class="ind-input w-20 text-right text-xs su-edit" /></td>
+        <td class="py-1 px-1"><input type="number" step="any" min="0" data-idx="${idx}" data-f="sigma" value="${c.sigma}" class="ind-input w-20 text-right text-xs su-edit" /></td>
+        <td class="py-1 pl-1 text-right"><button type="button" data-idx="${idx}" class="ind-btn ind-btn-danger py-0.5 px-2 text-[11px] su-del">X</button></td>
+      </tr>`
+    )
+    .join('');
+
+  if (out) {
+    const sensHtml = out.sensitivity
+      .slice(0, 4)
+      .map((s) => `<span class="px-2 py-0.5 rounded-xs bg-navy-canvas border border-navy-border text-[11px] font-mono text-icemint">${escapeHtml(s.name)}: <strong class="text-emerald-mint">${s.pct.toFixed(0)}%</strong></span>`)
+      .join(' ');
+    resEl.innerHTML = `
+      <div class="flex flex-wrap items-center gap-4 text-xs font-mono">
+        <span>Mean: <strong class="text-icemint">${out.mean.toFixed(3)}</strong></span>
+        <span>σ: <strong class="text-icemint">${out.sigma.toFixed(3)}</strong></span>
+        <span>Sim Cpk: <strong class="${out.cpk >= 1.33 ? 'text-emerald-mint' : out.cpk >= 1 ? 'text-copper' : 'text-crimson'}">${out.cpk.toFixed(2)}</strong></span>
+        <span>Sim PPM: <strong class="text-rose-dusty">${formatPPM(out.ppm)}</strong> (${out.oos}/${out.trials} OOS)</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5 mt-1.5"><span class="text-[11px] font-mono text-teal-slate">Variance Tornado:</span> ${sensHtml}</div>
+    `;
+  }
+
+  tbody.querySelectorAll('.su-edit').forEach((el) => {
+    el.addEventListener('change', (e) => {
+      const i = parseInt(e.target.dataset.idx, 10);
+      const f = e.target.dataset.f;
+      const comp = su.components[i];
+      if (!comp) return;
+      if (f === 'name' || f === 'dist') comp[f] = e.target.value;
+      else comp[f] = parseFloat(e.target.value) || 0;
+      renderStackupPanel(capState);
+      persistState();
+    });
+  });
+  tbody.querySelectorAll('.su-del').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      if (su.components.length <= 1) return;
+      su.components.splice(parseInt(e.target.dataset.idx, 10), 1);
+      renderStackupPanel(capState);
+      persistState();
+    });
+  });
 }
 
 export function renderCapability() {
@@ -939,6 +1186,8 @@ export function bindCapabilityEvents({ onOpenImport }) {
       cap.lsl = Math.min(cap.usl - minGap, val);
     } else if (capDataDragging === 'usl') {
       cap.usl = Math.max(cap.lsl + minGap, val);
+    } else if (capDataDragging === 'target') {
+      cap.target = Math.max(cap.lsl, Math.min(cap.usl, val));
     }
     renderCapability();
     persistState();
@@ -958,6 +1207,7 @@ export function bindCapabilityEvents({ onOpenImport }) {
       if (Number.isFinite(num)) {
         if (inlineField === 'lsl') cap.lsl = num;
         else if (inlineField === 'usl') cap.usl = num;
+        else if (inlineField === 'target') cap.target = num;
       }
     }
     inlineField = null;
@@ -1082,7 +1332,7 @@ export function bindCapabilityEvents({ onOpenImport }) {
     tight: { mu: 50, sigma: 6.2, lsl: 38, usl: 62 },
     reset: { mu: 50, sigma: 5.0, lsl: 30, usl: 70 },
   };
-  document.querySelectorAll('.cap-preset').forEach((btn) => {
+    document.querySelectorAll('.cap-preset').forEach((btn) => {
     btn.addEventListener('click', () => {
       const p = capPresets[btn.dataset.preset];
       if (p) {
@@ -1091,5 +1341,64 @@ export function bindCapabilityEvents({ onOpenImport }) {
         persistState();
       }
     });
+  });
+
+  // Target, Subgroup Size, Unmask All, SPC Chart Mode, Nelson Rules, Stack-Up
+  document.getElementById('cap-data-target')?.addEventListener('input', (e) => {
+    const v = parseFloat(e.target.value);
+    if (Number.isFinite(v)) {
+      getState().capability.target = v;
+      renderCapability();
+      persistState();
+    }
+  });
+  document.getElementById('cap-subgroup-size')?.addEventListener('change', (e) => {
+    const cap = getState().capability;
+    cap.subgroupSize = Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1));
+    if (cap.subgroupSize > 1 && cap.spcChartMode === 'imr') cap.spcChartMode = 'xbar_r';
+    if (cap.subgroupSize === 1 && (cap.spcChartMode === 'xbar_r' || cap.spcChartMode === 'xbar_s')) cap.spcChartMode = 'imr';
+    renderCapability();
+    persistState();
+  });
+  document.getElementById('btn-cap-unmask-all')?.addEventListener('click', () => {
+    getState().capability.maskedIndices = [];
+    renderCapability();
+    persistState();
+    showToast('All masked points restored');
+  });
+  document.querySelectorAll('.cap-spc-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cap = getState().capability;
+      cap.spcChartMode = btn.dataset.spc;
+      if ((cap.spcChartMode === 'xbar_r' || cap.spcChartMode === 'xbar_s') && (cap.subgroupSize || 1) < 2) {
+        cap.subgroupSize = 4;
+      }
+      document.querySelectorAll('.cap-spc-btn').forEach((b) => b.classList.toggle('active', b === btn));
+      renderCapability();
+      persistState();
+    });
+  });
+  document.querySelectorAll('.cap-nelson-chk').forEach((chk) => {
+    chk.addEventListener('change', (e) => {
+      const cap = getState().capability;
+      if (!cap.nelsonRules) cap.nelsonRules = {};
+      cap.nelsonRules[e.target.dataset.rule] = e.target.checked;
+      renderCapability();
+      persistState();
+    });
+  });
+  document.getElementById('btn-cap-su-add')?.addEventListener('click', () => {
+    const cap = getState().capability;
+    if (!cap.stackup) return;
+    cap.stackup.components.push({
+      id: Date.now(),
+      name: `Dim ${cap.stackup.components.length + 1}`,
+      sign: 1,
+      dist: 'normal',
+      mean: 0,
+      sigma: 0.5,
+    });
+    renderStackupPanel(cap);
+    persistState();
   });
 }

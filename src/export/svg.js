@@ -11,6 +11,9 @@ const SVG_ELEMENT_MAP = {
   vsm: 'svg-vsm',
   fives: 'svg-fives',
   ishikawa: 'svg-ishikawa',
+  msa: 'svg-msa',
+  comparator: 'svg-comparator',
+  fmea: 'svg-fmea',
 };
 
 function txt(id) {

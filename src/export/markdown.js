@@ -6,6 +6,9 @@ import { computeTaktMetrics } from '../modules/taktMath.js';
 import { aggregateParetoEvents, computeParetoSorted } from '../modules/paretoMath.js';
 import { computeVSMMetrics, identifyVSMBottleneck } from '../modules/vsmMath.js';
 import { compute5SMetrics } from '../modules/fivesMath.js';
+import { computeGageRR } from '../modules/msaMath.js';
+import { computeABComparison } from '../modules/comparatorMath.js';
+import { computeFMEAMetrics } from '../modules/fmeaMath.js';
 import { showToast } from '../ui/toast.js';
 
 export function buildMarkdownReport(state, timestampStr = new Date().toISOString()) {
@@ -117,6 +120,30 @@ export function buildMarkdownReport(state, timestampStr = new Date().toISOString
     lines.push(`  - None flagged yet`);
   } else {
     rootSuspects.forEach((rs) => lines.push(`  - ${rs}`));
+  }
+
+  const msa = computeGageRR(state.msa);
+  if (msa) {
+    lines.push('');
+    lines.push(`## 8. Gage R&R (MSA)`);
+    lines.push('');
+    lines.push(`- **%GRR (Study Var)**: ${msa.pctGRRStudy.toFixed(1)}% (**${msa.verdict}**) | **%Tolerance**: ${msa.pctGRRTol.toFixed(1)}% | **ndc**: ${msa.ndc}`);
+  }
+
+  const cmp = computeABComparison(state.comparator);
+  if (cmp) {
+    lines.push('');
+    lines.push(`## 9. Before / After Kaizen Comparator`);
+    lines.push('');
+    lines.push(`- **Mean Shift (Δμ)**: ${cmp.meanDiff >= 0 ? '+' : ''}${cmp.meanDiff.toFixed(3)} | **Welch p-value**: ${cmp.pValue.toFixed(4)} (${cmp.significant ? 'Significant' : 'Not Significant'}) | **Cohen's d**: ${cmp.cohenD.toFixed(2)}`);
+  }
+
+  const fmea = computeFMEAMetrics(state.fmea);
+  if (fmea.totalCount > 0) {
+    lines.push('');
+    lines.push(`## 10. PFMEA Risk Summary`);
+    lines.push('');
+    lines.push(`- **Max RPN**: ${fmea.maxRPN} | **Critical (≥200)**: ${fmea.criticalCount} | **Open Actions**: ${fmea.openCount}`);
   }
 
   return lines.join('\n');

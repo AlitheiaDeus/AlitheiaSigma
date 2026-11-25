@@ -15,6 +15,53 @@
   --color-rose: #E9C7C5;
 }
 
+/* High-Contrast Shop-Floor Theme Override */
+[data-theme="contrast"] {
+  --bg-canvas: #050814;
+  --bg-card: #0C122B;
+  --bg-panel: #141D42;
+  --border-struct: #3D52B8;
+  --color-icemint: #E8FBF8;
+  --color-rose: #FFF0EE;
+}
+[data-theme="contrast"] body,
+[data-theme="contrast"] html {
+  background-color: #050814;
+  color: #E8FBF8;
+}
+
+/* Floating SVG Hover Crosshair Tooltip */
+.ss-svg-tooltip {
+  position: fixed;
+  z-index: 80;
+  pointer-events: none;
+  background-color: #0A113E;
+  border: 2px solid #D929CF;
+  color: #E9C7C5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  max-width: 280px;
+}
+
+/* Cockpit Status LEDs */
+.led-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.led-ok { background-color: #45E1A5; box-shadow: 0 0 8px rgba(69, 225, 165, 0.7); }
+.led-warn { background-color: #B97232; box-shadow: 0 0 8px rgba(185, 114, 50, 0.7); }
+.led-bad { background-color: #B42754; box-shadow: 0 0 8px rgba(180, 39, 84, 0.85); }
+
+.drag-ns {
+  cursor: ns-resize;
+}
+
 * {
   box-sizing: border-box;
 }

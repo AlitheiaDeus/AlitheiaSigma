@@ -64,8 +64,15 @@
       </div>
     </div>
 
-    <!-- Import & Workspace JSON Controls -->
+    <!-- Import & Power Controls -->
     <div class="flex flex-wrap items-center gap-2">
+      <button type="button" id="btn-open-cmd" class="ind-btn" title="Command Palette (Ctrl+K or /)">
+        Cmd <span class="kbd-chip ml-1">Ctrl+K</span>
+      </button>
+      <button type="button" id="btn-undo" class="ind-btn" title="Undo (Ctrl+Z)" disabled>Undo</button>
+      <button type="button" id="btn-redo" class="ind-btn" title="Redo (Ctrl+Y)" disabled>Redo</button>
+      <button type="button" id="btn-pin-baseline" class="ind-btn" title="Pin current KPIs as Before-Kaizen baseline">Pin Baseline</button>
+      <button type="button" id="btn-toggle-theme" class="ind-btn" title="Toggle High-Contrast Shop-Floor Theme">Theme</button>
       <button type="button" id="btn-open-import" class="ind-btn ind-btn-primary" title="Import Excel / CSV or paste cells (Shortcut: i)">
         Import Data
       </button>
@@ -78,6 +85,18 @@
       <input type="file" id="global-json-file-input" accept=".json,application/json" class="hidden" />
     </div>
   </header>
+
+  <!-- COMMAND PALETTE MODAL (Ctrl+K) -->
+  <div id="cmd-palette-modal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-label="Command Palette">
+    <div class="modal-panel shadow-2xl" style="max-width:640px;">
+      <div class="p-3 border-b-2 border-navy-border bg-navy-panel flex items-center gap-2">
+        <span class="kbd-chip">⌘K</span>
+        <input id="cmd-palette-input" type="text" placeholder="Type a module, scenario, export, or action..." class="ind-input ind-input-text flex-1 text-sm" />
+        <span class="kbd-chip">ESC</span>
+      </div>
+      <div id="cmd-palette-list" class="max-h-80 overflow-y-auto bg-navy-card"></div>
+    </div>
+  </div>
 
   <!-- INLINE NOTIFICATION TOAST BANNER -->
   <div id="toast-bar" class="hidden fixed bottom-4 right-4 z-50 bg-navy-panel border-2 border-emerald-mint text-rose-dusty px-4 py-2.5 rounded-md font-mono text-xs font-semibold shadow-lg flex items-center gap-3">
@@ -106,6 +125,8 @@
               <option value="pareto">Pareto (Defect / Downtime Log)</option>
               <option value="takt">Takt (Workstations)</option>
               <option value="vsm">VSM (Process Steps)</option>
+              <option value="msa">Gage R&amp;R (MSA Readings)</option>
+              <option value="comparator">A/B Compare (Before / After)</option>
             </select>
           </div>
           <button type="button" id="imp-btn-sample" class="ind-btn text-xs">Load Sample CSV</button>
@@ -225,9 +246,21 @@
           <span class="flex items-center gap-2"><span class="kbd-chip">7</span><span>Ishikawa</span></span>
           <span class="tab-dot"></span>
         </button>
+        <button type="button" class="rail-tab" data-tab="msa">
+          <span class="flex items-center gap-2"><span class="kbd-chip">8</span><span>Gage R&amp;R</span></span>
+          <span class="tab-dot"></span>
+        </button>
+        <button type="button" class="rail-tab" data-tab="comparator">
+          <span class="flex items-center gap-2"><span class="kbd-chip">9</span><span>A/B Compare</span></span>
+          <span class="tab-dot"></span>
+        </button>
+        <button type="button" class="rail-tab" data-tab="fmea">
+          <span class="flex items-center gap-2"><span class="kbd-chip">0</span><span>5-Whys &amp; FMEA</span></span>
+          <span class="tab-dot"></span>
+        </button>
         <div class="hidden lg:block border-t border-navy-border my-1"></div>
         <button type="button" class="rail-tab" data-tab="export">
-          <span class="flex items-center gap-2"><span class="kbd-chip">8</span><span>Data &amp; Export</span></span>
+          <span class="flex items-center gap-2"><span class="kbd-chip">e</span><span>Data &amp; Export</span></span>
           <span class="tab-dot"></span>
         </button>
       </div>
@@ -235,6 +268,22 @@
 
     <!-- MAIN WORKSPACE AREA -->
     <main id="main-workspace" class="flex-1 min-w-0 p-4 sm:p-6 space-y-6">
+
+      <!-- PLANT / CELL HEALTH COCKPIT HUD -->
+      <div id="cockpit-strip" class="ind-card p-3 space-y-2.5 no-print">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-dusty">Cell Health Cockpit</span>
+            <span class="text-[11px] font-mono text-teal-slate">Click any KPI tile to jump</span>
+          </div>
+          <button type="button" id="btn-toggle-cockpit" class="ind-btn py-0.5 px-2 text-[11px]">Hide HUD</button>
+        </div>
+        <div id="cockpit-tiles" class="flex flex-wrap items-center gap-2"></div>
+        <div id="cockpit-insight-banner" class="hidden ind-well px-3 py-2 flex items-center gap-2 text-xs">
+          <span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-xs bg-indigo-royal border border-magenta text-rose-dusty shrink-0">INSIGHT</span>
+          <span id="cockpit-insight-text" class="text-icemint font-mono"></span>
+        </div>
+      </div>
 
       <!-- ================================================================= -->
       <!-- MODULE 1: CAPABILITY (Empirical Data + Interactive Simulator)     -->
@@ -439,14 +488,42 @@
           </div>
         </div>
 
-        <!-- Companion I-MR Run Chart (Data Mode) -->
-        <div id="cap-imr-card" class="ind-card p-4 space-y-2.5">
+        <!-- Companion SPC Chart (I-MR, Xbar-R/S, or Attribute p/u) -->
+        <div id="cap-imr-card" class="ind-card p-4 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <span class="font-bold text-rose-dusty uppercase">Individuals (I-MR) Statistical Control Chart</span>
-            <div class="flex items-center gap-4">
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-emerald-mint"></span> In Control</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-crimson"></span> OOC (Rule 1 / 8-pt Run)</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-bold text-rose-dusty uppercase">SPC Control Chart</span>
+              <div class="mode-switch" role="group" aria-label="SPC Chart Type">
+                <button type="button" data-spc="imr" class="mode-pill cap-spc-btn active">I-MR</button>
+                <button type="button" data-spc="xbar_r" class="mode-pill cap-spc-btn">Xbar-R</button>
+                <button type="button" data-spc="xbar_s" class="mode-pill cap-spc-btn">Xbar-S</button>
+                <button type="button" data-spc="p" class="mode-pill cap-spc-btn">p-Chart</button>
+                <button type="button" data-spc="u" class="mode-pill cap-spc-btn">u-Chart</button>
+              </div>
+              <label class="flex items-center gap-1 text-teal-slate">
+                <span>n=</span>
+                <input id="cap-subgroup-size" type="number" min="1" max="10" value="1" class="ind-input w-12 text-right py-0.5 text-xs" />
+              </label>
+              <span id="cap-masked-pill" class="hidden inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-navy-canvas border border-copper text-copper">
+                Masked: <strong id="cap-masked-count">0</strong>
+                <button type="button" id="btn-cap-unmask-all" class="underline cursor-pointer">Restore</button>
+              </span>
             </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-emerald-mint"></span> In Control</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block rounded-full bg-crimson"></span> OOC</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-[11px] font-mono text-teal-slate no-print">
+            <span class="font-bold text-rose-dusty">Nelson Rules:</span>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r1" checked /> R1(&gt;3σ)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r2" checked /> R2(8pt side)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r3" checked /> R3(6pt trend)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r4" checked /> R4(14pt alt)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r5" /> R5(2/3 &gt;2σ)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r6" /> R6(4/5 &gt;1σ)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r7" /> R7(15pt &lt;1σ)</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="cap-nelson-chk accent-emerald-mint" data-rule="r8" /> R8(8pt mix)</label>
           </div>
           <div class="ind-well p-2">
             <svg id="svg-capability-imr" viewBox="0 0 1000 270" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -455,7 +532,7 @@
 
         <!-- Data Mode Inputs & Raw Measurement Editor -->
         <div id="cap-data-controls" class="ind-card p-4 space-y-4 no-print">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div>
               <label for="cap-data-label" class="block text-xs font-bold uppercase text-rose-dusty mb-1">Characteristic</label>
               <input id="cap-data-label" type="text" class="ind-input ind-input-text w-full" />
@@ -469,6 +546,10 @@
               <input id="cap-data-lsl" type="number" step="any" class="ind-input w-full text-right" />
             </div>
             <div>
+              <label for="cap-data-target" class="block text-xs font-bold uppercase text-copper mb-1">Target (T)</label>
+              <input id="cap-data-target" type="number" step="any" class="ind-input w-full text-right" />
+            </div>
+            <div>
               <label for="cap-data-usl" class="block text-xs font-bold uppercase text-rose-dusty mb-1">USL</label>
               <input id="cap-data-usl" type="number" step="any" class="ind-input w-full text-right" />
             </div>
@@ -480,6 +561,29 @@
             </div>
             <textarea id="cap-data-raw" rows="2" class="ind-input w-full text-xs font-mono resize-y"></textarea>
           </div>
+          <!-- Monte Carlo Tolerance Stack-Up -->
+          <details class="ind-well p-3">
+            <summary class="cursor-pointer text-xs font-bold uppercase text-rose-dusty">Monte Carlo Tolerance Stack-Up Simulator (10,000 Trials)</summary>
+            <div class="mt-3 space-y-3">
+              <div id="cap-stackup-result"></div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-navy-border text-[11px] font-mono uppercase text-teal-slate">
+                      <th class="py-1 pr-2">Component</th>
+                      <th class="py-1 px-1">Sign</th>
+                      <th class="py-1 px-1">Dist</th>
+                      <th class="py-1 px-1">Mean</th>
+                      <th class="py-1 px-1">Sigma</th>
+                      <th class="py-1 pl-1 text-right">Del</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cap-stackup-body" class="divide-y divide-navy-border"></tbody>
+                </table>
+              </div>
+              <button type="button" id="btn-cap-su-add" class="ind-btn py-1 px-2.5 text-xs">+ Add Component</button>
+            </div>
+          </details>
         </div>
 
         <!-- Simulator Parameter Controls -->
@@ -1148,7 +1252,257 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- MODULE 8: DATA & EXPORT HUB                                       -->
+      <!-- MODULE 8: GAGE R&R (Measurement System Analysis)                  -->
+      <!-- ================================================================= -->
+      <section id="module-msa" class="module-section hidden space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-rose-dusty">Gage R&amp;R (MSA)</h2>
+            <p class="text-xs text-icemint mt-0.5">Crossed Repeatability &amp; Reproducibility (ANOVA &amp; Range Method) with AIAG thresholds</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-msa"></span>
+              <button type="button" data-raw-mod="msa" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 no-print">
+            <div class="mode-switch" role="group" aria-label="MSA Method">
+              <button type="button" id="msa-method-anova" class="mode-pill active">ANOVA</button>
+              <button type="button" id="msa-method-range" class="mode-pill">Xbar-R</button>
+            </div>
+            <label class="flex items-center gap-1.5 text-xs font-mono text-teal-slate">
+              <span>Tolerance:</span>
+              <input id="msa-in-tol" type="number" step="any" min="0.001" class="ind-input w-20 text-right text-xs" />
+            </label>
+            <button type="button" id="btn-msa-import" class="ind-btn ind-btn-primary">Import MSA</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div class="ind-card p-4 border-magenta">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-rose-dusty">%GRR (Study)</span>
+              <span id="msa-badge-verdict" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs border bg-navy-canvas">Acceptable</span>
+            </div>
+            <div id="msa-val-grr" class="font-mono text-2xl font-bold text-emerald-mint mt-1">0.0%</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">%Tolerance</span>
+            <div id="msa-val-tol" class="font-mono text-2xl font-bold text-icemint mt-1">0.0%</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">ndc (Categories)</span>
+            <div id="msa-val-ndc" class="font-mono text-2xl font-bold text-emerald-mint mt-1">5</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Repeatability (EV)</span>
+            <div id="msa-val-ev" class="font-mono text-2xl font-bold text-teal-slate mt-1">0.000</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Reproducibility (AV)</span>
+            <div id="msa-val-av" class="font-mono text-2xl font-bold text-magenta mt-1">0.000</div>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="font-bold text-rose-dusty uppercase">MSA Variance &amp; Interaction Plots</span>
+            <div class="flex items-center gap-2">
+              <button type="button" data-mod="msa" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="msa" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
+            </div>
+          </div>
+          <div class="ind-well p-2">
+            <svg id="svg-msa" viewBox="0 0 960 360" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3 no-print">
+          <h3 class="text-sm font-bold uppercase text-rose-dusty">Operator × Part × Trial Readings</h3>
+          <div class="overflow-x-auto max-h-72 overflow-y-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-navy-border text-xs font-mono uppercase text-teal-slate">
+                  <th class="py-1.5 pr-2">Operator</th>
+                  <th class="py-1.5 px-2">Part</th>
+                  <th class="py-1.5 px-2 text-right">Trial 1</th>
+                  <th class="py-1.5 px-2 text-right">Trial 2</th>
+                </tr>
+              </thead>
+              <tbody id="msa-table-body" class="divide-y divide-navy-border"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- MODULE 9: A/B KAIZEN COMPARATOR                                   -->
+      <!-- ================================================================= -->
+      <section id="module-comparator" class="module-section hidden space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-rose-dusty">Before / After Kaizen Comparator</h2>
+            <p class="text-xs text-icemint mt-0.5">Welch 2-sample t-test, Brown-Forsythe variance test, Mann-Whitney U &amp; Cohen's d</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-comparator"></span>
+              <button type="button" data-raw-mod="comparator" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 no-print">
+            <button type="button" id="btn-cmp-import" class="ind-btn ind-btn-primary">Import Before/After</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="ind-card p-4 border-magenta">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-rose-dusty">Welch p-Value</span>
+              <span id="cmp-badge-sig" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-xs border bg-navy-canvas">Significant</span>
+            </div>
+            <div id="cmp-val-p" class="font-mono text-2xl font-bold text-emerald-mint mt-1">0.0001</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Mean Shift (Δμ)</span>
+            <div id="cmp-val-diff" class="font-mono text-2xl font-bold text-icemint mt-1">0.000</div>
+            <div id="cmp-sub-ci" class="font-mono text-[11px] text-teal-slate mt-1">95% CI</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Variance p (BF)</span>
+            <div id="cmp-val-varp" class="font-mono text-2xl font-bold text-copper mt-1">0.0500</div>
+            <div id="cmp-sub-sd" class="font-mono text-[11px] text-teal-slate mt-1">SD</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Mann-Whitney p</span>
+            <div id="cmp-val-mw" class="font-mono text-2xl font-bold text-magenta mt-1">0.0001</div>
+            <div id="cmp-sub-d" class="font-mono text-[11px] text-teal-slate mt-1">Cohen's d</div>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="font-bold text-rose-dusty uppercase">Overlaid Distributions &amp; Box-Whisker</span>
+            <div class="flex items-center gap-2">
+              <button type="button" data-mod="comparator" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="comparator" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
+            </div>
+          </div>
+          <div class="ind-well p-2">
+            <svg id="svg-comparator" viewBox="0 0 960 360" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3 no-print">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase text-rose-dusty mb-1">Metric Name</label>
+              <input id="cmp-in-metric" type="text" class="ind-input ind-input-text w-full text-xs" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-crimson mb-1">Before Label</label>
+              <input id="cmp-in-before-lbl" type="text" class="ind-input ind-input-text w-full text-xs" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-emerald-mint mb-1">After Label</label>
+              <input id="cmp-in-after-lbl" type="text" class="ind-input ind-input-text w-full text-xs" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase text-crimson mb-1">Before Samples</label>
+              <textarea id="cmp-in-before-raw" rows="2" class="ind-input w-full text-xs font-mono"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-emerald-mint mb-1">After Samples</label>
+              <textarea id="cmp-in-after-raw" rows="2" class="ind-input w-full text-xs font-mono"></textarea>
+            </div>
+          </div>
+          <button type="button" id="btn-cmp-apply" class="ind-btn ind-btn-ok">Run Hypothesis Test</button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- MODULE 10: 5-WHYS & PFMEA ACTION HUB                              -->
+      <!-- ================================================================= -->
+      <section id="module-fmea" class="module-section hidden space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-rose-dusty">5-Whys &amp; PFMEA Action Hub</h2>
+            <p class="text-xs text-icemint mt-0.5">Drill down Ishikawa causes with 5-Whys chains and prioritize S × O × D = RPN actions</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+              <span id="src-badge-fmea"></span>
+              <button type="button" data-raw-mod="fmea" class="ind-btn py-0.5 px-2 text-[11px] btn-view-raw no-print">Raw Data</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="ind-card p-4 border-magenta">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Max RPN</span>
+            <div id="fmea-val-max" class="font-mono text-2xl font-bold text-crimson mt-1">240</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Critical (≥200)</span>
+            <div id="fmea-val-crit" class="font-mono text-2xl font-bold text-crimson mt-1">1</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">Open Actions</span>
+            <div id="fmea-val-open" class="font-mono text-2xl font-bold text-copper mt-1">2</div>
+          </div>
+          <div class="ind-card p-4">
+            <span class="text-xs font-bold uppercase text-rose-dusty">5-Whys Chains</span>
+            <div id="fmea-val-chains" class="font-mono text-2xl font-bold text-emerald-mint mt-1">1</div>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="font-bold text-rose-dusty uppercase">PFMEA Risk Priority Ranking (RPN)</span>
+            <div class="flex items-center gap-2">
+              <button type="button" data-mod="fmea" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-png no-print">PNG</button>
+              <button type="button" data-mod="fmea" class="ind-btn py-0.5 px-2 text-[11px] quick-chart-svg no-print">SVG</button>
+            </div>
+          </div>
+          <div class="ind-well p-2">
+            <svg id="svg-fmea" viewBox="0 0 960 300" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3 no-print">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase text-rose-dusty">5-Whys Root-Cause Chains</h3>
+            <button type="button" id="btn-fmea-add-chain" class="ind-btn ind-btn-primary text-xs">+ New 5-Whys Chain</button>
+          </div>
+          <div id="fmea-chains-list" class="space-y-3"></div>
+        </div>
+
+        <div class="ind-card p-4 space-y-3 no-print">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold uppercase text-rose-dusty">PFMEA Matrix</h3>
+            <button type="button" id="btn-fmea-add-row" class="ind-btn ind-btn-primary text-xs">+ Add Failure Mode</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-navy-border text-xs font-mono uppercase text-teal-slate">
+                  <th class="py-1.5 pr-1">Failure Mode</th>
+                  <th class="py-1.5 px-1">Cause</th>
+                  <th class="py-1.5 px-1 text-right">S</th>
+                  <th class="py-1.5 px-1 text-right">O</th>
+                  <th class="py-1.5 px-1 text-right">D</th>
+                  <th class="py-1.5 px-1">RPN</th>
+                  <th class="py-1.5 px-1">Action</th>
+                  <th class="py-1.5 px-1">Owner</th>
+                  <th class="py-1.5 px-1">Status</th>
+                  <th class="py-1.5 pl-1 text-right">Del</th>
+                </tr>
+              </thead>
+              <tbody id="fmea-table-body" class="divide-y divide-navy-border"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- MODULE 11: DATA & EXPORT HUB                                      -->
       <!-- ================================================================= -->
       <section id="module-export" class="module-section hidden space-y-5">
         <div>
@@ -1214,6 +1568,16 @@
               <button type="button" id="exp-btn-json-export" class="ind-btn ind-btn-primary">Download JSON</button>
               <button type="button" id="exp-btn-json-import" class="ind-btn">Import JSON</button>
               <button type="button" id="exp-btn-reset" class="ind-btn ind-btn-danger">Reset Defaults</button>
+            </div>
+            <div class="pt-3 border-t border-navy-border space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase text-teal-slate">Saved Studies (Multi-Workspace)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <input id="ws-save-name" type="text" placeholder="Study name (e.g. Line 3 Spindle)" class="ind-input ind-input-text flex-1 text-xs" />
+                <button type="button" id="btn-ws-save" class="ind-btn ind-btn-ok text-xs">Save Study</button>
+              </div>
+              <div id="ws-saved-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
             </div>
             <div id="exp-reset-confirm" class="hidden p-3 rounded-md bg-navy-canvas border-2 border-crimson flex flex-wrap items-center justify-between gap-2">
               <span class="text-xs font-mono text-rose-dusty">Confirm factory reset of all modules?</span>

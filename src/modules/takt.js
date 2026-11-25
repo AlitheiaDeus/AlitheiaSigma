@@ -1,9 +1,13 @@
 import { PALETTE } from '../constants.js';
-import { getState, nextId, persistState } from '../state.js';
+import { getState, nextId, persistState, recordUndoSnapshot } from '../state.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
+import { bindSvgHoverTargets } from '../ui/svgTooltip.js';
 import { computeTaktMetrics } from './taktMath.js';
 import { seedIshikawaFromCrossLink } from './ishikawa.js';
+
+let taktDomain = { top: 50, bottom: 328, plotH: 278, maxVal: 100 };
+let taktDragging = false;
 
 export function renderTaktChartOnly() {
   const state = getState();
@@ -32,6 +36,7 @@ export function renderTaktChartOnly() {
 
   const maxVal = Math.max(m.takt * 1.22, m.bottleneck.total * 1.18, 20);
   const yAt = (v) => bottom - (v / maxVal) * plotH;
+  taktDomain = { top, bottom, plotH, maxVal };
 
   let html = `<rect x="0" y="0" width="960" height="390" fill="${PALETTE.canvas}" />`;
 
@@ -62,13 +67,13 @@ export function renderTaktChartOnly() {
       const yWasteTop = yAt(tot);
 
       if (va > 0) {
-        html += `<rect x="${bx.toFixed(1)}" y="${yVaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(bottom - yVaTop).toFixed(1)}" fill="${PALETTE.emerald}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
+        html += `<rect class="takt-seg" data-station="${escapeHtml(st.name)}" data-part="VA" data-val="${va}" data-tot="${tot}" x="${bx.toFixed(1)}" y="${yVaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(bottom - yVaTop).toFixed(1)}" fill="${PALETTE.emerald}" stroke="${PALETTE.canvas}" stroke-width="1.5" style="cursor:pointer;" />`;
       }
       if (bnva > 0) {
-        html += `<rect x="${bx.toFixed(1)}" y="${yBnvaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yVaTop - yBnvaTop).toFixed(1)}" fill="${PALETTE.teal}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
+        html += `<rect class="takt-seg" data-station="${escapeHtml(st.name)}" data-part="BNVA" data-val="${bnva}" data-tot="${tot}" x="${bx.toFixed(1)}" y="${yBnvaTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yVaTop - yBnvaTop).toFixed(1)}" fill="${PALETTE.teal}" stroke="${PALETTE.canvas}" stroke-width="1.5" style="cursor:pointer;" />`;
       }
       if (waste > 0) {
-        html += `<rect x="${bx.toFixed(1)}" y="${yWasteTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yBnvaTop - yWasteTop).toFixed(1)}" fill="${PALETTE.crimson}" stroke="${PALETTE.canvas}" stroke-width="1.5" />`;
+        html += `<rect class="takt-seg" data-station="${escapeHtml(st.name)}" data-part="Waste" data-val="${waste}" data-tot="${tot}" x="${bx.toFixed(1)}" y="${yWasteTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${(yBnvaTop - yWasteTop).toFixed(1)}" fill="${PALETTE.crimson}" stroke="${PALETTE.canvas}" stroke-width="1.5" style="cursor:pointer;" />`;
       }
 
       if (over) {
@@ -84,11 +89,18 @@ export function renderTaktChartOnly() {
   }
 
   const yTakt = yAt(m.takt);
+  html += `<g id="takt-drag-line" class="drag-ns" style="cursor:ns-resize;">`;
   html += `<line x1="${left}" y1="${yTakt.toFixed(1)}" x2="${right}" y2="${yTakt.toFixed(1)}" stroke="${PALETTE.magenta}" stroke-width="2.8" stroke-dasharray="8 5" />`;
-  html += `<rect x="${(right - 122).toFixed(1)}" y="${(yTakt - 25).toFixed(1)}" width="122" height="21" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.magenta}" stroke-width="1.5" />`;
-  html += `<text x="${(right - 61).toFixed(1)}" y="${(yTakt - 11).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">TAKT ${m.takt.toFixed(1)}s</text>`;
+  html += `<line x1="${left}" y1="${yTakt.toFixed(1)}" x2="${right}" y2="${yTakt.toFixed(1)}" stroke="transparent" stroke-width="18" />`;
+  html += `<rect x="${(right - 134).toFixed(1)}" y="${(yTakt - 25).toFixed(1)}" width="134" height="21" rx="4" fill="${PALETTE.panel}" stroke="${PALETTE.magenta}" stroke-width="1.5" />`;
+  html += `<text x="${(right - 67).toFixed(1)}" y="${(yTakt - 11).toFixed(1)}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">TAKT ${m.takt.toFixed(1)}s ↕</text>`;
+  html += `<title>Drag vertically to adjust Takt Time (updates Demand)</title></g>`;
 
   svg.innerHTML = html;
+
+  bindSvgHoverTargets(svg, '.takt-seg', (el) => {
+    return `<strong>${escapeHtml(el.dataset.station)}</strong> · ${el.dataset.part}: <strong>${el.dataset.val}s</strong> (Total ${el.dataset.tot}s)`;
+  });
 }
 
 export function renderTaktTable() {
@@ -179,6 +191,38 @@ export function bindTaktEvents({ onOpenImport }) {
   });
   document.getElementById('btn-takt-import')?.addEventListener('click', () => {
     if (onOpenImport) onOpenImport('takt');
+  });
+
+  const svg = document.getElementById('svg-takt');
+  const toSvgY = (cy) => {
+    if (!svg) return 0;
+    const pt = svg.createSVGPoint();
+    pt.x = 0;
+    pt.y = cy;
+    const ctm = svg.getScreenCTM();
+    return ctm ? pt.matrixTransform(ctm.inverse()).y : 0;
+  };
+  svg?.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#takt-drag-line')) {
+      e.preventDefault();
+      taktDragging = true;
+    }
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!taktDragging) return;
+    const y = toSvgY(e.clientY);
+    const { bottom, plotH, maxVal } = taktDomain;
+    const newTakt = Math.max(5, Math.min(maxVal * 0.95, ((bottom - y) / plotH) * maxVal));
+    const st = getState().takt;
+    st.demand = Math.max(1, Math.round((Number(st.available) || 27000) / newTakt));
+    renderTakt();
+    persistState();
+  });
+  window.addEventListener('mouseup', () => {
+    if (taktDragging) {
+      taktDragging = false;
+      recordUndoSnapshot('Adjust Takt Line');
+    }
   });
   document.getElementById('btn-takt-to-ishikawa')?.addEventListener('click', () => {
     const m = computeTaktMetrics(getState().takt);

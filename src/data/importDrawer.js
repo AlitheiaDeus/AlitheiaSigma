@@ -362,6 +362,41 @@ export function bindImportDrawer({ renderAll }) {
       state.takt.stations = res.data;
     } else if (target === 'vsm') {
       state.vsm.steps = res.data.slice(0, 7);
+    } else if (target === 'msa') {
+      const ops = Array.from(new Set(res.data.map((r) => r.operator)));
+      const parts = Array.from(new Set(res.data.map((r) => r.part)));
+      if (ops.length < 2 || parts.length < 2) {
+        showToast('MSA requires at least 2 operators and 2 parts', true);
+        return;
+      }
+      const grouped = new Map();
+      res.data.forEach((r) => {
+        const k = `${r.operator}__${r.part}`;
+        if (!grouped.has(k)) grouped.set(k, []);
+        grouped.get(k).push(r.value);
+      });
+      const trials = Math.max(2, ...Array.from(grouped.values()).map((v) => v.length));
+      const readings = [];
+      ops.forEach((op) => {
+        parts.forEach((pt) => {
+          const arr = grouped.get(`${op}__${pt}`) || [];
+          while (arr.length < trials) arr.push(arr[0] ?? 0);
+          readings.push(arr.slice(0, trials));
+        });
+      });
+      state.msa.operators = ops;
+      state.msa.parts = parts;
+      state.msa.trials = trials;
+      state.msa.readings = readings;
+    } else if (target === 'comparator') {
+      const b = res.data.map((r) => r.before).filter(Number.isFinite);
+      const a = res.data.map((r) => r.after).filter(Number.isFinite);
+      if (b.length < 2 || a.length < 2) {
+        showToast('A/B Compare requires at least 2 values in Before and After', true);
+        return;
+      }
+      state.comparator.beforeSamples = b;
+      state.comparator.afterSamples = a;
     }
 
     const srcKind = rawWorkbook.sourceName === 'Clipboard Paste' ? 'paste' : 'file';

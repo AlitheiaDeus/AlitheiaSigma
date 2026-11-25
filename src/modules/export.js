@@ -1,5 +1,14 @@
 import { SAMPLE_SCENARIOS } from '../constants.js';
-import { getState, loadScenario, resetState } from '../state.js';
+import {
+  deleteWorkspaceById,
+  getState,
+  listWorkspaces,
+  loadScenario,
+  loadWorkspaceById,
+  resetState,
+  saveWorkspaceAs,
+} from '../state.js';
+import { escapeHtml } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { closeRawDataModal, openRawDataModal, renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { downloadSVG } from '../export/svg.js';
@@ -117,4 +126,52 @@ export function bindExportAndHeaderEvents({ renderAll, onOpenImport }) {
     confirmBox?.classList.add('hidden');
     showToast('Factory Defaults Restored');
   });
+
+  // Multi-Study Saved Workspaces
+  const renderSavedWorkspaces = () => {
+    const listEl = document.getElementById('ws-saved-list');
+    if (!listEl) return;
+    const list = listWorkspaces();
+    if (list.length === 0) {
+      listEl.innerHTML = '<div class="text-[11px] font-mono text-teal-slate">No saved studies yet</div>';
+      return;
+    }
+    listEl.innerHTML = list
+      .map(
+        (w) => `
+        <div class="flex items-center justify-between gap-2 p-1.5 rounded-xs bg-navy-canvas border border-navy-border text-xs">
+          <span class="font-semibold text-icemint truncate">${escapeHtml(w.name)}</span>
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" data-ws-load="${w.id}" class="ind-btn py-0.5 px-2 text-[10px]">Load</button>
+            <button type="button" data-ws-del="${w.id}" class="ind-btn ind-btn-danger py-0.5 px-2 text-[10px]">X</button>
+          </div>
+        </div>`
+      )
+      .join('');
+    listEl.querySelectorAll('[data-ws-load]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const loaded = loadWorkspaceById(btn.dataset.wsLoad);
+        if (loaded) {
+          renderAll?.();
+          syncScenarioSelect();
+          showToast(`Loaded study: ${loaded.name}`);
+        }
+      });
+    });
+    listEl.querySelectorAll('[data-ws-del]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        deleteWorkspaceById(btn.dataset.wsDel);
+        renderSavedWorkspaces();
+      });
+    });
+  };
+
+  document.getElementById('btn-ws-save')?.addEventListener('click', () => {
+    const inp = document.getElementById('ws-save-name');
+    const saved = saveWorkspaceAs(inp?.value || getState().scenarioName);
+    if (inp) inp.value = '';
+    renderSavedWorkspaces();
+    showToast(`Saved study: ${saved.name}`);
+  });
+  renderSavedWorkspaces();
 }

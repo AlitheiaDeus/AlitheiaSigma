@@ -1,4 +1,5 @@
 export const STORAGE_KEY = 'lean_suite_workspace_v1';
+export const WORKSPACES_STORAGE_KEY = 'sigmashack_workspaces_v1';
 export const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /* Palette Reference Tokens */
@@ -26,6 +27,9 @@ export const TAB_NAMES = {
   vsm: 'VSM',
   fives: '5S',
   ishikawa: 'Ishikawa',
+  msa: 'Gage R&R',
+  comparator: 'A/B Compare',
+  fmea: '5-Whys & FMEA',
   export: 'Data & Export',
 };
 
@@ -37,6 +41,9 @@ export const TAB_ORDER = [
   'vsm',
   'fives',
   'ishikawa',
+  'msa',
+  'comparator',
+  'fmea',
   'export',
 ];
 
@@ -226,6 +233,50 @@ export const SAMPLE_SCENARIOS = {
           { id: 13, text: 'Floor vibration from press', root: false },
         ],
       },
+    },
+    msa: {
+      tolerance: 40.0,
+      method: 'anova',
+      operators: ['Op A', 'Op B', 'Op C'],
+      parts: ['P1', 'P2', 'P3', 'P4', 'P5'],
+      trials: 2,
+      readings: [
+        [49.8, 50.1], [52.4, 52.6], [47.2, 47.5], [55.1, 54.9], [44.6, 44.8],
+        [50.2, 49.9], [52.8, 52.3], [47.6, 47.4], [55.4, 55.0], [45.0, 44.7],
+        [49.6, 50.0], [52.2, 52.5], [47.1, 47.3], [54.8, 55.2], [44.5, 44.9],
+      ],
+    },
+    comparator: {
+      metricName: 'Bore Diameter',
+      unit: 'mm',
+      alpha: 0.05,
+      lsl: 30.0,
+      usl: 70.0,
+      beforeLabel: 'Before Warm-Up SOP',
+      afterLabel: 'After Warm-Up SOP',
+      beforeSamples: [53.2, 54.1, 53.6, 55.2, 54.4, 56.1, 55.8, 57.3, 54.7, 52.9, 55.0, 54.2],
+      afterSamples: [50.1, 49.8, 50.4, 49.7, 50.2, 49.9, 50.5, 49.6, 50.0, 50.3, 49.8, 50.1],
+    },
+    fmea: {
+      chains: [
+        {
+          id: 1,
+          rib: 'Machine',
+          cause: 'Spindle thermal drift',
+          whys: [
+            'Bore diameter drifts +0.04mm in first 45 mins',
+            'Spindle housing expands as bearing temp rises',
+            'Cell starts cutting immediately from cold state',
+            'No automated spindle warm-up routine in CNC header',
+            'Standard work omits thermal stabilization step',
+          ],
+        },
+      ],
+      rows: [
+        { id: 1, cause: 'Spindle thermal drift', mode: 'Oversize bore in first hour', effect: 'Bearing press-fit loose', sev: 8, occ: 6, det: 5, action: 'Add 8-min G-code spindle warm-up cycle', owner: 'R. Lim', due: '2026-12-05', status: 'In Progress' },
+        { id: 2, cause: 'Night shift setup variance', mode: 'Zero-offset mis-entered', effect: 'Step-change scrap batch', sev: 9, occ: 4, det: 6, action: 'Enforce first-piece CMM probe interlock', owner: 'M. Tan', due: '2026-12-10', status: 'Open' },
+        { id: 3, cause: 'Worn boring bar insert', mode: 'Surface chatter & taper', effect: 'Ra roughness fail', sev: 6, occ: 5, det: 4, action: 'Set tool-life counter alarm at 180 parts', owner: 'K. Patel', due: '2026-12-01', status: 'Closed' },
+      ],
     },
   },
   smt: {

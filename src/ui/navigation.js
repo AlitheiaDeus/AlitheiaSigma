@@ -1,7 +1,11 @@
 import { TAB_NAMES, TAB_ORDER } from '../constants.js';
-import { getState, persistState } from '../state.js';
+import { getState, persistState, redoState, undoState } from '../state.js';
+import { closeCommandPalette, isCommandPaletteOpen, openCommandPalette } from './commandPalette.js';
+import { hideSvgTooltip } from './svgTooltip.js';
+import { showToast } from './toast.js';
 
 export function switchTab(tabKey, { updateHash = true } = {}) {
+  hideSvgTooltip();
   const state = getState();
   const safeKey = TAB_NAMES[tabKey] ? tabKey : 'capability';
   state.activeTab = safeKey;
@@ -40,7 +44,8 @@ export function resolveInitialTab() {
   return getState().activeTab || 'capability';
 }
 
-export function bindNavigationEvents({ onOpenImport, onCloseImport, isImportOpen }) {
+export function bindNavigationEvents(ctx) {
+  const { onOpenImport, onCloseImport, isImportOpen, renderAll } = ctx;
   document.querySelectorAll('.rail-tab').forEach((btn) => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
@@ -53,24 +58,77 @@ export function bindNavigationEvents({ onOpenImport, onCloseImport, isImportOpen
   });
 
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isImportOpen && isImportOpen()) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      if (onCloseImport) onCloseImport();
+      if (isCommandPaletteOpen()) closeCommandPalette();
+      else openCommandPalette(ctx);
       return;
+    }
+
+    if (e.key === 'Escape') {
+      if (isCommandPaletteOpen()) {
+        e.preventDefault();
+        closeCommandPalette();
+        return;
+      }
+      if (isImportOpen && isImportOpen()) {
+        e.preventDefault();
+        if (onCloseImport) onCloseImport();
+        return;
+      }
     }
 
     const tgt = e.target;
     const isEditing =
       tgt &&
       (['INPUT', 'TEXTAREA', 'SELECT'].includes(tgt.tagName) || tgt.isContentEditable);
+
+    if ((e.ctrlKey || e.metaKey) && !isEditing) {
+      const k = e.key.toLowerCase();
+      if (k === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        const lbl = undoState();
+        if (lbl) {
+          renderAll?.();
+          showToast(`Undid: ${lbl}`);
+        }
+        return;
+      }
+      if (k === 'y' || (k === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        const lbl = redoState();
+        if (lbl) {
+          renderAll?.();
+          showToast(`Redid: ${lbl}`);
+        }
+        return;
+      }
+    }
+
     if (isEditing || e.ctrlKey || e.metaKey || e.altKey) return;
 
-    if (e.key >= '1' && e.key <= '8') {
+    if (e.key === '/') {
+      e.preventDefault();
+      openCommandPalette(ctx);
+      return;
+    }
+
+    if (e.key >= '1' && e.key <= '9') {
       const idx = parseInt(e.key, 10) - 1;
       if (TAB_ORDER[idx]) {
         e.preventDefault();
         switchTab(TAB_ORDER[idx]);
       }
+      return;
+    }
+    if (e.key === '0' && TAB_ORDER[9]) {
+      e.preventDefault();
+      switchTab(TAB_ORDER[9]);
+      return;
+    }
+    if (e.key === 'e' || e.key === 'E') {
+      e.preventDefault();
+      switchTab('export');
       return;
     }
 

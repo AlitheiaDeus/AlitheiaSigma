@@ -2,6 +2,7 @@ import { PALETTE } from '../constants.js';
 import { getState, nextId, persistState } from '../state.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
+import { bindSvgHoverTargets } from '../ui/svgTooltip.js';
 import { computeShiftLogOEE, computeSingleOEE } from './oeeMath.js';
 
 function renderWaterfallSVG(m) {
@@ -110,7 +111,7 @@ function renderTrendSVG(series) {
     series.forEach((s, i) => {
       const cx = xAt(i);
       const cy = yAt(s.oee);
-      html += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4.5" fill="${PALETTE.canvas}" stroke="${PALETTE.emerald}" stroke-width="2.2" />`;
+      html += `<circle class="oee-trend-pt" data-idx="${i}" data-label="${escapeHtml(s.label)}" data-oee="${(s.oee * 100).toFixed(1)}" data-avail="${(s.avail * 100).toFixed(1)}" data-perf="${(s.perf * 100).toFixed(1)}" data-qual="${(s.qual * 100).toFixed(1)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5.5" fill="${PALETTE.canvas}" stroke="${PALETTE.emerald}" stroke-width="2.2" style="cursor:pointer;" />`;
       html += `<text x="${cx.toFixed(1)}" y="${(cy - 9).toFixed(1)}" text-anchor="middle" fill="${PALETTE.emerald}" font-family="ui-monospace, monospace" font-size="10" font-weight="700">${(s.oee * 100).toFixed(0)}%</text>`;
       if (series.length <= 12 || i % Math.ceil(series.length / 10) === 0) {
         html += `<text x="${cx.toFixed(1)}" y="${bottom + 18}" text-anchor="middle" fill="${PALETTE.rose}" font-family="ui-monospace, monospace" font-size="10">${escapeHtml(truncateText(s.label, 12))}</text>`;
@@ -119,6 +120,10 @@ function renderTrendSVG(series) {
   }
 
   svg.innerHTML = html;
+
+  bindSvgHoverTargets(svg, '.oee-trend-pt', (el) => {
+    return `<strong>${escapeHtml(el.dataset.label)}</strong> · OEE <strong>${el.dataset.oee}%</strong><br/>A: ${el.dataset.avail}% · P: ${el.dataset.perf}% · Q: ${el.dataset.qual}%`;
+  });
 }
 
 function renderOEELogTable(oeeState, lines) {

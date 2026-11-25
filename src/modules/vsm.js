@@ -4,6 +4,7 @@ import { renderAllSourceBadges } from '../ui/sourceBadge.js';
 import { escapeHtml, truncateText } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { switchTab } from '../ui/navigation.js';
+import { bindSvgHoverTargets } from '../ui/svgTooltip.js';
 import { computeVSMMetrics, identifyVSMBottleneck } from './vsmMath.js';
 import { renderTakt } from './takt.js';
 import { seedIshikawaFromCrossLink } from './ishikawa.js';
@@ -69,6 +70,7 @@ export function renderVSMChartOnly() {
 
       html += `<line x1="${boxCx.toFixed(1)}" y1="56" x2="${boxCx.toFixed(1)}" y2="${boxY}" stroke="${PALETTE.border}" stroke-width="1.4" stroke-dasharray="4 3" />`;
 
+      html += `<g class="vsm-step-box" data-name="${escapeHtml(st.name)}" data-cycle="${st.cycle}" data-co="${st.changeover}" data-up="${st.uptime}" data-queue="${st.queue}" style="cursor:pointer;">`;
       html += `<rect x="${bx.toFixed(1)}" y="${boxY}" width="${boxW.toFixed(1)}" height="${boxH}" rx="4" fill="${PALETTE.card}" stroke="${PALETTE.teal}" stroke-width="2" />`;
       html += `<rect x="${bx.toFixed(1)}" y="${boxY}" width="${boxW.toFixed(1)}" height="32" rx="3" fill="${PALETTE.indigo}" />`;
       html += `<text x="${boxCx.toFixed(1)}" y="${boxY + 21}" text-anchor="middle" fill="${PALETTE.rose}" font-family="Inter, system-ui, sans-serif" font-size="11.5" font-weight="700">${escapeHtml(truncateText(st.name, 13))}</text>`;
@@ -85,6 +87,7 @@ export function renderVSMChartOnly() {
         html += `<text x="${(bx + 10).toFixed(1)}" y="${ry}" fill="${PALETTE.teal}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5">${k}</text>`;
         html += `<text x="${(bx + boxW - 10).toFixed(1)}" y="${ry}" text-anchor="end" fill="${col}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">${v}</text>`;
       });
+      html += `</g>`;
 
       const waitStartX = segX;
       const waitEndX = bx;
@@ -116,6 +119,11 @@ export function renderVSMChartOnly() {
   html += `<text x="872" y="362" fill="${PALETTE.magenta}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11" font-weight="700">PCE: ${m.pce.toFixed(2)}%</text>`;
 
   svg.innerHTML = html;
+
+  bindSvgHoverTargets(svg, '.vsm-step-box', (el) => {
+    const qShare = m.totalLeadHrs > 0 ? ((Number(el.dataset.queue) / m.totalLeadHrs) * 100).toFixed(1) : '0.0';
+    return `<strong>${escapeHtml(el.dataset.name)}</strong><br/>Cycle: ${el.dataset.cycle}s · C/O: ${el.dataset.co}m · Uptime: ${el.dataset.up}%<br/>Queue: ${el.dataset.queue}h (${qShare}% of Lead Time)`;
+  });
 }
 
 export function renderVSMTable() {

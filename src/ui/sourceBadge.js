@@ -2,7 +2,7 @@ import { TAB_NAMES } from '../constants.js';
 import { getState } from '../state.js';
 import { escapeHtml } from '../utils.js';
 
-const MODULE_KEYS = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa'];
+const MODULE_KEYS = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa', 'msa', 'comparator', 'fmea'];
 
 function badgeClasses(kind) {
   if (kind === 'file' || kind === 'paste') {
@@ -38,7 +38,7 @@ export function renderAllSourceBadges() {
           <td class="py-2 pl-2 text-right whitespace-nowrap space-x-1.5">
             <button type="button" data-raw-mod="${key}" class="ind-btn py-1 px-2 text-[11px] btn-view-raw">View Raw</button>
             ${
-              ['capability', 'oee', 'takt', 'pareto', 'vsm'].includes(key)
+              ['capability', 'oee', 'takt', 'pareto', 'vsm', 'msa', 'comparator'].includes(key)
                 ? `<button type="button" data-imp-mod="${key}" class="ind-btn ind-btn-primary py-1 px-2 text-[11px] btn-hub-import">Import</button>`
                 : ''
             }
@@ -157,6 +157,41 @@ export function getRawTableForModule(key) {
       title: `Ishikawa Causes — ${state.ishikawa.problem}`,
       headers: ['6M Rib', 'Cause', 'Flag'],
       rows,
+    };
+  }
+  if (key === 'msa') {
+    const rows = [];
+    const ops = state.msa?.operators || [];
+    const parts = state.msa?.parts || [];
+    const readings = state.msa?.readings || [];
+    ops.forEach((op, i) => {
+      parts.forEach((pt, j) => {
+        const vals = readings[i * parts.length + j] || [];
+        rows.push([op, pt, ...vals]);
+      });
+    });
+    return {
+      title: 'Gage R&R (MSA) Readings',
+      headers: ['Operator', 'Part', 'Trial 1', 'Trial 2', 'Trial 3'].slice(0, 2 + (state.msa?.trials || 2)),
+      rows,
+    };
+  }
+  if (key === 'comparator') {
+    const b = state.comparator?.beforeSamples || [];
+    const a = state.comparator?.afterSamples || [];
+    const maxLen = Math.max(b.length, a.length);
+    const rows = Array.from({ length: maxLen }, (_, idx) => [idx + 1, b[idx] ?? '', a[idx] ?? '']);
+    return {
+      title: `A/B Comparator — ${state.comparator?.metricName || ''}`,
+      headers: ['#', state.comparator?.beforeLabel || 'Before', state.comparator?.afterLabel || 'After'],
+      rows,
+    };
+  }
+  if (key === 'fmea') {
+    return {
+      title: 'PFMEA Risk Matrix',
+      headers: ['Failure Mode', 'Cause', 'S', 'O', 'D', 'RPN', 'Owner', 'Status'],
+      rows: (state.fmea?.rows || []).map((r) => [r.mode, r.cause, r.sev, r.occ, r.det, r.sev * r.occ * r.det, r.owner, r.status]),
     };
   }
   return { title: 'Raw Data', headers: [], rows: [] };

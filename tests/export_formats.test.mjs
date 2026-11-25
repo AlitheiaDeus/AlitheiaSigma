@@ -21,9 +21,9 @@ test('buildMarkdownReport generates all 7 sections for Data Mode and Simulator M
   assert.match(mdSim, /OEE \(Single Shift\)/);
 });
 
-test('buildModuleCSV and buildModuleTSV emit valid tabular outputs for all 7 modules', () => {
+test('buildModuleCSV and buildModuleTSV emit valid tabular outputs for all 10 modules', () => {
   const state = createDefaultState('cnc');
-  const keys = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa'];
+  const keys = ['capability', 'oee', 'takt', 'pareto', 'vsm', 'fives', 'ishikawa', 'msa', 'comparator', 'fmea'];
   for (const key of keys) {
     const csv = buildModuleCSV(state, key);
     const tsv = buildModuleTSV(state, key);
